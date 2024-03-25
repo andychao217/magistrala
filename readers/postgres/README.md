@@ -24,7 +24,7 @@ default values.
 | MG_POSTGRES_SSL_CERT                | Postgres SSL certificate path                 | ""                             |
 | MG_POSTGRES_SSL_KEY                 | Postgres SSL key                              | ""                             |
 | MG_POSTGRES_SSL_ROOT_CERT           | Postgres SSL root certificate path            | ""                             |
-| MG_THINGS_AUTH_GRPC_URL             | Things service Auth gRPC URL                  | localhost:7000                 |
+| MG_THINGS_AUTH_GRPC_URL             | Things service Auth gRPC URL                  | localhost:7016                 |
 | MG_THINGS_AUTH_GRPC_TIMEOUT         | Things service Auth gRPC timeout in seconds   | 1s                             |
 | MG_THINGS_AUTH_GRPC_CLIENT_TLS      | Things service Auth gRPC TLS mode flag        | false                          |
 | MG_THINGS_AUTH_GRPC_CA_CERTS        | Things service Auth gRPC CA certificates      | ""                             |

@@ -28,7 +28,7 @@ default values.
 | MG_INFLUXDB_USER_AGENT           | InfluxDB user agent                                 | ""                             |
 | MG_INFLUXDB_TIMEOUT              | InfluxDB client connection readiness timeout        | 1s                             |
 | MG_INFLUXDB_INSECURE_SKIP_VERIFY | InfluxDB insecure skip verify                       | false                          |
-| MG_THINGS_AUTH_GRPC_URL          | Things service Auth gRPC URL                        | localhost:7000                 |
+| MG_THINGS_AUTH_GRPC_URL          | Things service Auth gRPC URL                        | localhost:7016                 |
 | MG_THINGS_AUTH_GRPC_TIMEOUT      | Things service Auth gRPC request timeout in seconds | 1s                             |
 | MG_THINGS_AUTH_GRPC_CLIENT_TLS   | Flag that indicates if TLS should be turned on      | false                          |
 | MG_THINGS_AUTH_GRPC_CA_CERTS     | Path to trusted CAs in PEM format                   | ""                             |

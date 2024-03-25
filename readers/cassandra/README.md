@@ -20,7 +20,7 @@ default values.
 | MG_CASSANDRA_PASS                    | Cassandra DB password                               | magistrala                     |
 | MG_CASSANDRA_KEYSPACE                | Cassandra keyspace name                             | messages                       |
 | MG_CASSANDRA_PORT                    | Cassandra DB port                                   | 9042                           |
-| MG_THINGS_AUTH_GRPC_URL              | Things service Auth gRPC URL                        | localhost:7000                 |
+| MG_THINGS_AUTH_GRPC_URL              | Things service Auth gRPC URL                        | localhost:7016                 |
 | MG_THINGS_AUTH_GRPC_TIMEOUT          | Things service Auth gRPC request timeout in seconds | 1                              |
 | MG_THINGS_AUTH_GRPC_CLIENT_TLS       | Things service Auth gRPC TLS enabled                | false                          |
 | MG_THINGS_AUTH_GRPC_CA_CERTS         | Things service Auth gRPC CA certificates            | ""                             |

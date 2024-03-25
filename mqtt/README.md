@@ -20,7 +20,7 @@ The service is configured using the environment variables presented in the follo
 | MG_MQTT_ADAPTER_WS_TARGET_PORT           | MQTT broker port for MQTT over WS                                                  | 8080                                |
 | MG_MQTT_ADAPTER_WS_TARGET_PATH           | MQTT broker MQTT over WS path                                                      | /mqtt                               |
 | MG_MQTT_ADAPTER_INSTANCE                 | Instance name for MQTT adapter                                                     | ""                                  |
-| MG_THINGS_AUTH_GRPC_URL                  | Things service Auth gRPC URL                                                       | <localhost:7000>                    |
+| MG_THINGS_AUTH_GRPC_URL                  | Things service Auth gRPC URL                                                       | <localhost:7016>                    |
 | MG_THINGS_AUTH_GRPC_TIMEOUT              | Things service Auth gRPC request timeout in seconds                                | 1s                                  |
 | MG_THINGS_AUTH_GRPC_CLIENT_CERT          | Path to the PEM encoded things service Auth gRPC client certificate file           | ""                                  |
 | MG_THINGS_AUTH_GRPC_CLIENT_KEY           | Path to the PEM encoded things service Auth gRPC client key file                   | ""                                  |
@@ -64,7 +64,7 @@ MG_MQTT_ADAPTER_WS_TARGET_HOST=localhost \
 MG_MQTT_ADAPTER_WS_TARGET_PORT=8080 \
 MG_MQTT_ADAPTER_WS_TARGET_PATH=/mqtt \
 MG_MQTT_ADAPTER_INSTANCE="" \
-MG_THINGS_AUTH_GRPC_URL=localhost:7000 \
+MG_THINGS_AUTH_GRPC_URL=localhost:7016 \
 MG_THINGS_AUTH_GRPC_TIMEOUT=1s \
 MG_THINGS_AUTH_GRPC_CLIENT_CERT="" \
 MG_THINGS_AUTH_GRPC_CLIENT_KEY="" \

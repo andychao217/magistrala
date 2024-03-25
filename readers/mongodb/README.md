@@ -18,7 +18,7 @@ default values.
 | MG_MONGO_NAME                    | MongoDB database name                               | messages                       |
 | MG_MONGO_HOST                    | MongoDB database host                               | localhost                      |
 | MG_MONGO_PORT                    | MongoDB database port                               | 27017                          |
-| MG_THINGS_AUTH_GRPC_URL          | Things service Auth gRPC URL                        | localhost:7000                 |
+| MG_THINGS_AUTH_GRPC_URL          | Things service Auth gRPC URL                        | localhost:7016                 |
 | MG_THINGS_AUTH_GRPC_TIMEOUT      | Things service Auth gRPC request timeout in seconds | 1s                             |
 | MG_THINGS_AUTH_GRPC_CLIENT_TLS   | Flag that indicates if TLS should be turned on      | false                          |
 | MG_THINGS_AUTH_GRPC_CA_CERTS     | Path to trusted CAs in PEM format                   | ""                             |
