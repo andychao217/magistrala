@@ -1,6 +1,7 @@
 # Copyright (c) Abstract Machines
 # SPDX-License-Identifier: Apache-2.0
 
+MG_DOCKER_IMAGE_USERNAME_PREFIX ?= andychao217
 MG_DOCKER_IMAGE_NAME_PREFIX ?= magistrala
 BUILD_DIR = build
 SERVICES = auth users things http coap ws lora influxdb-writer influxdb-reader mongodb-writer \
@@ -9,7 +10,8 @@ SERVICES = auth users things http coap ws lora influxdb-writer influxdb-reader m
 DOCKERS = $(addprefix docker_,$(SERVICES))
 DOCKERS_DEV = $(addprefix docker_dev_,$(SERVICES))
 CGO_ENABLED ?= 0
-GOARCH ?= amd64
+GOOS ?= linux
+GOARCH ?= arm64
 VERSION ?= $(shell git describe --abbrev=0 --tags)
 COMMIT ?= $(shell git rev-parse HEAD)
 TIME ?= $(shell date +%F_%T)
@@ -46,15 +48,13 @@ endef
 define make_docker
 	$(eval svc=$(subst docker_,,$(1)))
 
-	docker build \
+	docker buildx build --platform=linux/amd64,linux/arm64 \
 		--no-cache \
 		--build-arg SVC=$(svc) \
-		--build-arg GOARCH=$(GOARCH) \
-		--build-arg GOARM=$(GOARM) \
 		--build-arg VERSION=$(VERSION) \
 		--build-arg COMMIT=$(COMMIT) \
 		--build-arg TIME=$(TIME) \
-		--tag=$(MG_DOCKER_IMAGE_NAME_PREFIX)/$(svc) \
+		--tag=$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(svc) \
 		-f docker/Dockerfile .
 endef
 
@@ -64,7 +64,7 @@ define make_docker_dev
 	docker build \
 		--no-cache \
 		--build-arg SVC=$(svc) \
-		--tag=$(MG_DOCKER_IMAGE_NAME_PREFIX)/$(svc) \
+		--tag=$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(svc) \
 		-f docker/Dockerfile.dev ./build
 endef
 
@@ -176,7 +176,7 @@ release:
 	git checkout $(version)
 	$(MAKE) dockers
 	for svc in $(SERVICES); do \
-		docker tag $(MG_DOCKER_IMAGE_NAME_PREFIX)/$$svc $(MG_DOCKER_IMAGE_NAME_PREFIX)/$$svc:$(version); \
+		docker tag $(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$$svc $(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$$svc:$(version); \
 	done
 	$(call docker_push,$(version))
 
