@@ -448,7 +448,7 @@ func TestUpdateClientCredentialsReqValidate(t *testing.T) {
 				id:     validID,
 				Secret: "",
 			},
-			err: apiutil.ErrBearerKey,
+			err: apiutil.ErrMissingSecret,
 		},
 	}
 	for _, c := range cases {
@@ -732,7 +732,7 @@ func TestConnectChannelThingRequestValidate(t *testing.T) {
 				ChannelID: "",
 				ThingID:   validID,
 			},
-			err: svcerr.ErrCreateEntity,
+			err: apiutil.ErrMissingID,
 		},
 		{
 			desc: "empty thing id",
@@ -741,7 +741,7 @@ func TestConnectChannelThingRequestValidate(t *testing.T) {
 				ChannelID: validID,
 				ThingID:   "",
 			},
-			err: svcerr.ErrCreateEntity,
+			err: apiutil.ErrMissingID,
 		},
 	}
 	for _, c := range cases {
@@ -772,7 +772,7 @@ func TestDisconnectChannelThingRequestValidate(t *testing.T) {
 				ChannelID: "",
 				ThingID:   validID,
 			},
-			err: svcerr.ErrCreateEntity,
+			err: apiutil.ErrMissingID,
 		},
 		{
 			desc: "empty thing id",
@@ -781,7 +781,7 @@ func TestDisconnectChannelThingRequestValidate(t *testing.T) {
 				ChannelID: validID,
 				ThingID:   "",
 			},
-			err: svcerr.ErrCreateEntity,
+			err: apiutil.ErrMissingID,
 		},
 	}
 	for _, c := range cases {

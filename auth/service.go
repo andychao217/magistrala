@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/internal/postgres"
 	"github.com/absmach/magistrala/pkg/errors"
 	svcerr "github.com/absmach/magistrala/pkg/errors/service"
 )
@@ -131,7 +130,7 @@ func (svc service) RetrieveKey(ctx context.Context, token, id string) (Key, erro
 
 	key, err := svc.keys.Retrieve(ctx, issuerID, id)
 	if err != nil {
-		return Key{}, errors.Wrap(errRetrieve, err)
+		return Key{}, errors.Wrap(svcerr.ErrViewEntity, err)
 	}
 	return key, nil
 }
@@ -207,7 +206,7 @@ func (svc service) checkPolicy(ctx context.Context, pr PolicyReq) error {
 func (svc service) checkDomain(ctx context.Context, subjectType, subject, domainID string) error {
 	d, err := svc.domains.RetrieveByID(ctx, domainID)
 	if err != nil {
-		return errors.Wrap(errors.ErrUnidentified, err)
+		return errors.Wrap(svcerr.ErrViewEntity, err)
 	}
 
 	switch d.Status {
@@ -275,7 +274,7 @@ func (svc service) DeletePolicies(ctx context.Context, prs []PolicyReq) error {
 	return svc.agent.DeletePolicies(ctx, prs)
 }
 
-func (svc service) ListObjects(ctx context.Context, pr PolicyReq, nextPageToken string, limit int32) (PolicyPage, error) {
+func (svc service) ListObjects(ctx context.Context, pr PolicyReq, nextPageToken string, limit uint64) (PolicyPage, error) {
 	if limit <= 0 {
 		limit = 100
 	}
@@ -303,11 +302,11 @@ func (svc service) ListAllObjects(ctx context.Context, pr PolicyReq) (PolicyPage
 	return page, nil
 }
 
-func (svc service) CountObjects(ctx context.Context, pr PolicyReq) (int, error) {
+func (svc service) CountObjects(ctx context.Context, pr PolicyReq) (uint64, error) {
 	return svc.agent.RetrieveAllObjectsCount(ctx, pr)
 }
 
-func (svc service) ListSubjects(ctx context.Context, pr PolicyReq, nextPageToken string, limit int32) (PolicyPage, error) {
+func (svc service) ListSubjects(ctx context.Context, pr PolicyReq, nextPageToken string, limit uint64) (PolicyPage, error) {
 	if limit <= 0 {
 		limit = 100
 	}
@@ -335,7 +334,7 @@ func (svc service) ListAllSubjects(ctx context.Context, pr PolicyReq) (PolicyPag
 	return page, nil
 }
 
-func (svc service) CountSubjects(ctx context.Context, pr PolicyReq) (int, error) {
+func (svc service) CountSubjects(ctx context.Context, pr PolicyReq) (uint64, error) {
 	return svc.agent.RetrieveAllSubjectsCount(ctx, pr)
 }
 
@@ -573,7 +572,7 @@ func (svc service) RetrieveDomain(ctx context.Context, token, id string) (Domain
 	}
 	dom, err := svc.domains.RetrieveByID(ctx, id)
 	if err != nil {
-		return Domain{}, errors.Wrap(svcerr.ErrNotFound, err)
+		return Domain{}, errors.Wrap(svcerr.ErrViewEntity, err)
 	}
 	return dom, nil
 }
@@ -602,7 +601,7 @@ func (svc service) RetrieveDomainPermissions(ctx context.Context, token, id stri
 		ObjectType:  DomainType,
 	}, []string{AdminPermission, EditPermission, ViewPermission, MembershipPermission})
 	if err != nil {
-		return []string{}, err
+		return []string{}, errors.Wrap(svcerr.ErrViewEntity, err)
 	}
 	return lp, nil
 }
@@ -670,7 +669,7 @@ func (svc service) ListDomains(ctx context.Context, token string, p Page) (Domai
 	}
 	dp, err := svc.domains.ListDomains(ctx, p)
 	if err != nil {
-		return DomainsPage{}, postgres.HandleError(svcerr.ErrViewEntity, err)
+		return DomainsPage{}, errors.Wrap(svcerr.ErrViewEntity, err)
 	}
 	if p.SubjectID == "" {
 		for i := range dp.Domains {

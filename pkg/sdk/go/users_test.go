@@ -257,7 +257,7 @@ func TestListClients(t *testing.T) {
 			token:    invalidToken,
 			offset:   offset,
 			limit:    limit,
-			err:      errors.NewSDKErrorWithStatus(errors.Wrap(repoerr.ErrNotFound, repoerr.ErrNotFound), http.StatusNotFound),
+			err:      errors.NewSDKErrorWithStatus(errors.Wrap(svcerr.ErrViewEntity, svcerr.ErrViewEntity), http.StatusUnprocessableEntity),
 			response: nil,
 		},
 		{
@@ -265,7 +265,7 @@ func TestListClients(t *testing.T) {
 			token:    "",
 			offset:   offset,
 			limit:    limit,
-			err:      errors.NewSDKErrorWithStatus(errors.Wrap(repoerr.ErrNotFound, repoerr.ErrNotFound), http.StatusNotFound),
+			err:      errors.NewSDKErrorWithStatus(errors.Wrap(svcerr.ErrViewEntity, svcerr.ErrViewEntity), http.StatusUnprocessableEntity),
 			response: nil,
 		},
 		{
@@ -273,7 +273,7 @@ func TestListClients(t *testing.T) {
 			token:    token,
 			offset:   offset,
 			limit:    0,
-			err:      errors.NewSDKErrorWithStatus(errors.Wrap(repoerr.ErrNotFound, repoerr.ErrNotFound), http.StatusNotFound),
+			err:      errors.NewSDKErrorWithStatus(errors.Wrap(svcerr.ErrViewEntity, svcerr.ErrViewEntity), http.StatusUnprocessableEntity),
 			response: nil,
 		},
 		{
@@ -411,7 +411,7 @@ func TestClient(t *testing.T) {
 			response: sdk.User{},
 			token:    validToken,
 			clientID: wrongID,
-			err:      errors.NewSDKErrorWithStatus(errors.Wrap(svcerr.ErrNotFound, svcerr.ErrNotFound), http.StatusNotFound),
+			err:      errors.NewSDKErrorWithStatus(errors.Wrap(svcerr.ErrViewEntity, svcerr.ErrViewEntity), http.StatusUnprocessableEntity),
 		},
 		{
 			desc:     "view client with an invalid token and invalid client id",
@@ -821,7 +821,7 @@ func TestUpdateClientSecret(t *testing.T) {
 			token:     validToken,
 			response:  sdk.User{},
 			repoErr:   apiutil.ErrMissingSecret,
-			err:       errors.NewSDKErrorWithStatus(errors.Wrap(svcerr.ErrNotFound, repoerr.ErrMissingSecret), http.StatusBadRequest),
+			err:       errors.NewSDKErrorWithStatus(errors.Wrap(svcerr.ErrViewEntity, repoerr.ErrMissingSecret), http.StatusBadRequest),
 		},
 	}
 
@@ -985,7 +985,7 @@ func TestEnableClient(t *testing.T) {
 			client:   enabledClient1,
 			response: sdk.User{},
 			repoErr:  sdk.ErrFailedEnable,
-			err:      errors.NewSDKErrorWithStatus(errors.Wrap(sdk.ErrFailedEnable, repoerr.ErrNotFound), http.StatusNotFound),
+			err:      errors.NewSDKErrorWithStatus(errors.Wrap(sdk.ErrFailedEnable, svcerr.ErrViewEntity), http.StatusUnprocessableEntity),
 		},
 		{
 			desc:     "enable non-existing client",
@@ -994,7 +994,7 @@ func TestEnableClient(t *testing.T) {
 			client:   sdk.User{},
 			response: sdk.User{},
 			repoErr:  sdk.ErrFailedEnable,
-			err:      errors.NewSDKErrorWithStatus(errors.Wrap(sdk.ErrFailedEnable, repoerr.ErrNotFound), http.StatusNotFound),
+			err:      errors.NewSDKErrorWithStatus(errors.Wrap(sdk.ErrFailedEnable, svcerr.ErrViewEntity), http.StatusUnprocessableEntity),
 		},
 	}
 
@@ -1114,7 +1114,7 @@ func TestDisableClient(t *testing.T) {
 			client:   disabledClient1,
 			response: sdk.User{},
 			repoErr:  sdk.ErrFailedDisable,
-			err:      errors.NewSDKErrorWithStatus(errors.Wrap(sdk.ErrFailedDisable, repoerr.ErrNotFound), http.StatusNotFound),
+			err:      errors.NewSDKErrorWithStatus(errors.Wrap(sdk.ErrFailedDisable, svcerr.ErrViewEntity), http.StatusUnprocessableEntity),
 		},
 		{
 			desc:     "disable non-existing client",
@@ -1123,7 +1123,7 @@ func TestDisableClient(t *testing.T) {
 			token:    validToken,
 			response: sdk.User{},
 			repoErr:  sdk.ErrFailedDisable,
-			err:      errors.NewSDKErrorWithStatus(errors.Wrap(sdk.ErrFailedDisable, repoerr.ErrNotFound), http.StatusNotFound),
+			err:      errors.NewSDKErrorWithStatus(errors.Wrap(sdk.ErrFailedDisable, svcerr.ErrViewEntity), http.StatusUnprocessableEntity),
 		},
 	}
 
