@@ -760,3 +760,12 @@ services:
       - magistrala-base-net
     volumes:
       - magistrala-ui-db-volume:/var/lib/postgresql/data
+
+  websocket_bridge:
+      image: andychao217/magistrala-websocket_bridge:${MG_RELEASE_TAG}
+      container_name: magistrala-websocket_bridge
+      restart: on-failure
+      ports:
+        - 63000:63000
+      networks:
+        - magistrala-base-net
