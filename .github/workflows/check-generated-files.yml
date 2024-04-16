@@ -61,6 +61,9 @@ jobs:
               - "bootstrap/service.go"
               - "bootstrap/configs.go"
               - "invitations/invitations.go"
+              - "users/emailer.go"
+              - "users/hasher.go"
+              - "mqtt/events/streams.go"
 
       - name: Set up protoc
         if: steps.changes.outputs.proto == 'true'
@@ -128,6 +131,9 @@ jobs:
           mv ./bootstrap/mocks/configs.go ./bootstrap/mocks/configs.go.tmp
           mv ./invitations/mocks/service.go ./invitations/mocks/service.go.tmp
           mv ./invitations/mocks/repository.go ./invitations/mocks/repository.go.tmp
+          mv ./users/mocks/emailer.go ./users/mocks/emailer.go.tmp
+          mv ./users/mocks/hasher.go ./users/mocks/hasher.go.tmp
+          mv ./mqtt/mocks/events.go ./mqtt/mocks/events.go.tmp
 
           make mocks
 
@@ -164,3 +170,6 @@ jobs:
           check_mock_changes ./bootstrap/mocks/configs.go "Bootstrap Repository ./bootstrap/mocks/configs.go"
           check_mock_changes ./invitations/mocks/service.go "Invitations Service ./invitations/mocks/service.go"
           check_mock_changes ./invitations/mocks/repository.go "Invitations Repository ./invitations/mocks/repository.go"
+          check_mock_changes ./users/mocks/emailer.go "Users Emailer ./users/mocks/emailer.go"
+          check_mock_changes ./users/mocks/hasher.go "Users Hasher ./users/mocks/hasher.go"
+          check_mock_changes ./mqtt/mocks/events.go "MQTT Events Store ./mqtt/mocks/events.go"
