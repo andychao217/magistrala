@@ -5,6 +5,7 @@ package mqtt
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/url"
@@ -14,10 +15,12 @@ import (
 
 	"github.com/absmach/magistrala"
 	"github.com/absmach/magistrala/auth"
+	pgclient "github.com/absmach/magistrala/internal/clients/postgres"
 	"github.com/absmach/magistrala/mqtt/events"
 	"github.com/absmach/magistrala/pkg/errors"
 	svcerr "github.com/absmach/magistrala/pkg/errors/service"
 	"github.com/absmach/magistrala/pkg/messaging"
+	clientspg "github.com/absmach/magistrala/things/postgres"
 	"github.com/absmach/mproxy/pkg/session"
 )
 
@@ -131,6 +134,7 @@ func (h *handler) AuthSubscribe(ctx context.Context, topics *[]string) error {
 // Connect - after client successfully connected.
 func (h *handler) Connect(ctx context.Context) error {
 	s, ok := session.FromContext(ctx)
+	updateClientConnectionStatus(ctx, s, "connect")
 	if !ok {
 		return errors.Wrap(ErrFailedConnect, ErrClientNotInitialized)
 	}
@@ -180,6 +184,7 @@ func (h *handler) Publish(ctx context.Context, topic *string, payload *[]byte) e
 // Subscribe - after client successfully subscribed.
 func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
+	updateClientConnectionStatus(ctx, s, "subscribe")
 	if !ok {
 		return errors.Wrap(ErrFailedSubscribe, ErrClientNotInitialized)
 	}
@@ -190,6 +195,7 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 // Unsubscribe - after client unsubscribed.
 func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
+	updateClientConnectionStatus(ctx, s, "unsubscribe")
 	if !ok {
 		return errors.Wrap(ErrFailedUnsubscribe, ErrClientNotInitialized)
 	}
@@ -200,6 +206,7 @@ func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 // Disconnect - connection with broker or client lost.
 func (h *handler) Disconnect(ctx context.Context) error {
 	s, ok := session.FromContext(ctx)
+	updateClientConnectionStatus(ctx, s, "disconnect")
 	if !ok {
 		return errors.Wrap(ErrFailedDisconnect, ErrClientNotInitialized)
 	}
@@ -269,4 +276,47 @@ func parseSubtopic(subtopic string) (string, error) {
 
 	subtopic = strings.Join(filteredElems, ".")
 	return subtopic, nil
+}
+
+func updateClientConnectionStatus(ctx context.Context, s *session.Session, connectionType string) {
+	fmt.Printf("updateClientConnectionStatus: %v\n", connectionType)
+	dbConfig := pgclient.Config{
+		Host:        "things-db",
+		Port:        "5432",
+		User:        "magistrala",
+		Pass:        "magistrala",
+		Name:        "things",
+		SSLMode:     "disable",
+		SSLCert:     "",
+		SSLKey:      "",
+		SSLRootCert: "",
+	}
+	database, _ := pgclient.Connect(dbConfig)
+	cRepo := clientspg.NewRepository(database)
+	thing, _ := cRepo.RetrieveByIdentity(ctx, s.Username)
+
+	isOnline := "0"
+	if connectionType == "connect" || connectionType == "subscribe" {
+		isOnline = "1"
+	}
+	// 将对象转换为JSON字符串
+	jsonData, _ := json.Marshal(thing)
+	// 将JSON字节切片转换为字符串
+	jsonString := string(jsonData)
+	// 输出JSON字符串
+	fmt.Println("jsonString")
+	fmt.Println(jsonString)
+
+	thing.Metadata["isOnline"] = isOnline
+	fmt.Printf("isOnline: %+v\n", isOnline)
+
+	newThing, _ := cRepo.Update(ctx, thing)
+
+	// 将对象转换为JSON字符串
+	newjsonData, _ := json.Marshal(newThing)
+	// 将JSON字节切片转换为字符串
+	newjsonString := string(newjsonData)
+	// 输出JSON字符串
+	fmt.Println("newjsonString")
+	fmt.Println(newjsonString)
 }
