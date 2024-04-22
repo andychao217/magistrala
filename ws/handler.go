@@ -127,6 +127,7 @@ func (h *handler) AuthSubscribe(ctx context.Context, topics *[]string) error {
 
 // Connect - after client successfully connected.
 func (h *handler) Connect(ctx context.Context) error {
+	fmt.Println("Connect ws111")
 	return nil
 }
 
@@ -199,6 +200,7 @@ func (h *handler) Publish(ctx context.Context, topic *string, payload *[]byte) e
 // Subscribe - after client successfully subscribed.
 func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
+	fmt.Println("Subscribe ws111")
 	if !ok {
 		return errors.Wrap(ErrFailedSubscribe, ErrClientNotInitialized)
 	}
@@ -209,6 +211,7 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 // Unsubscribe - after client unsubscribed.
 func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
+	fmt.Println("Unsubscribe ws111")
 	if !ok {
 		return errors.Wrap(ErrFailedUnsubscribe, ErrClientNotInitialized)
 	}
@@ -219,6 +222,7 @@ func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 
 // Disconnect - connection with broker or client lost.
 func (h *handler) Disconnect(ctx context.Context) error {
+	fmt.Println("Disconnect ws111")
 	return nil
 }
 
