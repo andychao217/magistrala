@@ -317,11 +317,12 @@ func updateClientConnectionStatus(ctx context.Context, s *session.Session, conne
 			_, _ = cRepo.Update(ctx, thing)
 
 			// 暂停1秒钟
-			time.Sleep(1 * time.Second)
+			time.Sleep(500 * time.Millisecond)
 			if PublicTopics != nil && len(*PublicTopics) != 0 {
 				for _, topic := range *PublicTopics {
 					// 定义一个字符串
-					str := "refreshPage"
+					// str := "refreshPage"
+					str := connectionType + "_refreshPage"
 					// 将字符串转换为字节切片
 					payload := []byte(str)
 					// 传递字节切片的地址给函数

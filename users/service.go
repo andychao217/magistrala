@@ -4,8 +4,13 @@
 package users
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 	"time"
 
 	"github.com/absmach/magistrala"
@@ -28,6 +33,12 @@ type service struct {
 	selfRegister bool
 }
 
+type TokenResponseBody struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	AccessType   string `json:"access_type"`
+}
+
 // NewService returns a new Users service implementation.
 func NewService(crepo postgres.Repository, authClient magistrala.AuthServiceClient, emailer Emailer, hasher Hasher, idp magistrala.IDProvider, selfRegister bool) Service {
 	return service{
@@ -40,7 +51,76 @@ func NewService(crepo postgres.Repository, authClient magistrala.AuthServiceClie
 	}
 }
 
+func httpGetToken(identity string, secret string) (*TokenResponseBody, error) {
+	// 用已创建的用户获取新token
+	postData := []byte(`{"identity":"` + identity + `","secret":"` + secret + `"}`)
+	url := "http://users:9002/users/tokens/issue"
+	// 创建请求
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postData))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	// 执行请求
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	// 读取响应
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("Response Status1:", resp.Status)
+	fmt.Println("Response Body1:", string(body))
+	var tokenResponseBody TokenResponseBody
+	err = json.Unmarshal(body, &tokenResponseBody)
+	if err != nil {
+		return nil, err
+	}
+	return &tokenResponseBody, nil
+}
+
+func createDomain(token string) (auth.Domain, error) {
+	// 创建用户默认创建一个domain
+	// 要发送的数据
+	var domain auth.Domain
+	postData := []byte(`{
+			"name": "Default Domain",
+			"tags": [],
+			"metadata": {},
+			"alias": ""
+		}`)
+	url := "http://auth:8189/domains"
+	// 创建请求
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postData))
+	if err != nil {
+		return auth.Domain{}, err
+	}
+	// 设置Header
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	// 执行请求
+	httpClient1 := &http.Client{}
+	resp, err := httpClient1.Do(req)
+	if err != nil {
+		return auth.Domain{}, err
+	}
+	defer resp.Body.Close()
+	// 读取响应
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return auth.Domain{}, err
+	}
+	// 解析JSON字符串到User结构体
+	_ = json.Unmarshal(body, &domain)
+	return domain, err
+}
+
 func (svc service) RegisterClient(ctx context.Context, token string, cli mgclients.Client) (rc mgclients.Client, err error) {
+	secret := cli.Credentials.Secret
 	if !svc.selfRegister {
 		userID, err := svc.Identify(ctx, token)
 		if err != nil {
@@ -86,6 +166,29 @@ func (svc service) RegisterClient(ctx context.Context, token string, cli mgclien
 	client, err := svc.clients.Save(ctx, cli)
 	if err != nil {
 		return mgclients.Client{}, errors.Wrap(repoerr.ErrCreateEntity, err)
+	}
+
+	//通过新建的用户获取token
+	tokenResponseBody, err := httpGetToken(client.Credentials.Identity, secret)
+	if err != nil {
+		log.Fatalf("Failed to call the first API: %v", err)
+		return client, nil
+	}
+	newToken := tokenResponseBody.AccessToken
+
+	//创建默认domain
+	domain, err := createDomain(newToken)
+	if err != nil {
+		log.Fatalf("Failed to call the second API: %v", err)
+		return client, nil
+	}
+
+	//创建默认domain之后默认将这个domainID写入用户信息的metadata中
+	if domain.ID != "" {
+		client.Metadata["domainID"] = domain.ID
+		client.UpdatedAt = time.Now()
+		client.UpdatedBy = client.ID
+		client, _ = svc.clients.Update(ctx, client)
 	}
 	return client, nil
 }
