@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -21,6 +20,7 @@ import (
 	svcerr "github.com/absmach/magistrala/pkg/errors/service"
 	mgoauth2 "github.com/absmach/magistrala/pkg/oauth2"
 	"github.com/absmach/magistrala/users/postgres"
+	"github.com/go-redis/redis/v8"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -38,6 +38,13 @@ type TokenResponseBody struct {
 	RefreshToken string `json:"refresh_token"`
 	AccessType   string `json:"access_type"`
 }
+
+type UserInfo struct {
+	Identity string
+	Secret   string
+}
+
+var CurrentUser = UserInfo{}
 
 // NewService returns a new Users service implementation.
 func NewService(crepo postgres.Repository, authClient magistrala.AuthServiceClient, emailer Emailer, hasher Hasher, idp magistrala.IDProvider, selfRegister bool) Service {
@@ -80,10 +87,35 @@ func httpGetToken(identity string, secret string) (*TokenResponseBody, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	CurrentUser.Identity = identity
+	CurrentUser.Secret = secret
+	// 连接到Redis服务器
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "things-redis:6379", // Redis服务器地址和端口
+		Password: "",                  // Redis密码（如果有的话）
+		DB:       0,                   // Redis数据库索引（默认为0）
+	})
+	rdctx := context.Background()
+	_, err = rdb.Ping(rdctx).Result()
+	if err != nil {
+		fmt.Printf("无法连接到Redis: %v", err)
+	} else {
+		err = rdb.Set(rdctx, "CurrentUserIdentity", CurrentUser.Identity, 168*time.Hour).Err()
+		if err != nil {
+			fmt.Printf("Failed to set value in Redis: %v\n", err)
+		}
+		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 168*time.Hour).Err()
+		if err != nil {
+			fmt.Printf("Failed to set value in Redis: %v\n", err)
+		}
+	}
+
 	return &tokenResponseBody, nil
 }
 
-func createDomain(token string) (auth.Domain, error) {
+// 创建默认domain
+func createDefaultDomain(token string) (auth.Domain, error) {
 	// 创建用户默认创建一个domain
 	// 要发送的数据
 	var domain auth.Domain
@@ -103,8 +135,8 @@ func createDomain(token string) (auth.Domain, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
 	// 执行请求
-	httpClient1 := &http.Client{}
-	resp, err := httpClient1.Do(req)
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return auth.Domain{}, err
 	}
@@ -171,15 +203,15 @@ func (svc service) RegisterClient(ctx context.Context, token string, cli mgclien
 	//通过新建的用户获取token
 	tokenResponseBody, err := httpGetToken(client.Credentials.Identity, secret)
 	if err != nil {
-		log.Fatalf("Failed to call the first API: %v", err)
+		fmt.Printf("Failed to call the first API: %v\n", err)
 		return client, nil
 	}
 	newToken := tokenResponseBody.AccessToken
 
 	//创建默认domain
-	domain, err := createDomain(newToken)
+	domain, err := createDefaultDomain(newToken)
 	if err != nil {
-		log.Fatalf("Failed to call the second API: %v", err)
+		fmt.Printf("Failed to call the second API: %v\n", err)
 		return client, nil
 	}
 
@@ -198,6 +230,7 @@ func (svc service) IssueToken(ctx context.Context, identity, secret, domainID st
 	if err != nil {
 		return &magistrala.Token{}, errors.Wrap(svcerr.ErrViewEntity, err)
 	}
+	var sercetVar string = secret
 	if err := svc.hasher.Compare(secret, dbUser.Credentials.Secret); err != nil {
 		return &magistrala.Token{}, errors.Wrap(svcerr.ErrLogin, err)
 	}
@@ -206,6 +239,30 @@ func (svc service) IssueToken(ctx context.Context, identity, secret, domainID st
 	if domainID != "" {
 		d = domainID
 	}
+
+	CurrentUser.Identity = identity
+	CurrentUser.Secret = sercetVar
+	// 连接到Redis服务器
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "things-redis:6379", // Redis服务器地址和端口
+		Password: "",                  // Redis密码（如果有的话）
+		DB:       0,                   // Redis数据库索引（默认为0）
+	})
+	rdctx := context.Background()
+	_, err = rdb.Ping(rdctx).Result()
+	if err != nil {
+		fmt.Printf("无法连接到Redis: %v", err)
+	} else {
+		err = rdb.Set(rdctx, "CurrentUserIdentity", CurrentUser.Identity, 168*time.Hour).Err()
+		if err != nil {
+			fmt.Printf("Failed to set value in Redis: %v\n", err)
+		}
+		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 168*time.Hour).Err()
+		if err != nil {
+			fmt.Printf("Failed to set value in Redis: %v\n", err)
+		}
+	}
+
 	return svc.auth.Issue(ctx, &magistrala.IssueReq{UserId: dbUser.ID, DomainId: &d, Type: uint32(auth.AccessKey)})
 }
 
@@ -357,6 +414,25 @@ func (svc service) UpdateClientIdentity(ctx context.Context, token, clientID, id
 	if err != nil {
 		return mgclients.Client{}, errors.Wrap(svcerr.ErrUpdateEntity, err)
 	}
+
+	CurrentUser.Identity = identity
+	// 连接到Redis服务器
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "things-redis:6379", // Redis服务器地址和端口
+		Password: "",                  // Redis密码（如果有的话）
+		DB:       0,                   // Redis数据库索引（默认为0）
+	})
+	rdctx := context.Background()
+	_, err = rdb.Ping(rdctx).Result()
+	if err != nil {
+		fmt.Printf("无法连接到Redis: %v", err)
+	} else {
+		err = rdb.Set(rdctx, "CurrentUserIdentity", CurrentUser.Identity, 168*time.Hour).Err()
+		if err != nil {
+			fmt.Printf("Failed to set value in Redis: %v\n", err)
+		}
+	}
+
 	return cli, nil
 }
 
@@ -389,6 +465,7 @@ func (svc service) ResetSecret(ctx context.Context, resetToken, secret string) e
 	if c.Credentials.Identity == "" {
 		return repoerr.ErrNotFound
 	}
+	var sercetVar string = secret
 	secret, err = svc.hasher.Hash(secret)
 	if err != nil {
 		return err
@@ -405,6 +482,25 @@ func (svc service) ResetSecret(ctx context.Context, resetToken, secret string) e
 	if _, err := svc.clients.UpdateSecret(ctx, c); err != nil {
 		return errors.Wrap(svcerr.ErrAuthorization, err)
 	}
+
+	CurrentUser.Secret = sercetVar
+	// 连接到Redis服务器
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "things-redis:6379", // Redis服务器地址和端口
+		Password: "",                  // Redis密码（如果有的话）
+		DB:       0,                   // Redis数据库索引（默认为0）
+	})
+	rdctx := context.Background()
+	_, err = rdb.Ping(rdctx).Result()
+	if err != nil {
+		fmt.Printf("无法连接到Redis: %v", err)
+	} else {
+		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 168*time.Hour).Err()
+		if err != nil {
+			fmt.Printf("Failed to set value in Redis: %v\n", err)
+		}
+	}
+
 	return nil
 }
 
@@ -420,6 +516,7 @@ func (svc service) UpdateClientSecret(ctx context.Context, token, oldSecret, new
 	if _, err := svc.IssueToken(ctx, dbClient.Credentials.Identity, oldSecret, ""); err != nil {
 		return mgclients.Client{}, errors.Wrap(svcerr.ErrIssueToken, err)
 	}
+	var sercetVar string = newSecret
 	newSecret, err = svc.hasher.Hash(newSecret)
 	if err != nil {
 		return mgclients.Client{}, errors.Wrap(repoerr.ErrMalformedEntity, err)
@@ -431,6 +528,24 @@ func (svc service) UpdateClientSecret(ctx context.Context, token, oldSecret, new
 	dbClient, err = svc.clients.UpdateSecret(ctx, dbClient)
 	if err != nil {
 		return mgclients.Client{}, errors.Wrap(svcerr.ErrUpdateEntity, err)
+	}
+
+	CurrentUser.Secret = sercetVar
+	// 连接到Redis服务器
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "things-redis:6379", // Redis服务器地址和端口
+		Password: "",                  // Redis密码（如果有的话）
+		DB:       0,                   // Redis数据库索引（默认为0）
+	})
+	rdctx := context.Background()
+	_, err = rdb.Ping(rdctx).Result()
+	if err != nil {
+		fmt.Printf("无法连接到Redis: %v", err)
+	} else {
+		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 168*time.Hour).Err()
+		if err != nil {
+			fmt.Printf("Failed to set value in Redis: %v\n", err)
+		}
 	}
 
 	return dbClient, nil

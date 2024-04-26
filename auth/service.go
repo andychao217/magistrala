@@ -4,14 +4,19 @@
 package auth
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"strings"
 	"time"
 
 	"github.com/absmach/magistrala"
 	"github.com/absmach/magistrala/pkg/errors"
 	svcerr "github.com/absmach/magistrala/pkg/errors/service"
+	"github.com/go-redis/redis/v8"
 )
 
 const recoveryDuration = 5 * time.Minute
@@ -79,6 +84,21 @@ type service struct {
 	loginDuration      time.Duration
 	refreshDuration    time.Duration
 	invitationDuration time.Duration
+}
+
+type TokenResponseBody struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	AccessType   string `json:"access_type"`
+}
+
+type Channel struct {
+	ID        string `json:"id"`
+	OwnerID   string `json:"owner_id"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Status    string `json:"status"`
 }
 
 // New instantiates the auth service implementation.
@@ -522,6 +542,72 @@ func SwitchToPermission(relation string) string {
 	}
 }
 
+// 使用domianId获取token
+func httpGetToken(identity string, secret string, domainID string) (*TokenResponseBody, error) {
+	// 用已创建的用户获取新token
+	postData := []byte(`{"identity":"` + identity + `","secret":"` + secret + `","domain_id":"` + domainID + `"}`)
+	url := "http://users:9002/users/tokens/issue"
+	// 创建请求
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postData))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	// 执行请求
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	// 读取响应
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("Response Status1:", resp.Status)
+	fmt.Println("Response Body1:", string(body))
+	var tokenResponseBody TokenResponseBody
+	err = json.Unmarshal(body, &tokenResponseBody)
+	if err != nil {
+		return nil, err
+	}
+
+	return &tokenResponseBody, nil
+}
+
+// 创建默认channel
+func createDefaultChannel(token string) (Channel, error) {
+	// 创建domain时默认创建一个channel
+	// 要发送的数据
+	var channel Channel
+	postData := []byte(`{"name": "Default Channel"}`)
+	url := "http://things:9000/channels"
+	// 创建请求
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postData))
+	if err != nil {
+		return Channel{}, err
+	}
+	// 设置Header
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	// 执行请求
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return Channel{}, err
+	}
+	defer resp.Body.Close()
+	// 读取响应
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return Channel{}, err
+	}
+	// 解析JSON字符串到User结构体
+	_ = json.Unmarshal(body, &channel)
+	return channel, err
+}
+
 func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do Domain, err error) {
 	key, err := svc.Identify(ctx, token)
 	if err != nil {
@@ -554,6 +640,40 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 	dom, err := svc.domains.Save(ctx, d)
 	if err != nil {
 		return Domain{}, errors.Wrap(svcerr.ErrCreateEntity, err)
+	}
+
+	// 连接到Redis服务器
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "things-redis:6379", // Redis服务器地址和端口
+		Password: "",                  // Redis密码（如果有的话）
+		DB:       0,                   // Redis数据库索引（默认为0）
+	})
+	rdctx := context.Background()
+	_, err = rdb.Ping(rdctx).Result()
+	if err != nil {
+		fmt.Printf("无法连接到Redis: %v", err)
+	} else {
+		// 获取并打印值
+		CurrentUserIdentity, err := rdb.Get(rdctx, "CurrentUserIdentity").Result()
+		if err != nil {
+			fmt.Printf("Failed to get value from Redis: %v\n", err)
+		}
+		CurrentUserSecret, err := rdb.Get(rdctx, "CurrentUserSecret").Result()
+		if err != nil {
+			fmt.Printf("Failed to get value from Redis: %v\n", err)
+		}
+		//通过新建的用户获取token
+		tokenResponseBody, err := httpGetToken(CurrentUserIdentity, CurrentUserSecret, dom.ID)
+		if err != nil {
+			fmt.Printf("Failed to call the first API: %v\n", err)
+		}
+		newToken := tokenResponseBody.AccessToken
+
+		//创建默认channel
+		_, err = createDefaultChannel(newToken)
+		if err != nil {
+			fmt.Printf("Failed to call the second API: %v\n", err)
+		}
 	}
 
 	return dom, nil
