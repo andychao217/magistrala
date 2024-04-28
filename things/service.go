@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -54,7 +53,7 @@ type ChannelListResponse struct {
 func getChannelIDs(token string) ([]string, error) {
 	// 创建domain时默认创建一个channel
 	// 要发送的数据
-	url := "http://things:9000/channels"
+	url := "http://things:9000/channels?limit=100"
 	// 创建HTTP GET请求
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -75,7 +74,7 @@ func getChannelIDs(token string) ([]string, error) {
 	// 读取响应体
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 		return []string{}, err
 	}
 	// 打印响应体

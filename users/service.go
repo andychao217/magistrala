@@ -44,6 +44,23 @@ type UserInfo struct {
 	Secret   string
 }
 
+// Credentials 结构体表示credentials对象
+type Credentials struct {
+	Identity string `json:"identity"`
+}
+
+// UserInfo 结构体表示整个JSON对象
+type UserInfoResponseBody struct {
+	ID          string                 `json:"id"`
+	Name        string                 `json:"name"`
+	Credentials Credentials            `json:"credentials"`
+	Metadata    map[string]interface{} `json:"metadata"`
+	CreatedAt   time.Time              `json:"created_at"`
+	UpdatedAt   time.Time              `json:"updated_at"`
+	UpdatedBy   string                 `json:"updated_by"`
+	Status      string                 `json:"status"`
+}
+
 var CurrentUser = UserInfo{}
 
 // NewService returns a new Users service implementation.
@@ -63,7 +80,7 @@ func httpGetToken(identity string, secret string) (*TokenResponseBody, error) {
 	postData := []byte(`{"identity":"` + identity + `","secret":"` + secret + `"}`)
 	url := "http://users:9002/users/tokens/issue"
 	// 创建请求
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postData))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(postData))
 	if err != nil {
 		return nil, err
 	}
@@ -114,6 +131,43 @@ func httpGetToken(identity string, secret string) (*TokenResponseBody, error) {
 	return &tokenResponseBody, nil
 }
 
+// 使用token获取用户信息
+func httpGetUserInfo(token string) (UserInfoResponseBody, error) {
+	// 用已创建的用户获取新token
+	url := "http://users:9002/users/profile"
+	// 创建请求
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		fmt.Println("err httpGetUserInfo 1111: ", err)
+		return UserInfoResponseBody{}, err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	// 执行请求
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		fmt.Println("err httpGetUserInfo 2222: ", err)
+		return UserInfoResponseBody{}, err
+	}
+	defer resp.Body.Close()
+	// 读取响应
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("err httpGetUserInfo 333: ", err)
+		return UserInfoResponseBody{}, err
+	}
+	fmt.Println("Response Status UserInfo:", resp.Status)
+	fmt.Println("Response Body UserInfo:", string(body))
+	var userInfoResponseBody UserInfoResponseBody
+	err = json.Unmarshal(body, &userInfoResponseBody)
+	if err != nil {
+		fmt.Println("err httpGetUserInfo 444: ", err)
+		return UserInfoResponseBody{}, err
+	}
+
+	return userInfoResponseBody, nil
+}
+
 // 创建默认domain
 func createDefaultDomain(token string) (auth.Domain, error) {
 	// 创建用户默认创建一个domain
@@ -127,7 +181,7 @@ func createDefaultDomain(token string) (auth.Domain, error) {
 		}`)
 	url := "http://auth:8189/domains"
 	// 创建请求
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postData))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(postData))
 	if err != nil {
 		return auth.Domain{}, err
 	}
@@ -217,7 +271,12 @@ func (svc service) RegisterClient(ctx context.Context, token string, cli mgclien
 
 	//创建默认domain之后默认将这个domainID写入用户信息的metadata中
 	if domain.ID != "" {
-		client.Metadata["domainID"] = domain.ID
+		//获取最新的user最新的metata，再更新domainID
+		userInfo, _ := httpGetUserInfo(newToken)
+		jsonData, _ := json.Marshal(userInfo)
+		fmt.Println("userService userinfo data: ", string(jsonData))
+		userInfo.Metadata["domainID"] = domain.ID
+		client.Metadata = userInfo.Metadata
 		client.UpdatedAt = time.Now()
 		client.UpdatedBy = client.ID
 		client, _ = svc.clients.Update(ctx, client)

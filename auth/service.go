@@ -101,6 +101,23 @@ type Channel struct {
 	Status    string `json:"status"`
 }
 
+// Credentials 结构体表示credentials对象
+type Credentials struct {
+	Identity string `json:"identity"`
+}
+
+// UserInfo 结构体表示整个JSON对象
+type UserInfoResponseBody struct {
+	ID          string                 `json:"id"`
+	Name        string                 `json:"name"`
+	Credentials Credentials            `json:"credentials"`
+	Metadata    map[string]interface{} `json:"metadata"`
+	CreatedAt   time.Time              `json:"created_at"`
+	UpdatedAt   time.Time              `json:"updated_at"`
+	UpdatedBy   string                 `json:"updated_by"`
+	Status      string                 `json:"status"`
+}
+
 // New instantiates the auth service implementation.
 func New(keys KeyRepository, domains DomainsRepository, idp magistrala.IDProvider, tokenizer Tokenizer, policyAgent PolicyAgent, loginDuration, refreshDuration, invitationDuration time.Duration) Service {
 	return &service{
@@ -548,7 +565,7 @@ func httpGetToken(identity string, secret string, domainID string) (*TokenRespon
 	postData := []byte(`{"identity":"` + identity + `","secret":"` + secret + `","domain_id":"` + domainID + `"}`)
 	url := "http://users:9002/users/tokens/issue"
 	// 创建请求
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postData))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(postData))
 	if err != nil {
 		return nil, err
 	}
@@ -577,15 +594,32 @@ func httpGetToken(identity string, secret string, domainID string) (*TokenRespon
 }
 
 // 创建默认channel
-func createDefaultChannel(token string) (Channel, error) {
+func createDefaultChannel(token string, domain Domain) (Channel, error) {
 	// 创建domain时默认创建一个channel
+	fmt.Println("domain: ", domain.Name)
 	// 要发送的数据
 	var channel Channel
-	postData := []byte(`{"name": "Default Channel", "id": "defaultChannel"}`)
+	type ChannelPostData struct {
+		Name string `json:"name"`
+		ID   string `json:"id"`
+	}
+	// 创建一个Channel结构体的实例
+	postChannel := ChannelPostData{
+		Name: "Default Channel",
+		ID:   "",
+	}
+	jsonBytes, err := json.Marshal(postChannel)
+	if err != nil {
+		fmt.Println("err createDefaultChannel 111: ", err)
+		return Channel{}, err
+	}
+
+	postData := jsonBytes
 	url := "http://things:9000/channels"
 	// 创建请求
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postData))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(postData))
 	if err != nil {
+		fmt.Println("err createDefaultChannel 222: ", err)
 		return Channel{}, err
 	}
 	// 设置Header
@@ -595,17 +629,109 @@ func createDefaultChannel(token string) (Channel, error) {
 	httpClient := &http.Client{}
 	resp, err := httpClient.Do(req)
 	if err != nil {
+		fmt.Println("err createDefaultChannel 333: ", err)
 		return Channel{}, err
 	}
 	defer resp.Body.Close()
 	// 读取响应
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		fmt.Println("err createDefaultChannel 444: ", err)
 		return Channel{}, err
 	}
 	// 解析JSON字符串到User结构体
 	_ = json.Unmarshal(body, &channel)
-	return channel, err
+	return channel, nil
+}
+
+// 使用token获取用户信息
+func httpGetUserInfo(token string) (UserInfoResponseBody, error) {
+	// 用已创建的用户获取新token
+	url := "http://users:9002/users/profile"
+	// 创建请求
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		fmt.Println("err httpGetUserInfo 1111: ", err)
+		return UserInfoResponseBody{}, err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	// 执行请求
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		fmt.Println("err httpGetUserInfo 2222: ", err)
+		return UserInfoResponseBody{}, err
+	}
+	defer resp.Body.Close()
+	// 读取响应
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("err httpGetUserInfo 333: ", err)
+		return UserInfoResponseBody{}, err
+	}
+	fmt.Println("Response Status UserInfo:", resp.Status)
+	fmt.Println("Response Body UserInfo:", string(body))
+	var userInfoResponseBody UserInfoResponseBody
+	err = json.Unmarshal(body, &userInfoResponseBody)
+	if err != nil {
+		fmt.Println("err httpGetUserInfo 444: ", err)
+		return UserInfoResponseBody{}, err
+	}
+
+	return userInfoResponseBody, nil
+}
+
+// 把这个新domain默认创建的channelId写入userInfo
+func updateUserInfo(token string, userInfo UserInfoResponseBody, channelID string, domainID string) error {
+	// 要发送的数据
+	type UserPostData struct {
+		Name     string                 `json:"name"`
+		Metadata map[string]interface{} `json:"metadata"`
+	}
+	var metadata map[string]interface{}
+	if userInfo.Metadata == nil || len(userInfo.Metadata) == 0 {
+		metadata = map[string]interface{}{}
+	} else {
+		metadata = userInfo.Metadata
+	}
+	metadata[domainID] = channelID
+	postUser := UserPostData{
+		Metadata: metadata,
+		Name:     userInfo.Name,
+	}
+	postData, err := json.Marshal(postUser)
+	fmt.Println("updateUserInfo data: ", string(postData))
+	if err != nil {
+		fmt.Println("err updateUserInfo 111: ", err)
+		return err
+	}
+	url := "http://users:9002/users/" + userInfo.ID
+	// 创建请求
+	req, err := http.NewRequest(http.MethodPatch, url, bytes.NewBuffer(postData))
+	if err != nil {
+		fmt.Println("err updateUserInfo 222: ", err)
+		return err
+	}
+	// 设置Header
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	// 执行请求
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		fmt.Println("err updateUserInfo 333: ", err)
+		return err
+	}
+	defer resp.Body.Close()
+	// 读取响应
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("err updateUserInfo 444: ", err)
+		return err
+	}
+	fmt.Println("Response Status updateUserInfo:", resp.Status)
+	fmt.Println("Response Body updateUserInfo:", string(body))
+	return nil
 }
 
 func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do Domain, err error) {
@@ -637,6 +763,9 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 			}
 		}
 	}()
+	if d.Metadata == nil || len(d.Metadata) == 0 {
+		d.Metadata = map[string]interface{}{}
+	}
 	dom, err := svc.domains.Save(ctx, d)
 	if err != nil {
 		return Domain{}, errors.Wrap(svcerr.ErrCreateEntity, err)
@@ -670,9 +799,22 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 		newToken := tokenResponseBody.AccessToken
 
 		//创建默认channel
-		_, err = createDefaultChannel(newToken)
+		newChannel, err := createDefaultChannel(newToken, dom)
 		if err != nil {
 			fmt.Printf("Failed to call the second API: %v\n", err)
+		}
+		if newChannel.ID != "" {
+			userInfo, err := httpGetUserInfo(newToken)
+			// 将结构体转换为JSON格式的字节切片
+			jsonData, _ := json.Marshal(userInfo)
+			// 打印JSON格式的字节切片（这将以二进制形式显示）
+			fmt.Println("authService userinfo data: ", string(jsonData))
+
+			if err != nil {
+				fmt.Printf("Failed to set value in Redis: %v\n", err)
+			} else {
+				_ = updateUserInfo(newToken, userInfo, newChannel.ID, dom.ID)
+			}
 		}
 	}
 
