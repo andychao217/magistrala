@@ -581,7 +581,7 @@ func createDefaultChannel(token string) (Channel, error) {
 	// 创建domain时默认创建一个channel
 	// 要发送的数据
 	var channel Channel
-	postData := []byte(`{"name": "Default Channel"}`)
+	postData := []byte(`{"name": "Default Channel", "id": "defaultChannel"}`)
 	url := "http://things:9000/channels"
 	// 创建请求
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postData))
