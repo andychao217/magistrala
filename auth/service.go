@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/absmach/magistrala"
+	mgclients "github.com/absmach/magistrala/pkg/clients"
 	"github.com/absmach/magistrala/pkg/errors"
 	svcerr "github.com/absmach/magistrala/pkg/errors/service"
 	"github.com/go-redis/redis/v8"
@@ -734,6 +735,57 @@ func updateUserInfo(token string, userInfo UserInfoResponseBody, channelID strin
 	return nil
 }
 
+// 创建默认thing: platform
+func createDefaultThing(token string) (mgclients.Client, error) {
+	// 要发送的数据
+	var thing mgclients.Client
+	type ThingPostData struct {
+		Name        string                `json:"name"`
+		Credentials mgclients.Credentials `json:"credentials"`
+	}
+	postThing := ThingPostData{
+		Name: "Platform",
+		Credentials: mgclients.Credentials{
+			Identity: "platform",
+			Secret:   "platform",
+		},
+	}
+	jsonBytes, err := json.Marshal(postThing)
+	if err != nil {
+		fmt.Println("err createDefaultThing 111: ", err)
+		return mgclients.Client{}, err
+	}
+
+	postData := jsonBytes
+	url := "http://things:9000/things"
+	// 创建请求
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(postData))
+	if err != nil {
+		fmt.Println("err createDefaultThing 222: ", err)
+		return mgclients.Client{}, err
+	}
+	// 设置Header
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	// 执行请求
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		fmt.Println("err createDefaultThing 333: ", err)
+		return mgclients.Client{}, err
+	}
+	defer resp.Body.Close()
+	// 读取响应
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("err createDefaultThing 444: ", err)
+		return mgclients.Client{}, err
+	}
+	// 解析JSON字符串到User结构体
+	_ = json.Unmarshal(body, &thing)
+	return thing, nil
+}
+
 func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do Domain, err error) {
 	key, err := svc.Identify(ctx, token)
 	if err != nil {
@@ -815,6 +867,12 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 			} else {
 				_ = updateUserInfo(newToken, userInfo, newChannel.ID, dom.ID)
 			}
+		}
+
+		//创建默认thing: platform
+		_, err = createDefaultThing(newToken)
+		if err != nil {
+			fmt.Printf("Failed to call the third API: %v\n", err)
 		}
 	}
 
