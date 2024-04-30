@@ -464,8 +464,13 @@ func PageQuery(pm clients.Page) (string, error) {
 	if pm.Identity != "" {
 		query = append(query, "c.identity = :identity")
 	}
-	if pm.Name != "" {
+	// 不显示名称为Platform的thing，这个thing是新建domain时默认创建的，只用做平台和设备通信用
+	// 处理name字段，排除"Platform"
+	if pm.Name != "" && pm.Name != "Platform" {
 		query = append(query, "c.name = :name")
+	} else if pm.Name == "" {
+		// 如果pm.Name没有被设置，并且你想排除"Platform"，则添加条件
+		query = append(query, "c.name <> 'Platform'")
 	}
 	if pm.Tag != "" {
 		query = append(query, ":tag = ANY(c.tags)")
@@ -491,8 +496,11 @@ func constructSearchQuery(pm clients.Page) (string, string) {
 	var emq string
 	var tq string
 
-	if pm.Name != "" {
+	// 不显示名称为Platform的thing，这个thing是新建domain时默认创建的，只用做平台和设备通信用
+	if pm.Name != "" && pm.Name != "Platform" {
 		query = append(query, "name ~ :name")
+	} else if pm.Name == "" {
+		query = append(query, "name ~ :name AND name <> 'Platform'")
 	}
 	if pm.Identity != "" {
 		query = append(query, "identity ~ :identity")
