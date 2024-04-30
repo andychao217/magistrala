@@ -14,10 +14,12 @@ import (
 
 	"github.com/absmach/magistrala"
 	"github.com/absmach/magistrala/auth"
+	pgclient "github.com/absmach/magistrala/internal/clients/postgres"
 	"github.com/absmach/magistrala/mqtt/events"
 	"github.com/absmach/magistrala/pkg/errors"
 	svcerr "github.com/absmach/magistrala/pkg/errors/service"
 	"github.com/absmach/magistrala/pkg/messaging"
+	clientspg "github.com/absmach/magistrala/things/postgres"
 	"github.com/absmach/mproxy/pkg/session"
 )
 
@@ -54,6 +56,9 @@ var (
 )
 
 var channelRegExp = regexp.MustCompile(`^\/?channels\/([\w\-]+)\/messages(\/[^?]*)?(\?.*)?$`)
+
+// 公共变量来保存*[]string
+var PublicTopics *[]string
 
 // Event implements events.Event interface.
 type handler struct {
@@ -112,6 +117,7 @@ func (h *handler) AuthPublish(ctx context.Context, topic *string, payload *[]byt
 // prior forwarding to the MQTT broker.
 func (h *handler) AuthSubscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
+	SaveTopics(topics)
 	if !ok {
 		return ErrClientNotInitialized
 	}
@@ -135,6 +141,9 @@ func (h *handler) Connect(ctx context.Context) error {
 		return errors.Wrap(ErrFailedConnect, ErrClientNotInitialized)
 	}
 	h.logger.Info(fmt.Sprintf(LogInfoConnected, s.ID))
+	if s.Username != "" {
+		updateClientConnectionStatus(ctx, s, "connect", h)
+	}
 	return nil
 }
 
@@ -184,12 +193,20 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 		return errors.Wrap(ErrFailedSubscribe, ErrClientNotInitialized)
 	}
 	h.logger.Info(fmt.Sprintf(LogInfoSubscribed, s.ID, strings.Join(*topics, ",")))
+	SaveTopics(topics)
+	if s.Username != "" {
+		updateClientConnectionStatus(ctx, s, "subscribe", h)
+	}
 	return nil
 }
 
 // Unsubscribe - after client unsubscribed.
 func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
+	SaveTopics(topics)
+	if s.Username != "" {
+		updateClientConnectionStatus(ctx, s, "unsubscribe", h)
+	}
 	if !ok {
 		return errors.Wrap(ErrFailedUnsubscribe, ErrClientNotInitialized)
 	}
@@ -200,6 +217,9 @@ func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 // Disconnect - connection with broker or client lost.
 func (h *handler) Disconnect(ctx context.Context) error {
 	s, ok := session.FromContext(ctx)
+	if s.Username != "" {
+		updateClientConnectionStatus(ctx, s, "disconnect", h)
+	}
 	if !ok {
 		return errors.Wrap(ErrFailedDisconnect, ErrClientNotInitialized)
 	}
@@ -269,4 +289,58 @@ func parseSubtopic(subtopic string) (string, error) {
 
 	subtopic = strings.Join(filteredElems, ".")
 	return subtopic, nil
+}
+
+func updateClientConnectionStatus(ctx context.Context, s *session.Session, connectionType string, handler *handler) {
+	fmt.Printf("updateClientConnectionStatus: %v\n", connectionType)
+	dbConfig := pgclient.Config{
+		Host:        "things-db",
+		Port:        "5432",
+		User:        "magistrala",
+		Pass:        "magistrala",
+		Name:        "things",
+		SSLMode:     "disable",
+		SSLCert:     "",
+		SSLKey:      "",
+		SSLRootCert: "",
+	}
+	database, _ := pgclient.Connect(dbConfig)
+	cRepo := clientspg.NewRepository(database)
+	thing, _ := cRepo.RetrieveByIdentity(ctx, s.Username)
+	if thing.ID != "" {
+		onlineStatus := "0"
+		if connectionType == "connect" || connectionType == "subscribe" {
+			onlineStatus = "1"
+		}
+		if thing.Metadata["isOnline"] != onlineStatus {
+			thing.Metadata["isOnline"] = onlineStatus
+			_, _ = cRepo.Update(ctx, thing)
+
+			// 暂停1秒钟
+			time.Sleep(500 * time.Millisecond)
+			if PublicTopics != nil && len(*PublicTopics) != 0 {
+				for _, topic := range *PublicTopics {
+					// 定义一个字符串
+					// str := "refreshPage"
+					str := connectionType + "_refreshPage"
+					// 将字符串转换为字节切片
+					payload := []byte(str)
+					// 传递字节切片的地址给函数
+					handler.Publish(ctx, &topic, &payload)
+				}
+			}
+		}
+	}
+}
+
+// 函数接收*[]string参数并保存为公共变量
+func SaveTopics(newTopics *[]string) {
+	// 在保存之前确保PublicTopics不是nil
+	if PublicTopics == nil {
+		PublicTopics = &[]string{}
+	}
+	// 清空PublicTopics指向的切片的内容
+	*PublicTopics = (*PublicTopics)[:0]
+	// 现在将newTopics的内容追加到PublicTopics指向的切片中
+	*PublicTopics = append(*PublicTopics, *newTopics...)
 }

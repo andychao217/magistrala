@@ -4,6 +4,8 @@
 package cli
 
 import (
+	"fmt"
+
 	mgxsdk "github.com/absmach/magistrala/pkg/sdk/go"
 	"github.com/spf13/cobra"
 )
@@ -20,6 +22,7 @@ var cmdMessages = []cobra.Command{
 			}
 
 			if err := sdk.SendMessage(args[0], args[1], args[2]); err != nil {
+				fmt.Printf("%v, %v, %v", args[0], args[1], args[2])
 				logError(err)
 				return
 			}

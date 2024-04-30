@@ -27,6 +27,7 @@ var (
 	userRegexp    = regexp.MustCompile("^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~.-]+$")
 	hostRegexp    = regexp.MustCompile(`^[^\s]+\.[^\s]+$`)
 	userDotRegexp = regexp.MustCompile("(^[.]{1})|([.]{1}$)|([.]{2,})")
+	phoneRegex    = regexp.MustCompile(`^1[3-9]\d{9}$`)
 )
 
 // Credentials represent client credentials: its
@@ -105,7 +106,7 @@ type Repository interface {
 
 // Validate returns an error if client representation is invalid.
 func (u Client) Validate() error {
-	if !isEmail(u.Credentials.Identity) {
+	if !(isEmail(u.Credentials.Identity) || validateChinesePhoneNumber(u.Credentials.Identity)) {
 		return errors.ErrMalformedEntity
 	}
 	return nil
@@ -170,4 +171,11 @@ func isEmail(email string) bool {
 	}
 
 	return true
+}
+
+func validateChinesePhoneNumber(phoneNumber string) bool {
+	// 匹配中国大陆手机号码的正则表达式
+	// 这里只考虑最常见的手机号码格式，不包括一些特殊的号码或新的号段
+	// 正则表达式可以根据需要进行调整
+	return phoneRegex.MatchString(phoneNumber)
 }

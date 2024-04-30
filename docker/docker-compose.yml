@@ -80,7 +80,7 @@ services:
       - magistrala-auth-db-volume:/var/lib/postgresql/data
 
   auth:
-    image: magistrala/auth:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-auth:${MG_RELEASE_TAG}
     container_name: magistrala-auth
     depends_on:
       - auth-db
@@ -171,7 +171,7 @@ services:
       - magistrala-invitations-db-volume:/var/lib/postgresql/data
 
   invitations:
-    image: magistrala/invitations:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-invitations:${MG_RELEASE_TAG}
     container_name: magistrala-invitations
     restart: on-failure
     depends_on:
@@ -289,7 +289,7 @@ services:
       - magistrala-things-redis-volume:/data
 
   things:
-    image: magistrala/things:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-things:${MG_RELEASE_TAG}
     container_name: magistrala-things
     depends_on:
       - things-db
@@ -394,7 +394,7 @@ services:
       - magistrala-users-db-volume:/var/lib/postgresql/data
 
   users:
-    image: magistrala/users:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-users:${MG_RELEASE_TAG}
     container_name: magistrala-users
     depends_on:
       - users-db
@@ -482,7 +482,7 @@ services:
       - magistrala-base-net
 
   mqtt-adapter:
-    image: magistrala/mqtt:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-mqtt:${MG_RELEASE_TAG}
     container_name: magistrala-mqtt
     depends_on:
       - things
@@ -534,7 +534,7 @@ services:
           create_host_path: true
 
   http-adapter:
-    image: magistrala/http:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-http:${MG_RELEASE_TAG}
     container_name: magistrala-http
     depends_on:
       - things
@@ -579,7 +579,7 @@ services:
           create_host_path: true
 
   coap-adapter:
-    image: magistrala/coap:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-coap:${MG_RELEASE_TAG}
     container_name: magistrala-coap
     depends_on:
       - things
@@ -629,7 +629,7 @@ services:
           create_host_path: true
 
   ws-adapter:
-    image: magistrala/ws:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-ws:${MG_RELEASE_TAG}
     container_name: magistrala-ws
     depends_on:
       - things
@@ -674,10 +674,12 @@ services:
           create_host_path: true
 
   vernemq:
-    image: magistrala/vernemq:${MG_RELEASE_TAG}
+    image: vernemq/vernemq:${MG_RELEASE_TAG}
     container_name: magistrala-vernemq
     restart: on-failure
     environment:
+      VERNEMQ_ACCEPT_EULA: yes
+      DOCKER_VERNEMQ_ACCEPT_EULA: yes
       DOCKER_VERNEMQ_ALLOW_ANONYMOUS: ${MG_DOCKER_VERNEMQ_ALLOW_ANONYMOUS}
       DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL: ${MG_DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL}
     networks:
@@ -704,7 +706,7 @@ services:
       - magistrala-base-net
 
   ui:
-    image: magistrala/ui:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-ui:${MG_RELEASE_TAG}
     container_name: magistrala-ui
     restart: on-failure
     environment:
@@ -758,3 +760,12 @@ services:
       - magistrala-base-net
     volumes:
       - magistrala-ui-db-volume:/var/lib/postgresql/data
+
+  websocket_bridge:
+      image: andychao217/magistrala-websocket_bridge:${MG_RELEASE_TAG}
+      container_name: magistrala-websocket_bridge
+      restart: on-failure
+      ports:
+        - 63000:63000
+      networks:
+        - magistrala-base-net

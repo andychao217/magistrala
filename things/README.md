@@ -24,7 +24,7 @@ default values.
 | MG_THINGS_SERVER_CERT           | Path to the PEM encoded server certificate file                         | ""                               |
 | MG_THINGS_SERVER_KEY            | Path to the PEM encoded server key file                                 | ""                               |
 | MG_THINGS_AUTH_GRPC_HOST        | Things service gRPC host                                                | localhost                        |
-| MG_THINGS_AUTH_GRPC_PORT        | Things service gRPC port                                                | 7000                             |
+| MG_THINGS_AUTH_GRPC_PORT        | Things service gRPC port                                                | 7016                             |
 | MG_THINGS_AUTH_GRPC_SERVER_CERT | Path to the PEM encoded server certificate file                         | ""                               |
 | MG_THINGS_AUTH_GRPC_SERVER_KEY  | Path to the PEM encoded server key file                                 | ""                               |
 | MG_THINGS_DB_HOST               | Database host address                                                   | localhost                        |

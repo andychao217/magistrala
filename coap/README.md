@@ -17,7 +17,7 @@ The service is configured using the environment variables presented in the follo
 | MG_COAP_ADAPTER_HTTP_PORT        | Service listening port                                                             | 5683                                |
 | MG_COAP_ADAPTER_HTTP_SERVER_CERT | Service server certificate                                                         | ""                                  |
 | MG_COAP_ADAPTER_HTTP_SERVER_KEY  | Service server key                                                                 | ""                                  |
-| MG_THINGS_AUTH_GRPC_URL          | Things service Auth gRPC URL                                                       | <localhost:7000>                    |
+| MG_THINGS_AUTH_GRPC_URL          | Things service Auth gRPC URL                                                       | <localhost:7016>                    |
 | MG_THINGS_AUTH_GRPC_TIMEOUT      | Things service Auth gRPC request timeout in seconds                                | 1s                                  |
 | MG_THINGS_AUTH_GRPC_CLIENT_CERT  | Path to the PEM encoded things service Auth gRPC client certificate file           | ""                                  |
 | MG_THINGS_AUTH_GRPC_CLIENT_KEY   | Path to the PEM encoded things service Auth gRPC client key file                   | ""                                  |
@@ -57,7 +57,7 @@ MG_COAP_ADAPTER_HTTP_HOST=localhost \
 MG_COAP_ADAPTER_HTTP_PORT=5683 \
 MG_COAP_ADAPTER_HTTP_SERVER_CERT="" \
 MG_COAP_ADAPTER_HTTP_SERVER_KEY="" \
-MG_THINGS_AUTH_GRPC_URL=localhost:7000 \
+MG_THINGS_AUTH_GRPC_URL=localhost:7016 \
 MG_THINGS_AUTH_GRPC_TIMEOUT=1s \
 MG_THINGS_AUTH_GRPC_CLIENT_CERT="" \
 MG_THINGS_AUTH_GRPC_CLIENT_KEY="" \

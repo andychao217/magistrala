@@ -4,6 +4,10 @@ package things
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"time"
 
 	"github.com/absmach/magistrala"
@@ -28,6 +32,96 @@ type service struct {
 	clientCache Cache
 	idProvider  magistrala.IDProvider
 	grepo       mggroups.Repository
+}
+
+type Channel struct {
+	ID        string `json:"id"`
+	DomainID  string `json:"domain_id"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Status    string `json:"status"`
+}
+
+type ChannelListResponse struct {
+	Total    int       `json:"total"`
+	Offset   int       `json:"offset"`
+	Channels []Channel `json:"groups"`
+}
+
+// 获取channel id列表
+func getChannelIDs(token string) ([]string, error) {
+	// 创建domain时默认创建一个channel
+	// 要发送的数据
+	url := "http://things:9000/channels?limit=100"
+	// 创建HTTP GET请求
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		fmt.Println(err)
+		return []string{}, err
+	}
+	// 在请求头中添加token
+	req.Header.Set("Authorization", "Bearer "+token) // 假设token是一个Bearer token
+	// 创建一个HTTP客户端
+	client := &http.Client{}
+	// 发送请求
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return []string{}, err
+	}
+	defer resp.Body.Close()
+	// 读取响应体
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return []string{}, err
+	}
+	// 打印响应体
+	fmt.Println(string(body))
+
+	// 创建一个Response变量来存储解析后的数据
+	var response ChannelListResponse
+	// 使用json.Unmarshal来解析JSON字符串到Go结构体
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		fmt.Printf("Error unmarshaling JSON: %s\n", err)
+		return []string{}, err
+	}
+	// 提取所有channel的id并组合为[]string数组
+	channelIDs := make([]string, len(response.Channels))
+	for i, channel := range response.Channels {
+		channelIDs[i] = channel.ID
+	}
+	// 打印结果
+	fmt.Println(channelIDs)
+
+	return channelIDs, err
+}
+
+// 新建things后默认关联channels
+func connectThingsAndChannels(thingIDs []string, channelIDs []string, token string) {
+	for _, thingID := range thingIDs {
+		for _, channelID := range channelIDs {
+			// 设置请求URL
+			url := "http://things:9000/channels/" + channelID + "/things/" + thingID + "/connect"
+			// 创建一个HTTP客户端
+			client := &http.Client{}
+			// 创建一个请求
+			req, err := http.NewRequest(http.MethodPost, url, nil)
+			if err != nil {
+				fmt.Printf("http.NewRequest: %s\n", err)
+			}
+			// 设置请求头
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			// 发送请求
+			_, err = client.Do(req)
+			if err != nil {
+				fmt.Printf("client.Do: %s\n", err)
+			}
+		}
+	}
 }
 
 // NewService returns a new Clients service implementation.
@@ -126,6 +220,18 @@ func (svc service) CreateThings(ctx context.Context, token string, cls ...mgclie
 	}
 	if _, err := svc.auth.AddPolicies(ctx, &policies); err != nil {
 		return nil, errors.Wrap(errAddPolicies, err)
+	}
+
+	channelIDs, err := getChannelIDs(token)
+	if err != nil {
+		fmt.Println("error get ChannelIDs")
+	}
+	thingIDs := make([]string, len(saved))
+	for i, thing := range saved {
+		thingIDs[i] = thing.ID
+	}
+	if len(thingIDs) > 0 && len(channelIDs) > 0 {
+		connectThingsAndChannels(thingIDs, channelIDs, token)
 	}
 
 	return saved, nil

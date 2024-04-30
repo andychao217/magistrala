@@ -13,7 +13,7 @@ The service is configured using the environment variables presented in the follo
 | MG_WS_ADAPTER_HTTP_PORT          | Service WS port                                                                    | 8190                                |
 | MG_WS_ADAPTER_HTTP_SERVER_CERT   | Path to the PEM encoded server certificate file                                    | ""                                  |
 | MG_WS_ADAPTER_HTTP_SERVER_KEY    | Path to the PEM encoded server key file                                            | ""                                  |
-| MG_THINGS_AUTH_GRPC_URL          | Things service Auth gRPC URL                                                       | <localhost:7000>                    |
+| MG_THINGS_AUTH_GRPC_URL          | Things service Auth gRPC URL                                                       | <localhost:7016>                    |
 | MG_THINGS_AUTH_GRPC_TIMEOUT      | Things service Auth gRPC request timeout in seconds                                | 1s                                  |
 | MG_THINGS_AUTH_GRPC_CLIENT_CERT  | Path to the PEM encoded things service Auth gRPC client certificate file           | ""                                  |
 | MG_THINGS_AUTH_GRPC_CLIENT_KEY   | Path to the PEM encoded things service Auth gRPC client key file                   | ""                                  |
@@ -49,7 +49,7 @@ MG_WS_ADAPTER_HTTP_HOST=localhost \
 MG_WS_ADAPTER_HTTP_PORT=8190 \
 MG_WS_ADAPTER_HTTP_SERVER_CERT="" \
 MG_WS_ADAPTER_HTTP_SERVER_KEY="" \
-MG_THINGS_AUTH_GRPC_URL=localhost:7000 \
+MG_THINGS_AUTH_GRPC_URL=localhost:7016 \
 MG_THINGS_AUTH_GRPC_TIMEOUT=1s \
 MG_THINGS_AUTH_GRPC_CLIENT_CERT="" \
 MG_THINGS_AUTH_GRPC_CLIENT_KEY="" \

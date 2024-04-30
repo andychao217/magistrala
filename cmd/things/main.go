@@ -59,7 +59,7 @@ const (
 	envPrefixAuth      = "MG_AUTH_GRPC_"
 	defDB              = "things"
 	defSvcHTTPPort     = "9000"
-	defSvcAuthGRPCPort = "7000"
+	defSvcAuthGRPCPort = "7016"
 
 	streamID = "magistrala.things"
 )

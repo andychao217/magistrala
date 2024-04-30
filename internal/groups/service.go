@@ -40,6 +40,7 @@ func NewService(g groups.Repository, idp magistrala.IDProvider, authClient magis
 	}
 }
 
+// 新建group、channel, createChannel
 func (svc service) CreateGroup(ctx context.Context, token, kind string, g groups.Group) (gr groups.Group, err error) {
 	res, err := svc.identify(ctx, token)
 	if err != nil {
@@ -49,6 +50,7 @@ func (svc service) CreateGroup(ctx context.Context, token, kind string, g groups
 	if _, err := svc.authorizeKind(ctx, "", auth.UserType, auth.UsersKind, res.GetId(), auth.MembershipPermission, auth.DomainType, res.GetDomainId()); err != nil {
 		return groups.Group{}, err
 	}
+
 	groupID, err := svc.idProvider.ID()
 	if err != nil {
 		return groups.Group{}, err
@@ -57,7 +59,11 @@ func (svc service) CreateGroup(ctx context.Context, token, kind string, g groups
 		return groups.Group{}, svcerr.ErrInvalidStatus
 	}
 
-	g.ID = groupID
+	//如果传入ID，则以传入的ID为准
+	if g.ID == "" {
+		g.ID = groupID
+	}
+
 	g.CreatedAt = time.Now()
 	g.Domain = res.GetDomainId()
 	if g.Parent != "" {
