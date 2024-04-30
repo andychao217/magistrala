@@ -210,21 +210,25 @@ func (svc service) RegisterClient(ctx context.Context, token string, cli mgclien
 	if !svc.selfRegister {
 		userID, err := svc.Identify(ctx, token)
 		if err != nil {
+			fmt.Println("RegisterClient 11: ", err)
 			return mgclients.Client{}, err
 		}
 		if err := svc.checkSuperAdmin(ctx, userID); err != nil {
+			fmt.Println("RegisterClient 22: ", err)
 			return mgclients.Client{}, err
 		}
 	}
 
 	clientID, err := svc.idProvider.ID()
 	if err != nil {
+		fmt.Println("RegisterClient 33: ", err)
 		return mgclients.Client{}, err
 	}
 
 	if cli.Credentials.Secret != "" {
 		hash, err := svc.hasher.Hash(cli.Credentials.Secret)
 		if err != nil {
+			fmt.Println("RegisterClient 44: ", err)
 			return mgclients.Client{}, errors.Wrap(repoerr.ErrMalformedEntity, err)
 		}
 		cli.Credentials.Secret = hash
@@ -240,17 +244,20 @@ func (svc service) RegisterClient(ctx context.Context, token string, cli mgclien
 	cli.CreatedAt = time.Now()
 
 	if err := svc.addClientPolicy(ctx, cli.ID, cli.Role); err != nil {
+		fmt.Println("RegisterClient 55: ", err)
 		return mgclients.Client{}, err
 	}
 	defer func() {
 		if err != nil {
 			if errRollback := svc.addClientPolicyRollback(ctx, cli.ID, cli.Role); errRollback != nil {
+				fmt.Println("RegisterClient 66: ", err)
 				err = errors.Wrap(errors.Wrap(repoerr.ErrRollbackTx, errRollback), err)
 			}
 		}
 	}()
 	client, err := svc.clients.Save(ctx, cli)
 	if err != nil {
+		fmt.Println("RegisterClient 77: ", err)
 		return mgclients.Client{}, errors.Wrap(repoerr.ErrCreateEntity, err)
 	}
 

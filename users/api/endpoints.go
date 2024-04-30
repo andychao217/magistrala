@@ -5,6 +5,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/absmach/magistrala/internal/apiutil"
 	mgclients "github.com/absmach/magistrala/pkg/clients"
@@ -17,6 +18,7 @@ func registrationEndpoint(svc users.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(createClientReq)
 		if err := req.validate(); err != nil {
+			fmt.Println("registrationEndpoint 11: ", err)
 			return nil, errors.Wrap(apiutil.ErrValidation, err)
 		}
 
