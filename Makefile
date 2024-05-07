@@ -50,7 +50,7 @@ endef
 define make_docker
 	$(eval svc=$(subst docker_,,$(1)))
 
-	docker buildx build --platform=linux/amd64,linux/arm64 \
+	docker buildx build --platform=linux/amd64,linux/arm64,windows/amd64,windows/arm64 \
 		--no-cache \
 		--build-arg SVC=$(svc) \
 		--build-arg VERSION=$(VERSION) \

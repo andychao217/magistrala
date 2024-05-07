@@ -6,10 +6,14 @@ package users
 import (
 	"bytes"
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/absmach/magistrala"
@@ -61,6 +65,7 @@ type UserInfoResponseBody struct {
 	Status      string                 `json:"status"`
 }
 
+var encryptedKey = []byte(`LFJEW2HvOI9EpI5FmIWE*#&$(HFKDFR0`)
 var CurrentUser = UserInfo{}
 
 // NewService returns a new Users service implementation.
@@ -72,6 +77,62 @@ func NewService(crepo postgres.Repository, authClient magistrala.AuthServiceClie
 		email:        emailer,
 		idProvider:   idp,
 		selfRegister: selfRegister,
+	}
+}
+
+// pkcs7UnPadding 移除PKCS#7填充
+func pkcs7UnPadding(origData []byte) ([]byte, error) {
+	length := len(origData)
+	fmt.Println("origData: ", origData)
+
+	if length == 0 {
+		return nil, fmt.Errorf("input data is empty")
+	}
+	padding := int(origData[length-1])
+	fmt.Println("padding: ", padding)
+	fmt.Println("length: ", length)
+	fmt.Println("aes.BlockSize: ", aes.BlockSize)
+
+	if padding > length || padding > aes.BlockSize {
+		return nil, fmt.Errorf("padding size error")
+	}
+	return origData[:length-padding], nil
+}
+
+// 密码解密
+// Decrypts text from base64 encoded string using AES-CBC mode and removes PKCS#7 padding
+func decrypt(encryptedString string, key []byte) (string, error) {
+	if strings.Contains(encryptedString, ":") {
+		//如果包含:则将字符串用:分割，进行解密
+		parts := strings.Split(encryptedString, ":")
+		ciphertext, _ := base64.StdEncoding.DecodeString(parts[0])
+		iv, _ := base64.StdEncoding.DecodeString(parts[1])
+		// 创建一个新的 cipher.Block
+		block, err := aes.NewCipher(key)
+		if err != nil {
+			fmt.Println(err)
+			return "", err
+		}
+		// 创建一个新的 CBC BlockMode
+		if len(ciphertext) < aes.BlockSize {
+			fmt.Println("ciphertext too short")
+			return "", err
+		}
+		if len(ciphertext)%aes.BlockSize != 0 {
+			fmt.Println("ciphertext is not a multiple of the block size")
+			return "", err
+		}
+		mode := cipher.NewCBCDecrypter(block, iv)
+		// 创建一个字节切片来存储解密后的数据
+		mode.CryptBlocks(ciphertext, ciphertext)
+		decrypted, err := pkcs7UnPadding(ciphertext)
+		if err != nil {
+			return "", err
+		}
+		return string(decrypted), nil
+	} else {
+		//如果不包含:则原样返回
+		return encryptedString, nil
 	}
 }
 
@@ -226,7 +287,10 @@ func (svc service) RegisterClient(ctx context.Context, token string, cli mgclien
 	}
 
 	if cli.Credentials.Secret != "" {
-		hash, err := svc.hasher.Hash(cli.Credentials.Secret)
+		// 密码解密
+		secret := cli.Credentials.Secret
+		secret, _ = decrypt(secret, encryptedKey)
+		hash, err := svc.hasher.Hash(secret)
 		if err != nil {
 			fmt.Println("RegisterClient 44: ", err)
 			return mgclients.Client{}, errors.Wrap(repoerr.ErrMalformedEntity, err)
@@ -291,11 +355,13 @@ func (svc service) RegisterClient(ctx context.Context, token string, cli mgclien
 	return client, nil
 }
 
-func (svc service) IssueToken(ctx context.Context, identity, secret, domainID string) (*magistrala.Token, error) {
+func (svc service) IssueToken(ctx context.Context, identity, secretStr, domainID string) (*magistrala.Token, error) {
 	dbUser, err := svc.clients.RetrieveByIdentity(ctx, identity)
 	if err != nil {
 		return &magistrala.Token{}, errors.Wrap(svcerr.ErrViewEntity, err)
 	}
+	// 密码解密
+	secret, _ := decrypt(secretStr, encryptedKey)
 	var sercetVar string = secret
 	if err := svc.hasher.Compare(secret, dbUser.Credentials.Secret); err != nil {
 		return &magistrala.Token{}, errors.Wrap(svcerr.ErrLogin, err)
@@ -519,7 +585,7 @@ func (svc service) GenerateResetToken(ctx context.Context, email, host string) e
 	return svc.SendPasswordReset(ctx, host, email, client.Name, token.AccessToken)
 }
 
-func (svc service) ResetSecret(ctx context.Context, resetToken, secret string) error {
+func (svc service) ResetSecret(ctx context.Context, resetToken, secretStr string) error {
 	id, err := svc.Identify(ctx, resetToken)
 	if err != nil {
 		return err
@@ -531,6 +597,8 @@ func (svc service) ResetSecret(ctx context.Context, resetToken, secret string) e
 	if c.Credentials.Identity == "" {
 		return repoerr.ErrNotFound
 	}
+	// 密码解密
+	secret, _ := decrypt(secretStr, encryptedKey)
 	var sercetVar string = secret
 	secret, err = svc.hasher.Hash(secret)
 	if err != nil {
@@ -570,7 +638,7 @@ func (svc service) ResetSecret(ctx context.Context, resetToken, secret string) e
 	return nil
 }
 
-func (svc service) UpdateClientSecret(ctx context.Context, token, oldSecret, newSecret string) (mgclients.Client, error) {
+func (svc service) UpdateClientSecret(ctx context.Context, token, oldSecretStr, newSecretStr string) (mgclients.Client, error) {
 	id, err := svc.Identify(ctx, token)
 	if err != nil {
 		return mgclients.Client{}, err
@@ -579,6 +647,9 @@ func (svc service) UpdateClientSecret(ctx context.Context, token, oldSecret, new
 	if err != nil {
 		return mgclients.Client{}, errors.Wrap(svcerr.ErrViewEntity, err)
 	}
+	// 密码解密
+	oldSecret, _ := decrypt(oldSecretStr, encryptedKey)
+	newSecret, _ := decrypt(newSecretStr, encryptedKey)
 	if _, err := svc.IssueToken(ctx, dbClient.Credentials.Identity, oldSecret, ""); err != nil {
 		return mgclients.Client{}, errors.Wrap(svcerr.ErrIssueToken, err)
 	}
