@@ -31,7 +31,7 @@ services:
       - magistrala-mongodb-configdb-volume:/data/configdb
 
   mongodb-writer:
-    image: magistrala/mongodb-writer:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-mongodb-writer:${MG_RELEASE_TAG}
     container_name: magistrala-mongodb-writer
     depends_on:
       - mongodb

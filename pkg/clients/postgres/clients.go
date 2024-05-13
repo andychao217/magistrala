@@ -464,6 +464,9 @@ func PageQuery(pm clients.Page) (string, error) {
 	if pm.Identity != "" {
 		query = append(query, "c.identity = :identity")
 	}
+	// if pm.Name != "" {
+	// 	query = append(query, "c.name = :name")
+	// }
 	// 不显示名称为Platform的thing，这个thing是新建domain时默认创建的，只用做平台和设备通信用
 	// 处理name字段，排除"Platform"
 	if pm.Name != "" && pm.Name != "Platform" {
@@ -496,6 +499,9 @@ func constructSearchQuery(pm clients.Page) (string, string) {
 	var emq string
 	var tq string
 
+	// if pm.Name != "" {
+	// 	query = append(query, "name ~ :name")
+	// }
 	// 不显示名称为Platform的thing，这个thing是新建domain时默认创建的，只用做平台和设备通信用
 	if pm.Name != "" && pm.Name != "Platform" {
 		query = append(query, "name ~ :name")

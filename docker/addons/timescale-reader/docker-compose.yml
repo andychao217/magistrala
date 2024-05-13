@@ -12,7 +12,7 @@ networks:
 
 services:
   timescale-reader:
-    image: magistrala/timescale-reader:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-timescale-reader:${MG_RELEASE_TAG}
     container_name: magistrala-timescale-reader
     restart: on-failure
     environment:

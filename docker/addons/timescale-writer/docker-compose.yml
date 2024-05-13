@@ -31,7 +31,7 @@ services:
       - magistrala-timescale-writer-volume:/var/lib/timescalesql/data
 
   timescale-writer:
-    image: magistrala/timescale-writer:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-timescale-writer:${MG_RELEASE_TAG}
     container_name: magistrala-timescale-writer
     depends_on:
       - timescale

@@ -37,7 +37,7 @@ services:
       - magistrala-twins-db-configdb-volume:/data/configdb
 
   twins:
-    image: magistrala/twins:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-twins:${MG_RELEASE_TAG}
     container_name: magistrala-twins
     restart: on-failure
     environment:

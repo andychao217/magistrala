@@ -11,7 +11,7 @@ networks:
 
 services:
   provision:
-    image: magistrala/provision:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-provision:${MG_RELEASE_TAG}
     container_name: magistrala-provision
     restart: on-failure
     networks:

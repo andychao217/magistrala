@@ -34,7 +34,7 @@ services:
       - magistrala-influxdb-volume:/var/lib/influxdb
 
   influxdb-writer:
-    image: magistrala/influxdb-writer:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-influxdb-writer:${MG_RELEASE_TAG}
     container_name: magistrala-influxdb-writer
     depends_on:
       - influxdb

@@ -36,7 +36,7 @@ services:
       - magistrala-base-net
 
   cassandra-writer:
-    image: magistrala/cassandra-writer:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-cassandra-writer:${MG_RELEASE_TAG}
     container_name: magistrala-cassandra-writer
     depends_on:
       - cassandra

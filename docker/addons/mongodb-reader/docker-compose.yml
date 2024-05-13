@@ -12,7 +12,7 @@ networks:
 
 services:
   mongodb-reader:
-    image: magistrala/mongodb-reader:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-mongodb-reader:${MG_RELEASE_TAG}
     container_name: magistrala-mongodb-reader
     restart: on-failure
     environment:

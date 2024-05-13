@@ -194,9 +194,9 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 	}
 	h.logger.Info(fmt.Sprintf(LogInfoSubscribed, s.ID, strings.Join(*topics, ",")))
 	SaveTopics(topics)
-	if s.Username != "" {
-		updateClientConnectionStatus(ctx, s, "subscribe", h)
-	}
+	// if s.Username != "" {
+	// 	updateClientConnectionStatus(ctx, s, "subscribe", h)
+	// }
 	return nil
 }
 
@@ -204,9 +204,9 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
 	SaveTopics(topics)
-	if s.Username != "" {
-		updateClientConnectionStatus(ctx, s, "unsubscribe", h)
-	}
+	// if s.Username != "" {
+	// 	updateClientConnectionStatus(ctx, s, "unsubscribe", h)
+	// }
 	if !ok {
 		return errors.Wrap(ErrFailedUnsubscribe, ErrClientNotInitialized)
 	}

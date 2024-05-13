@@ -226,9 +226,14 @@ func (svc service) CreateThings(ctx context.Context, token string, cls ...mgclie
 	if err != nil {
 		fmt.Println("error get ChannelIDs")
 	}
+	//新建名为”Platform“的things时，自动连接所有该domain下Channels
 	thingIDs := make([]string, len(saved))
 	for i, thing := range saved {
-		thingIDs[i] = thing.ID
+		if thing.Name == "Platform" {
+			thingIDs[i] = thing.ID
+		} else {
+			continue
+		}
 	}
 	if len(thingIDs) > 0 && len(channelIDs) > 0 {
 		connectThingsAndChannels(thingIDs, channelIDs, token)

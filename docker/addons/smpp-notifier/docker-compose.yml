@@ -27,7 +27,7 @@ services:
       - magistrala-smpp-notifier-volume:/var/lib/postgresql/datab
 
   smpp-notifier:
-    image: magistrala/smpp-notifier:latest
+    image: andychao217/magistrala-smpp-notifier:${MG_RELEASE_TAG}
     container_name: magistrala-smpp-notifier
     depends_on:
       - smpp-notifier-db

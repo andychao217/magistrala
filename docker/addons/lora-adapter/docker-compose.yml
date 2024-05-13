@@ -18,7 +18,7 @@ services:
       - magistrala-base-net
 
   lora-adapter:
-    image: magistrala/lora:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-lora:${MG_RELEASE_TAG}
     container_name: magistrala-lora
     restart: on-failure
     environment:

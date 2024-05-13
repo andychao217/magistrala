@@ -11,7 +11,7 @@ networks:
 
 services:
   cassandra-reader:
-    image: magistrala/cassandra-reader:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-cassandra-reader:${MG_RELEASE_TAG}
     container_name: magistrala-cassandra-reader
     restart: on-failure
     environment:

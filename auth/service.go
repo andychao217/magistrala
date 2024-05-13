@@ -851,10 +851,11 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 		newToken := tokenResponseBody.AccessToken
 
 		//创建默认channel
-		newChannel, err := createDefaultChannel(newToken, dom)
-		if err != nil {
-			fmt.Printf("Failed to call the second API: %v\n", err)
-		}
+		// newChannel, err := createDefaultChannel(newToken, dom)
+		newChannel := Channel{}
+		// if err != nil {
+		// 	fmt.Printf("Failed to call the second API: %v\n", err)
+		// }
 		if newChannel.ID != "" {
 			userInfo, err := httpGetUserInfo(newToken)
 			// 将结构体转换为JSON格式的字节切片

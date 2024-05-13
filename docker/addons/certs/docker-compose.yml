@@ -28,7 +28,7 @@ services:
       - magistrala-certs-db-volume:/var/lib/postgresql/data
 
   certs:
-    image: magistrala/certs:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-certs:${MG_RELEASE_TAG}
     container_name: magistrala-certs
     depends_on:
       - certs-db

@@ -24,7 +24,7 @@ services:
       - magistrala-opcua-redis-volume:/data
 
   opcua-adapter:
-    image: magistrala/opcua:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-opcua:${MG_RELEASE_TAG}
     container_name: magistrala-opcua
     restart: on-failure
     environment:

@@ -13,7 +13,7 @@ networks:
 
 services:
   influxdb-reader:
-    image: magistrala/influxdb-reader:${MG_RELEASE_TAG}
+    image: andychao217/magistrala-influxdb-reader:${MG_RELEASE_TAG}
     container_name: magistrala-influxdb-reader
     restart: on-failure
     environment:
