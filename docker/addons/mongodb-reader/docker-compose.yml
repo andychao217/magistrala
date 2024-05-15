@@ -14,6 +14,11 @@ services:
   mongodb-reader:
     image: andychao217/magistrala-mongodb-reader:${MG_RELEASE_TAG}
     container_name: magistrala-mongodb-reader
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MG_MONGO_READER_LOG_LEVEL: ${MG_MONGO_READER_LOG_LEVEL}

@@ -16,6 +16,11 @@ services:
   cassandra:
     image: cassandra:3.11.16
     container_name: magistrala-cassandra
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     networks:
       - magistrala-base-net
@@ -26,6 +31,11 @@ services:
 
   cassandra-init-keyspace:
     image: cassandra:3.11.16
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - cassandra
     restart: on-failure
@@ -38,6 +48,11 @@ services:
   cassandra-writer:
     image: andychao217/magistrala-cassandra-writer:${MG_RELEASE_TAG}
     container_name: magistrala-cassandra-writer
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - cassandra
     restart: on-failure

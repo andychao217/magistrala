@@ -13,6 +13,11 @@ services:
   cassandra-reader:
     image: andychao217/magistrala-cassandra-reader:${MG_RELEASE_TAG}
     container_name: magistrala-cassandra-reader
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MG_CASSANDRA_READER_LOG_LEVEL: ${MG_CASSANDRA_READER_LOG_LEVEL}

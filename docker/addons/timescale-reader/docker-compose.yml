@@ -14,6 +14,11 @@ services:
   timescale-reader:
     image: andychao217/magistrala-timescale-reader:${MG_RELEASE_TAG}
     container_name: magistrala-timescale-reader
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MG_TIMESCALE_READER_LOG_LEVEL: ${MG_TIMESCALE_READER_LOG_LEVEL}

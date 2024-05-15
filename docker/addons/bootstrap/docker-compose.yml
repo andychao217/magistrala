@@ -17,6 +17,11 @@ services:
   bootstrap-db:
     image: postgres:16.2-alpine
     container_name: magistrala-bootstrap-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       POSTGRES_USER: ${MG_BOOTSTRAP_DB_USER}
@@ -30,6 +35,11 @@ services:
   bootstrap:
     image: andychao217/magistrala-bootstrap:${MG_RELEASE_TAG}
     container_name: magistrala-bootstrap
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - bootstrap-db
     restart: on-failure

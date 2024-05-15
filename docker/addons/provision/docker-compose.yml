@@ -13,6 +13,11 @@ services:
   provision:
     image: andychao217/magistrala-provision:${MG_RELEASE_TAG}
     container_name: magistrala-provision
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     networks:
       - magistrala-base-net

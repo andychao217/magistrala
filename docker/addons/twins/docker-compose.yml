@@ -17,6 +17,11 @@ services:
   twins-redis:
     image: redis:7.2.4-alpine
     container_name: magistrala-twins-redis
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     networks:
       - magistrala-base-net
@@ -25,6 +30,11 @@ services:
     image: mongo:bionic
     command: mongod --port ${MG_TWINS_DB_PORT}
     container_name: magistrala-twins-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MONGO_INITDB_DATABASE: ${MG_TWINS_DB_NAME}
@@ -39,6 +49,11 @@ services:
   twins:
     image: andychao217/magistrala-twins:${MG_RELEASE_TAG}
     container_name: magistrala-twins
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MG_TWINS_LOG_LEVEL: ${MG_TWINS_LOG_LEVEL}

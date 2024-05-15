@@ -16,6 +16,11 @@ services:
   smpp-notifier-db:
     image: postgres:16.2-alpine
     container_name: magistrala-smpp-notifier-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       POSTGRES_USER: ${MG_SMPP_NOTIFIER_DB_USER}
@@ -29,6 +34,11 @@ services:
   smpp-notifier:
     image: andychao217/magistrala-smpp-notifier:${MG_RELEASE_TAG}
     container_name: magistrala-smpp-notifier
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - smpp-notifier-db
     restart: on-failure

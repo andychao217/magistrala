@@ -15,6 +15,11 @@ services:
   influxdb-reader:
     image: andychao217/magistrala-influxdb-reader:${MG_RELEASE_TAG}
     container_name: magistrala-influxdb-reader
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MG_INFLUX_READER_LOG_LEVEL: ${MG_INFLUX_READER_LOG_LEVEL}

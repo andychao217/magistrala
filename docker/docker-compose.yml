@@ -22,6 +22,11 @@ services:
   spicedb:
     image: "authzed/spicedb:v1.30.0"
     container_name: magistrala-spicedb
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     command: "serve"
     restart: "always"
     networks:
@@ -40,6 +45,11 @@ services:
   spicedb-migrate:
     image: "authzed/spicedb:v1.30.0"
     container_name: magistrala-spicedb-migrate
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     command: "migrate head"
     restart: "on-failure"
     networks:
@@ -53,6 +63,11 @@ services:
   spicedb-db:
     image: "postgres:16.2-alpine"
     container_name: magistrala-spicedb-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     networks:
       - magistrala-base-net
     ports:
@@ -67,6 +82,11 @@ services:
   auth-db:
     image: postgres:16.2-alpine
     container_name: magistrala-auth-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     ports:
       - 6004:5432
@@ -82,6 +102,11 @@ services:
   auth:
     image: andychao217/magistrala-auth:${MG_RELEASE_TAG}
     container_name: magistrala-auth
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - auth-db
       - spicedb
@@ -156,6 +181,11 @@ services:
   invitations-db:
     image: postgres:16.2-alpine
     container_name: magistrala-invitations-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
@@ -173,6 +203,11 @@ services:
   invitations:
     image: andychao217/magistrala-invitations:${MG_RELEASE_TAG}
     container_name: magistrala-invitations
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     depends_on:
       - invitations-db
@@ -227,6 +262,11 @@ services:
   nginx:
     image: nginx:1.25.4-alpine
     container_name: magistrala-nginx
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     volumes:
       - ./nginx/nginx-${AUTH-key}.conf:/etc/nginx/nginx.conf.template
@@ -265,6 +305,11 @@ services:
   things-db:
     image: postgres:16.2-alpine
     container_name: magistrala-things-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
@@ -282,6 +327,11 @@ services:
   things-redis:
     image: redis:7.2.4-alpine
     container_name: magistrala-things-redis
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     networks:
       - magistrala-base-net
@@ -291,6 +341,11 @@ services:
   things:
     image: andychao217/magistrala-things:${MG_RELEASE_TAG}
     container_name: magistrala-things
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - things-db
       - users
@@ -379,6 +434,11 @@ services:
   users-db:
     image: postgres:16.2-alpine
     container_name: magistrala-users-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
@@ -396,6 +456,11 @@ services:
   users:
     image: andychao217/magistrala-users:${MG_RELEASE_TAG}
     container_name: magistrala-users
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - users-db
       - auth
@@ -472,6 +537,11 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:1.53.0
     container_name: magistrala-jaeger
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     environment:
       COLLECTOR_OTLP_ENABLED: ${MG_JAEGER_COLLECTOR_OTLP_ENABLED}
     command: --memory.max-traces ${MG_JAEGER_MEMORY_MAX_TRACES}
@@ -484,6 +554,11 @@ services:
   mqtt-adapter:
     image: andychao217/magistrala-mqtt:${MG_RELEASE_TAG}
     container_name: magistrala-mqtt
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - things
       - vernemq
@@ -536,6 +611,11 @@ services:
   http-adapter:
     image: andychao217/magistrala-http:${MG_RELEASE_TAG}
     container_name: magistrala-http
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - things
       - nats
@@ -581,6 +661,11 @@ services:
   coap-adapter:
     image: andychao217/magistrala-coap:${MG_RELEASE_TAG}
     container_name: magistrala-coap
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - things
       - nats
@@ -631,6 +716,11 @@ services:
   ws-adapter:
     image: andychao217/magistrala-ws:${MG_RELEASE_TAG}
     container_name: magistrala-ws
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - things
       - nats
@@ -676,6 +766,11 @@ services:
   vernemq:
     image: vernemq/vernemq:${MG_RELEASE_TAG}
     container_name: magistrala-vernemq
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       VERNEMQ_ACCEPT_EULA: yes
@@ -690,6 +785,11 @@ services:
   nats:
     image: nats:2.10.9-alpine
     container_name: magistrala-nats
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     command: "--config=/etc/nats/nats.conf"
     environment:
@@ -708,6 +808,11 @@ services:
   ui:
     image: andychao217/magistrala-ui:${MG_RELEASE_TAG}
     container_name: magistrala-ui
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MG_UI_LOG_LEVEL: ${MG_UI_LOG_LEVEL}
@@ -747,6 +852,11 @@ services:
   ui-db:
     image: postgres:16.2-alpine
     container_name: magistrala-ui-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
@@ -764,6 +874,11 @@ services:
   websocket_bridge:
       image: andychao217/magistrala-websocket_bridge:${MG_RELEASE_TAG}
       container_name: magistrala-websocket_bridge
+      logging:  
+        driver: "json-file"  
+        options:  
+          max-size: "10m"  
+          max-file: "3"
       restart: on-failure
       ports:
         - 63000:63000

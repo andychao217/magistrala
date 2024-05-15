@@ -19,6 +19,11 @@ services:
   mongodb:
     image: mongo:7.0.8
     container_name: magistrala-mongodb
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MONGO_INITDB_DATABASE: ${MG_MONGO_NAME}
@@ -33,6 +38,11 @@ services:
   mongodb-writer:
     image: andychao217/magistrala-mongodb-writer:${MG_RELEASE_TAG}
     container_name: magistrala-mongodb-writer
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - mongodb
     restart: on-failure

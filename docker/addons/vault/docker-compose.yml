@@ -20,6 +20,11 @@ services:
   vault:
     image: hashicorp/vault:1.15.4
     container_name: magistrala-vault
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     ports:
       - ${MG_VAULT_PORT}:8200
     networks:

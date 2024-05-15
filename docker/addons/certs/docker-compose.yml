@@ -17,6 +17,11 @@ services:
   certs-db:
     image: postgres:16.2-alpine
     container_name: magistrala-certs-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       POSTGRES_USER: ${MG_CERTS_DB_USER}
@@ -30,6 +35,11 @@ services:
   certs:
     image: andychao217/magistrala-certs:${MG_RELEASE_TAG}
     container_name: magistrala-certs
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - certs-db
     restart: on-failure

@@ -17,6 +17,11 @@ services:
   promethues:
     image: prom/prometheus:v2.49.1
     container_name: magistrala-prometheus
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     ports:
       - ${MG_PROMETHEUS_PORT}:${MG_PROMETHEUS_PORT}
@@ -31,6 +36,11 @@ services:
   grafana:
     image: grafana/grafana:10.2.3
     container_name: magistrala-grafana
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - promethues
     restart: on-failure
