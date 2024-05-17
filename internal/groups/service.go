@@ -51,7 +51,7 @@ func NewService(g groups.Repository, idp magistrala.IDProvider, authClient magis
 
 // 获取名为Platform的thing id
 func getPlatformThingID(token string) (string, error) {
-	url := "http://things:9000/things?limit=100&name=Platform"
+	url := "http://things:9000/things?limit=1000&name=Platform"
 	// 创建HTTP GET请求
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

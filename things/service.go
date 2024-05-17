@@ -53,7 +53,7 @@ type ChannelListResponse struct {
 func getChannelIDs(token string) ([]string, error) {
 	// 创建domain时默认创建一个channel
 	// 要发送的数据
-	url := "http://things:9000/channels?limit=100"
+	url := "http://things:9000/channels?limit=1000"
 	// 创建HTTP GET请求
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

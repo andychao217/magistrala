@@ -10,7 +10,7 @@ import (
 	"github.com/absmach/magistrala/invitations"
 )
 
-const maxLimitSize = 100
+const maxLimitSize = 1000
 
 var errMissingDomain = errors.New("missing domain")
 

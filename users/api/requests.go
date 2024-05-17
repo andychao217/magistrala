@@ -9,7 +9,7 @@ import (
 	mgclients "github.com/absmach/magistrala/pkg/clients"
 )
 
-const maxLimitSize = 100
+const maxLimitSize = 1000
 
 type createClientReq struct {
 	client mgclients.Client

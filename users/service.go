@@ -235,7 +235,7 @@ func createDefaultDomain(token string) (auth.Domain, error) {
 	// 要发送的数据
 	var domain auth.Domain
 	postData := []byte(`{
-			"name": "Default Domain",
+			"name": "默认机构",
 			"tags": [],
 			"metadata": {},
 			"alias": ""

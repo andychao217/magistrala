@@ -10,7 +10,7 @@ import (
 
 const (
 	maxNameSize  = 1024
-	maxLimitSize = 100
+	maxLimitSize = 1000
 )
 
 type addTwinReq struct {

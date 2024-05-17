@@ -62,7 +62,7 @@ const (
 	ContentType = "application/json"
 
 	// MaxNameSize limits name size to prevent making them too complex.
-	MaxLimitSize = 100
+	MaxLimitSize = 1000
 	MaxNameSize  = 1024
 	NameOrder    = "name"
 	IDOrder      = "id"
