@@ -194,9 +194,9 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 	}
 	h.logger.Info(fmt.Sprintf(LogInfoSubscribed, s.ID, strings.Join(*topics, ",")))
 	SaveTopics(topics)
-	// if s.Username != "" {
-	// 	updateClientConnectionStatus(ctx, s, "subscribe", h)
-	// }
+	if s.Username != "" {
+		updateClientConnectionStatus(ctx, s, "subscribe", h)
+	}
 	return nil
 }
 

@@ -178,7 +178,7 @@ dockers_dev: $(DOCKERS_DEV)
 
 define docker_push
 	for svc in $(SERVICES); do \
-		docker push $(MG_DOCKER_IMAGE_NAME_PREFIX)/$$svc:$(1); \
+		docker push $(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(SVC):$(1); \
 	done
 endef
 
