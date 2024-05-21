@@ -179,11 +179,11 @@ func httpGetToken(identity string, secret string) (*TokenResponseBody, error) {
 	if err != nil {
 		fmt.Printf("无法连接到Redis: %v", err)
 	} else {
-		err = rdb.Set(rdctx, "CurrentUserIdentity", CurrentUser.Identity, 168*time.Hour).Err()
+		err = rdb.Set(rdctx, "CurrentUserIdentity", CurrentUser.Identity, 1*365*24*time.Hour).Err()
 		if err != nil {
 			fmt.Printf("Failed to set value in Redis: %v\n", err)
 		}
-		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 168*time.Hour).Err()
+		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 1*365*24*time.Hour).Err()
 		if err != nil {
 			fmt.Printf("Failed to set value in Redis: %v\n", err)
 		}
@@ -385,11 +385,11 @@ func (svc service) IssueToken(ctx context.Context, identity, secretStr, domainID
 	if err != nil {
 		fmt.Printf("无法连接到Redis: %v", err)
 	} else {
-		err = rdb.Set(rdctx, "CurrentUserIdentity", CurrentUser.Identity, 168*time.Hour).Err()
+		err = rdb.Set(rdctx, "CurrentUserIdentity", CurrentUser.Identity, 1*365*24*time.Hour).Err()
 		if err != nil {
 			fmt.Printf("Failed to set value in Redis: %v\n", err)
 		}
-		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 168*time.Hour).Err()
+		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 1*365*24*time.Hour).Err()
 		if err != nil {
 			fmt.Printf("Failed to set value in Redis: %v\n", err)
 		}
@@ -559,7 +559,7 @@ func (svc service) UpdateClientIdentity(ctx context.Context, token, clientID, id
 	if err != nil {
 		fmt.Printf("无法连接到Redis: %v", err)
 	} else {
-		err = rdb.Set(rdctx, "CurrentUserIdentity", CurrentUser.Identity, 168*time.Hour).Err()
+		err = rdb.Set(rdctx, "CurrentUserIdentity", CurrentUser.Identity, 1*365*24*time.Hour).Err()
 		if err != nil {
 			fmt.Printf("Failed to set value in Redis: %v\n", err)
 		}
@@ -629,7 +629,7 @@ func (svc service) ResetSecret(ctx context.Context, resetToken, secretStr string
 	if err != nil {
 		fmt.Printf("无法连接到Redis: %v", err)
 	} else {
-		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 168*time.Hour).Err()
+		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 1*365*24*time.Hour).Err()
 		if err != nil {
 			fmt.Printf("Failed to set value in Redis: %v\n", err)
 		}
@@ -679,7 +679,7 @@ func (svc service) UpdateClientSecret(ctx context.Context, token, oldSecretStr, 
 	if err != nil {
 		fmt.Printf("无法连接到Redis: %v", err)
 	} else {
-		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 168*time.Hour).Err()
+		err = rdb.Set(rdctx, "CurrentUserSecret", CurrentUser.Secret, 1*365*24*time.Hour).Err()
 		if err != nil {
 			fmt.Printf("Failed to set value in Redis: %v\n", err)
 		}

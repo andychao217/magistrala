@@ -53,7 +53,8 @@ type ChannelListResponse struct {
 func getChannelIDs(token string) ([]string, error) {
 	// 创建domain时默认创建一个channel
 	// 要发送的数据
-	url := "http://things:9000/channels?limit=1000"
+	// 只默认关联default_channel
+	url := "http://things:9000/channels?limit=1000&name=default_channel"
 	// 创建HTTP GET请求
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -226,14 +227,10 @@ func (svc service) CreateThings(ctx context.Context, token string, cls ...mgclie
 	if err != nil {
 		fmt.Println("error get ChannelIDs")
 	}
-	//新建名为”Platform“的things时，自动连接所有该domain下Channels
+	//新建things时，自动连接该domain下的default Channel
 	thingIDs := make([]string, len(saved))
 	for i, thing := range saved {
-		if thing.Name == "Platform" {
-			thingIDs[i] = thing.ID
-		} else {
-			continue
-		}
+		thingIDs[i] = thing.ID
 	}
 	if len(thingIDs) > 0 && len(channelIDs) > 0 {
 		connectThingsAndChannels(thingIDs, channelIDs, token)

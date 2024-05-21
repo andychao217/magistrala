@@ -606,7 +606,7 @@ func createDefaultChannel(token string, domain Domain) (Channel, error) {
 	}
 	// 创建一个Channel结构体的实例
 	postChannel := ChannelPostData{
-		Name: "Default Channel",
+		Name: "default_channel",
 		ID:   "",
 	}
 	jsonBytes, err := json.Marshal(postChannel)
@@ -850,21 +850,31 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 		}
 		newToken := tokenResponseBody.AccessToken
 
-		//创建默认channel
-		// newChannel, err := createDefaultChannel(newToken, dom)
-		newChannel := Channel{}
-		// if err != nil {
-		// 	fmt.Printf("Failed to call the second API: %v\n", err)
-		// }
+		//创建默认channel,之后把默认channel的id写入domain的metadata.comID
+		newChannel, err := createDefaultChannel(newToken, dom)
+		if err != nil {
+			fmt.Printf("Failed to call the second API: %v\n", err)
+		}
 		if newChannel.ID != "" {
-			userInfo, err := httpGetUserInfo(newToken)
-			// 将结构体转换为JSON格式的字节切片
-			jsonData, _ := json.Marshal(userInfo)
-			// 打印JSON格式的字节切片（这将以二进制形式显示）
-			fmt.Println("authService userinfo data: ", string(jsonData))
-
+			if dom.Metadata == nil {
+				dom.Metadata = make(mgclients.Metadata)
+			}
+			dom.Metadata["comID"] = newChannel.ID
+			domainReqData := DomainReq{
+				Name:     &dom.Name,
+				Tags:     &dom.Tags,
+				Alias:    &dom.Alias,
+				Status:   &dom.Status,
+				Metadata: &dom.Metadata,
+			}
+			_, err = svc.UpdateDomain(ctx, newToken, dom.ID, domainReqData)
 			if err != nil {
-				fmt.Printf("Failed to set value in Redis: %v\n", err)
+				fmt.Printf("Failed to UpdateDomain: %v\n", err)
+			}
+
+			userInfo, err := httpGetUserInfo(newToken)
+			if err != nil {
+				fmt.Printf("Failed to httpGetUserInfo: %v\n", err)
 			} else {
 				_ = updateUserInfo(newToken, userInfo, newChannel.ID, dom.ID)
 			}
