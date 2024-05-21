@@ -36,6 +36,8 @@ services:
       - "9091:9090"
       - "50051:50051"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       SPICEDB_GRPC_PRESHARED_KEY: ${MG_SPICEDB_PRE_SHARED_KEY}
       SPICEDB_DATASTORE_ENGINE: ${MG_SPICEDB_DATASTORE_ENGINE}
       SPICEDB_DATASTORE_CONN_URI: "${MG_SPICEDB_DATASTORE_ENGINE}://${MG_SPICEDB_DB_USER}:${MG_SPICEDB_DB_PASS}@spicedb-db:${MG_SPICEDB_DB_PORT}/${MG_SPICEDB_DB_NAME}?sslmode=disable"
@@ -73,6 +75,8 @@ services:
     ports:
       - "6010:5432"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_SPICEDB_DB_USER}
       POSTGRES_PASSWORD: ${MG_SPICEDB_DB_PASS}
       POSTGRES_DB: ${MG_SPICEDB_DB_NAME}
@@ -91,6 +95,8 @@ services:
     ports:
       - 6004:5432
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_AUTH_DB_USER}
       POSTGRES_PASSWORD: ${MG_AUTH_DB_PASS}
       POSTGRES_DB: ${MG_AUTH_DB_NAME}
@@ -189,6 +195,8 @@ services:
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_INVITATIONS_DB_USER}
       POSTGRES_PASSWORD: ${MG_INVITATIONS_DB_PASS}
       POSTGRES_DB: ${MG_INVITATIONS_DB_NAME}
@@ -313,6 +321,8 @@ services:
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_THINGS_DB_USER}
       POSTGRES_PASSWORD: ${MG_THINGS_DB_PASS}
       POSTGRES_DB: ${MG_THINGS_DB_NAME}
@@ -442,6 +452,8 @@ services:
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_USERS_DB_USER}
       POSTGRES_PASSWORD: ${MG_USERS_DB_PASS}
       POSTGRES_DB: ${MG_USERS_DB_NAME}
@@ -860,6 +872,8 @@ services:
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_UI_DB_USER}
       POSTGRES_PASSWORD: ${MG_UI_DB_PASS}
       POSTGRES_DB: ${MG_UI_DB_NAME}
