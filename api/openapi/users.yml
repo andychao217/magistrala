@@ -1031,7 +1031,7 @@ components:
           properties:
             identity:
               type: string
-              example: "admin@example.com"
+              example: "admin@sponxt.com"
               description: User's identity for example email address will be used as its unique identifier
             secret:
               type: string
@@ -1534,7 +1534,7 @@ components:
         type: string
         pattern: "^[^\u0000-\u001F]*$"
       required: false
-      example: "admin@example.com"
+      example: "admin@sponxt.com"
 
     Status:
       name: status

@@ -62,7 +62,7 @@ func TestCreateClient(t *testing.T) {
 	user := sdk.User{
 		Name:        "clientname",
 		Tags:        []string{"tag1", "tag2"},
-		Credentials: sdk.Credentials{Identity: "admin@example.com", Secret: "12345678"},
+		Credentials: sdk.Credentials{Identity: "admin@sponxt.com", Secret: "12345678"},
 		Status:      mgclients.EnabledStatus.String(),
 	}
 	conf := sdk.Config{

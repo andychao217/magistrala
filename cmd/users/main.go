@@ -65,7 +65,7 @@ const (
 
 type config struct {
 	LogLevel           string  `env:"MG_USERS_LOG_LEVEL"              envDefault:"info"`
-	AdminEmail         string  `env:"MG_USERS_ADMIN_EMAIL"            envDefault:"admin@example.com"`
+	AdminEmail         string  `env:"MG_USERS_ADMIN_EMAIL"            envDefault:"admin@sponxt.com"`
 	AdminPassword      string  `env:"MG_USERS_ADMIN_PASSWORD"         envDefault:"12345678"`
 	PassRegexText      string  `env:"MG_USERS_PASS_REGEX"             envDefault:"^.{8,}$"`
 	ResetURL           string  `env:"MG_TOKEN_RESET_ENDPOINT"         envDefault:"/reset-request"`

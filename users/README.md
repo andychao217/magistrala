@@ -15,7 +15,7 @@ The service is configured using the environment variables presented in the follo
 | Variable                      | Description                                                             | Default                             |
 | ----------------------------- | ----------------------------------------------------------------------- | ----------------------------------- |
 | MG_USERS_LOG_LEVEL            | Log level for users service (debug, info, warn, error)                  | info                                |
-| MG_USERS_ADMIN_EMAIL          | Default user, created on startup                                        | <admin@example.com>                 |
+| MG_USERS_ADMIN_EMAIL          | Default user, created on startup                                        | <admin@sponxt.com>                 |
 | MG_USERS_ADMIN_PASSWORD       | Default user password, created on startup                               | 12345678                            |
 | MG_USERS_PASS_REGEX           | Password regex                                                          | ^.{8,}$                             |
 | MG_TOKEN_RESET_ENDPOINT       | Password request reset endpoint, for constructing link                  | /reset-request                      |
@@ -72,7 +72,7 @@ make install
 
 # set the environment variables and run the service
 MG_USERS_LOG_LEVEL=info \
-MG_USERS_ADMIN_EMAIL=admin@example.com \
+MG_USERS_ADMIN_EMAIL=admin@sponxt.com \
 MG_USERS_ADMIN_PASSWORD=12345678 \
 MG_USERS_PASS_REGEX="^.{8,}$" \
 MG_TOKEN_RESET_ENDPOINT="/reset-request" \
