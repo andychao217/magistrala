@@ -238,7 +238,7 @@ func createDefaultDomain(token string) (auth.Domain, error) {
 			"name": "默认机构",
 			"tags": [],
 			"metadata": {},
-			"alias": ""
+			"alias": "默认机构"
 		}`)
 	url := "http://auth:8189/domains"
 	// 创建请求
