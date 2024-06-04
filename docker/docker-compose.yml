@@ -896,7 +896,7 @@ services:
           max-file: "3"
       restart: on-failure
       ports:
-        - 63000:63000
+        - ${MG_WEBSOCKET_BRIDGE_PORT}:${MG_WEBSOCKET_BRIDGE_PORT}
       networks:
         - magistrala-base-net
   
@@ -904,13 +904,35 @@ services:
     image: minio/minio:latest
     container_name: magistrala-minio
     ports:
-      - "8000:9100"  # 将 8000 端口映射到容器内的 9100 端口
-      - "8001:9101"  # 将 8001 端口映射到容器内的 9101 端口
+      - ${MINIO_PORT}:${MINIO_PORT}
+      - ${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     networks:
       - magistrala-base-net
+    restart: on-failure
     volumes:
       - magistrala-minio-data-volume:/data
-    command: server /data --address ":9100" --console-address ":9101"
+    command: server /data --address ":${MINIO_PORT}" --console-address ":${MINIO_CONSOLE_PORT}"
+
+  minio_bridge:
+      image: andychao217/magistrala-minio_bridge:${MG_RELEASE_TAG}
+      container_name: magistrala-minio_bridge
+      depends_on:
+        - minio
+      logging:  
+        driver: "json-file"  
+        options:  
+          max-size: "10m"  
+          max-file: "3"
+      restart: on-failure
+      environment:
+        MINIO_ENDPOINT: "minio:${MINIO_PORT}"
+        MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+        MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+        MINIO_BRIDGE_PORT: ${MINIO_BRIDGE_PORT} # 添加环境变量来配置端口
+      ports:
+        - "${MINIO_BRIDGE_PORT}:${MINIO_BRIDGE_PORT}" # 这里你也可以更改宿主机的端口，比如 "9090:8080"
+      networks:
+        - magistrala-base-net
