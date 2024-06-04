@@ -17,6 +17,7 @@ volumes:
   magistrala-auth-db-volume:
   magistrala-invitations-db-volume:
   magistrala-ui-db-volume:
+  magistrala-minio-data-volume:
 
 services:
   spicedb:
@@ -898,3 +899,18 @@ services:
         - 63000:63000
       networks:
         - magistrala-base-net
+  
+  minio:
+    image: minio/minio:latest
+    container_name: magistrala-minio
+    ports:
+      - "8000:9100"  # 将 8000 端口映射到容器内的 9100 端口
+      - "8001:9101"  # 将 8001 端口映射到容器内的 9101 端口
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    networks:
+      - magistrala-base-net
+    volumes:
+      - magistrala-minio-data-volume:/data
+    command: server /data --address ":9100" --console-address ":9101"
