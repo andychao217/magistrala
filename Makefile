@@ -4,9 +4,10 @@
 MG_DOCKER_IMAGE_USERNAME_PREFIX ?= andychao217
 MG_DOCKER_IMAGE_NAME_PREFIX ?= magistrala
 BUILD_DIR = build
-SERVICES = auth users things http coap ws lora influxdb-writer influxdb-reader mongodb-writer \
-	mongodb-reader cassandra-writer cassandra-reader postgres-writer postgres-reader timescale-writer timescale-reader cli \
-	bootstrap opcua twins mqtt provision certs smtp-notifier smpp-notifier invitations
+SERVICES = auth users things http coap ws mqtt invitations \
+	influxdb-writer influxdb-reader mongodb-writer mongodb-reader smtp-notifier smpp-notifier \
+	cassandra-writer cassandra-reader postgres-writer postgres-reader timescale-writer timescale-reader \
+	cli bootstrap opcua twins lora provision certs
 TEST_API_SERVICES = auth bootstrap certs http invitations notifiers provision readers things twins users
 TEST_API = $(addprefix test_api_,$(TEST_API_SERVICES))
 DOCKERS = $(addprefix docker_,$(SERVICES))
