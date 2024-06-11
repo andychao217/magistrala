@@ -14,7 +14,7 @@ volumes:
 
 services:
   smtp-notifier-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
     container_name: magistrala-smtp-notifier-db
     logging:  
       driver: "json-file"  
@@ -32,7 +32,7 @@ services:
       - magistrala-smtp-notifier-volume:/var/lib/postgresql/datab
 
   smtp-notifier:
-    image: andychao217/magistrala-smtp-notifier:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-smtp-notifier:${MG_RELEASE_TAG}
     container_name: magistrala-smtp-notifier
     logging:  
       driver: "json-file"  

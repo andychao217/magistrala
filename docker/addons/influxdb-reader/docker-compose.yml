@@ -13,7 +13,7 @@ networks:
 
 services:
   influxdb-reader:
-    image: andychao217/magistrala-influxdb-reader:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-influxdb-reader:${MG_RELEASE_TAG}
     container_name: magistrala-influxdb-reader
     logging:  
       driver: "json-file"  

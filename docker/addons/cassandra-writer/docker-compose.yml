@@ -46,7 +46,7 @@ services:
       - magistrala-base-net
 
   cassandra-writer:
-    image: andychao217/magistrala-cassandra-writer:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-cassandra-writer:${MG_RELEASE_TAG}
     container_name: magistrala-cassandra-writer
     logging:  
       driver: "json-file"  

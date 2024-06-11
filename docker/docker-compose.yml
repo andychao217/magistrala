@@ -777,7 +777,7 @@ services:
           create_host_path: true
 
   vernemq:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-vernemq:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-vernemq:latest
     container_name: magistrala-vernemq
     logging:  
       driver: "json-file"  
@@ -901,7 +901,7 @@ services:
         - magistrala-base-net
   
   minio:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-minio:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-minio:latest
     container_name: magistrala-minio
     ports:
       - ${MINIO_PORT}:${MINIO_PORT}

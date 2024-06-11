@@ -15,7 +15,7 @@ volumes:
 
 services:
   twins-redis:
-    image: redis:7.2.4-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-redis:7.2.4-alpine
     container_name: magistrala-twins-redis
     logging:  
       driver: "json-file"  
@@ -47,7 +47,7 @@ services:
       - magistrala-twins-db-configdb-volume:/data/configdb
 
   twins:
-    image: andychao217/magistrala-twins:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-twins:${MG_RELEASE_TAG}
     container_name: magistrala-twins
     logging:  
       driver: "json-file"  

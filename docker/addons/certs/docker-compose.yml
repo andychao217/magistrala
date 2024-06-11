@@ -15,7 +15,7 @@ volumes:
 
 services:
   certs-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
     container_name: magistrala-certs-db
     logging:  
       driver: "json-file"  
@@ -33,7 +33,7 @@ services:
       - magistrala-certs-db-volume:/var/lib/postgresql/data
 
   certs:
-    image: andychao217/magistrala-certs:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-certs:${MG_RELEASE_TAG}
     container_name: magistrala-certs
     logging:  
       driver: "json-file"  

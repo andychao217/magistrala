@@ -12,7 +12,7 @@ networks:
 
 services:
   postgres-reader:
-    image: andychao217/magistrala-postgres-reader:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres-reader:${MG_RELEASE_TAG}
     container_name: magistrala-postgres-reader
     logging:  
       driver: "json-file"  
