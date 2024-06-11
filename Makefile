@@ -1,6 +1,7 @@
 # Copyright (c) Abstract Machines
 # SPDX-License-Identifier: Apache-2.0
 
+MG_DOCKER_IMAGE_ALIYUN_PREFIX ?= registry.cn-hangzhou.aliyuncs.com
 MG_DOCKER_IMAGE_USERNAME_PREFIX ?= andychao217
 MG_DOCKER_IMAGE_NAME_PREFIX ?= magistrala
 BUILD_DIR = build
@@ -58,6 +59,7 @@ define make_docker
 		--build-arg COMMIT=$(COMMIT) \
 		--build-arg TIME=$(TIME) \
 		--tag=$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(svc) \
+		--tag=$(MG_DOCKER_IMAGE_ALIYUN_PREFIX)/$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(SVC) \
 		-f docker/Dockerfile .
 endef
 
@@ -72,9 +74,9 @@ define make_docker_dev
 endef
 
 ADDON_SERVICES = bootstrap cassandra-reader cassandra-writer certs \
-					influxdb-reader influxdb-writer lora-adapter mongodb-reader mongodb-writer \
-					opcua-adapter postgres-reader postgres-writer provision smpp-notifier smtp-notifier \
-					timescale-reader timescale-writer twins
+	influxdb-reader influxdb-writer lora-adapter mongodb-reader mongodb-writer \
+	opcua-adapter postgres-reader postgres-writer provision smpp-notifier smtp-notifier \
+	timescale-reader timescale-writer twins
 
 EXTERNAL_SERVICES = vault prometheus
 
@@ -180,6 +182,7 @@ dockers_dev: $(DOCKERS_DEV)
 define docker_push
 	for svc in $(SERVICES); do \
 		docker push $(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(SVC):$(1); \
+		docker push ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(SVC):$(1) \
 	done
 endef
 

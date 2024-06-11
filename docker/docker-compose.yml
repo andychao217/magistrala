@@ -21,7 +21,7 @@ volumes:
 
 services:
   spicedb:
-    image: "authzed/spicedb:v1.30.0"
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-spicedb:v1.30.0
     container_name: magistrala-spicedb
     logging:  
       driver: "json-file"  
@@ -46,7 +46,7 @@ services:
       - spicedb-migrate
 
   spicedb-migrate:
-    image: "authzed/spicedb:v1.30.0"
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-spicedb:v1.30.0
     container_name: magistrala-spicedb-migrate
     logging:  
       driver: "json-file"  
@@ -64,7 +64,7 @@ services:
       - spicedb-db
 
   spicedb-db:
-    image: "postgres:16.2-alpine"
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
     container_name: magistrala-spicedb-db
     logging:  
       driver: "json-file"  
@@ -85,7 +85,7 @@ services:
       - magistrala-spicedb-db-volume:/var/lib/postgresql/data
 
   auth-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
     container_name: magistrala-auth-db
     logging:  
       driver: "json-file"  
@@ -107,7 +107,7 @@ services:
       - magistrala-auth-db-volume:/var/lib/postgresql/data
 
   auth:
-    image: andychao217/magistrala-auth:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-auth:${MG_RELEASE_TAG}
     container_name: magistrala-auth
     logging:  
       driver: "json-file"  
@@ -186,7 +186,7 @@ services:
           create_host_path: true
 
   invitations-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
     container_name: magistrala-invitations-db
     logging:  
       driver: "json-file"  
@@ -210,7 +210,7 @@ services:
       - magistrala-invitations-db-volume:/var/lib/postgresql/data
 
   invitations:
-    image: andychao217/magistrala-invitations:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-invitations:${MG_RELEASE_TAG}
     container_name: magistrala-invitations
     logging:  
       driver: "json-file"  
@@ -269,7 +269,7 @@ services:
           create_host_path: true
 
   nginx:
-    image: nginx:1.25.4-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-nginx:1.25.4-alpine
     container_name: magistrala-nginx
     logging:  
       driver: "json-file"  
@@ -312,7 +312,7 @@ services:
       - coap-adapter
 
   things-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
     container_name: magistrala-things-db
     logging:  
       driver: "json-file"  
@@ -336,7 +336,7 @@ services:
       - magistrala-things-db-volume:/var/lib/postgresql/data
 
   things-redis:
-    image: redis:7.2.4-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-redis:7.2.4-alpine
     container_name: magistrala-things-redis
     logging:  
       driver: "json-file"  
@@ -350,7 +350,7 @@ services:
       - magistrala-things-redis-volume:/data
 
   things:
-    image: andychao217/magistrala-things:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-things:${MG_RELEASE_TAG}
     container_name: magistrala-things
     logging:  
       driver: "json-file"  
@@ -443,7 +443,7 @@ services:
           create_host_path: true
 
   users-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
     container_name: magistrala-users-db
     logging:  
       driver: "json-file"  
@@ -467,7 +467,7 @@ services:
       - magistrala-users-db-volume:/var/lib/postgresql/data
 
   users:
-    image: andychao217/magistrala-users:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-users:${MG_RELEASE_TAG}
     container_name: magistrala-users
     logging:  
       driver: "json-file"  
@@ -548,7 +548,7 @@ services:
           create_host_path: true
 
   jaeger:
-    image: jaegertracing/all-in-one:1.53.0
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-jaegertracing:1.53.0
     container_name: magistrala-jaeger
     logging:  
       driver: "json-file"  
@@ -565,7 +565,7 @@ services:
       - magistrala-base-net
 
   mqtt-adapter:
-    image: andychao217/magistrala-mqtt:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-mqtt:${MG_RELEASE_TAG}
     container_name: magistrala-mqtt
     logging:  
       driver: "json-file"  
@@ -622,7 +622,7 @@ services:
           create_host_path: true
 
   http-adapter:
-    image: andychao217/magistrala-http:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-http:${MG_RELEASE_TAG}
     container_name: magistrala-http
     logging:  
       driver: "json-file"  
@@ -672,7 +672,7 @@ services:
           create_host_path: true
 
   coap-adapter:
-    image: andychao217/magistrala-coap:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-coap:${MG_RELEASE_TAG}
     container_name: magistrala-coap
     logging:  
       driver: "json-file"  
@@ -727,7 +727,7 @@ services:
           create_host_path: true
 
   ws-adapter:
-    image: andychao217/magistrala-ws:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-ws:${MG_RELEASE_TAG}
     container_name: magistrala-ws
     logging:  
       driver: "json-file"  
@@ -777,7 +777,7 @@ services:
           create_host_path: true
 
   vernemq:
-    image: vernemq/vernemq:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-vernemq:${MG_RELEASE_TAG}
     container_name: magistrala-vernemq
     logging:  
       driver: "json-file"  
@@ -796,7 +796,7 @@ services:
       - magistrala-mqtt-broker-volume:/var/lib/vernemq
 
   nats:
-    image: nats:2.10.9-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-nats:2.10.9-alpine
     container_name: magistrala-nats
     logging:  
       driver: "json-file"  
@@ -819,7 +819,7 @@ services:
       - magistrala-base-net
 
   ui:
-    image: andychao217/magistrala-ui:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-ui:${MG_RELEASE_TAG}
     container_name: magistrala-ui
     logging:  
       driver: "json-file"  
@@ -863,7 +863,7 @@ services:
       - magistrala-base-net
 
   ui-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
     container_name: magistrala-ui-db
     logging:  
       driver: "json-file"  
@@ -887,7 +887,7 @@ services:
       - magistrala-ui-db-volume:/var/lib/postgresql/data
 
   websocket_bridge:
-      image: andychao217/magistrala-websocket_bridge:${MG_RELEASE_TAG}
+      image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-websocket_bridge:${MG_RELEASE_TAG}
       container_name: magistrala-websocket_bridge
       logging:  
         driver: "json-file"  
@@ -901,7 +901,7 @@ services:
         - magistrala-base-net
   
   minio:
-    image: minio/minio:latest
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-minio:${MG_RELEASE_TAG}
     container_name: magistrala-minio
     ports:
       - ${MINIO_PORT}:${MINIO_PORT}
@@ -917,7 +917,7 @@ services:
     command: server /data --address ":${MINIO_PORT}" --console-address ":${MINIO_CONSOLE_PORT}"
 
   minio_bridge:
-      image: andychao217/magistrala-minio_bridge:${MG_RELEASE_TAG}
+      image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-minio_bridge:${MG_RELEASE_TAG}
       container_name: magistrala-minio_bridge
       depends_on:
         - minio
