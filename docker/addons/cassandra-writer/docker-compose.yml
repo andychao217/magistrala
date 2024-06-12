@@ -14,7 +14,7 @@ volumes:
 
 services:
   cassandra:
-    image: cassandra:3.11.16
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/cassandra:3.11.16
     container_name: magistrala-cassandra
     logging:  
       driver: "json-file"  
@@ -30,7 +30,7 @@ services:
       - magistrala-cassandra-volume:/var/lib/cassandra
 
   cassandra-init-keyspace:
-    image: cassandra:3.11.16
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/cassandra:3.11.16
     logging:  
       driver: "json-file"  
       options:  

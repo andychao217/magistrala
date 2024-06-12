@@ -8,7 +8,7 @@ BUILD_DIR = build
 SERVICES = auth users things http coap ws mqtt invitations \
 	influxdb-writer influxdb-reader mongodb-writer mongodb-reader smtp-notifier smpp-notifier \
 	cassandra-writer cassandra-reader postgres-writer postgres-reader timescale-writer timescale-reader \
-	cli bootstrap opcua twins lora provision certs
+	cli bootstrap opcua twins lora provision certs vault
 TEST_API_SERVICES = auth bootstrap certs http invitations notifiers provision readers things twins users
 TEST_API = $(addprefix test_api_,$(TEST_API_SERVICES))
 DOCKERS = $(addprefix docker_,$(SERVICES))
@@ -59,7 +59,7 @@ define make_docker
 		--build-arg COMMIT=$(COMMIT) \
 		--build-arg TIME=$(TIME) \
 		--tag=$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(svc) \
-		--tag=$(MG_DOCKER_IMAGE_ALIYUN_PREFIX)/$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(SVC) \
+		--tag=$(MG_DOCKER_IMAGE_ALIYUN_PREFIX)/$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(svc) \
 		-f docker/Dockerfile .
 endef
 
@@ -76,7 +76,7 @@ endef
 ADDON_SERVICES = bootstrap cassandra-reader cassandra-writer certs \
 	influxdb-reader influxdb-writer lora-adapter mongodb-reader mongodb-writer \
 	opcua-adapter postgres-reader postgres-writer provision smpp-notifier smtp-notifier \
-	timescale-reader timescale-writer twins
+	timescale-reader timescale-writer twins vault
 
 EXTERNAL_SERVICES = vault prometheus
 

@@ -17,7 +17,7 @@ volumes:
 
 services:
   mongodb:
-    image: mongo:7.0.8
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/mongo:7.0.8
     container_name: magistrala-mongodb
     logging:  
       driver: "json-file"  

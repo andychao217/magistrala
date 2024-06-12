@@ -14,7 +14,7 @@ volumes:
 
 services:
   influxdb:
-    image: influxdb:2.7.5-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/influxdb:2.7.5-alpine
     container_name: magistrala-influxdb
     logging:  
       driver: "json-file"  

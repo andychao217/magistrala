@@ -15,7 +15,7 @@ volumes:
 
 services:
   bootstrap-db:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-bootstrap-db
     logging:  
       driver: "json-file"  

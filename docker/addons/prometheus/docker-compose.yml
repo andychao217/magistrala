@@ -15,7 +15,7 @@ volumes:
 
 services:
   promethues:
-    image: prom/prometheus:v2.49.1
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/prometheus:v2.49.1
     container_name: magistrala-prometheus
     logging:  
       driver: "json-file"  
@@ -34,7 +34,7 @@ services:
       - magistrala-prometheus-volume:/prometheus
 
   grafana:
-    image: grafana/grafana:10.2.3
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/grafana:10.2.3
     container_name: magistrala-grafana
     logging:  
       driver: "json-file"  

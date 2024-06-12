@@ -11,7 +11,7 @@ networks:
 
 services:
   lora-redis:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-redis:7.2.4-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/redis:7.2.4-alpine
     container_name: magistrala-lora-redis
     logging:  
       driver: "json-file"  

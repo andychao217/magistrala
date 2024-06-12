@@ -18,7 +18,7 @@ volumes:
 
 services:
   vault:
-    image: hashicorp/vault:1.15.4
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/vault:1.15.4
     container_name: magistrala-vault
     logging:  
       driver: "json-file"  

@@ -18,10 +18,11 @@ volumes:
   magistrala-invitations-db-volume:
   magistrala-ui-db-volume:
   magistrala-minio-data-volume:
+  # magistrala-portainer-data-volume:
 
 services:
   spicedb:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-spicedb:v1.30.0
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/spicedb:v1.30.0
     container_name: magistrala-spicedb
     logging:  
       driver: "json-file"  
@@ -46,7 +47,7 @@ services:
       - spicedb-migrate
 
   spicedb-migrate:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-spicedb:v1.30.0
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/spicedb:v1.30.0
     container_name: magistrala-spicedb-migrate
     logging:  
       driver: "json-file"  
@@ -64,7 +65,7 @@ services:
       - spicedb-db
 
   spicedb-db:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-spicedb-db
     logging:  
       driver: "json-file"  
@@ -85,7 +86,7 @@ services:
       - magistrala-spicedb-db-volume:/var/lib/postgresql/data
 
   auth-db:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-auth-db
     logging:  
       driver: "json-file"  
@@ -186,7 +187,7 @@ services:
           create_host_path: true
 
   invitations-db:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-invitations-db
     logging:  
       driver: "json-file"  
@@ -269,7 +270,7 @@ services:
           create_host_path: true
 
   nginx:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-nginx:1.25.4-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/nginx:1.25.4-alpine
     container_name: magistrala-nginx
     logging:  
       driver: "json-file"  
@@ -312,7 +313,7 @@ services:
       - coap-adapter
 
   things-db:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-things-db
     logging:  
       driver: "json-file"  
@@ -336,7 +337,7 @@ services:
       - magistrala-things-db-volume:/var/lib/postgresql/data
 
   things-redis:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-redis:7.2.4-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/redis:7.2.4-alpine
     container_name: magistrala-things-redis
     logging:  
       driver: "json-file"  
@@ -443,7 +444,7 @@ services:
           create_host_path: true
 
   users-db:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-users-db
     logging:  
       driver: "json-file"  
@@ -548,7 +549,7 @@ services:
           create_host_path: true
 
   jaeger:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-jaegertracing:1.53.0
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/jaegertracing:1.53.0
     container_name: magistrala-jaeger
     logging:  
       driver: "json-file"  
@@ -777,7 +778,7 @@ services:
           create_host_path: true
 
   vernemq:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-vernemq:latest
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/vernemq:latest
     container_name: magistrala-vernemq
     logging:  
       driver: "json-file"  
@@ -796,7 +797,7 @@ services:
       - magistrala-mqtt-broker-volume:/var/lib/vernemq
 
   nats:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-nats:2.10.9-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/nats:2.10.9-alpine
     container_name: magistrala-nats
     logging:  
       driver: "json-file"  
@@ -863,7 +864,7 @@ services:
       - magistrala-base-net
 
   ui-db:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-ui-db
     logging:  
       driver: "json-file"  
@@ -901,7 +902,7 @@ services:
         - magistrala-base-net
   
   minio:
-    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-minio:latest
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/minio:latest
     container_name: magistrala-minio
     ports:
       - ${MINIO_PORT}:${MINIO_PORT}
@@ -936,3 +937,20 @@ services:
         - "${MINIO_BRIDGE_PORT}:${MINIO_BRIDGE_PORT}" # 这里你也可以更改宿主机的端口，比如 "9090:8080"
       networks:
         - magistrala-base-net
+
+  # portainer:
+  #   image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/portainer-ce:latest
+  #   container_name: magistrala-portainer
+  #   logging:  
+  #       driver: "json-file"  
+  #       options:  
+  #         max-size: "10m"  
+  #         max-file: "3"
+  #   restart: on-failure
+  #   ports:
+  #     - ${PORTAINER_PORT}:${PORTAINER_PORT}
+  #   networks:
+  #       - magistrala-base-net
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - magistrala-portainer-data-volume:/data

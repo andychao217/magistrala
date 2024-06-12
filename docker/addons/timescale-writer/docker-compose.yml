@@ -16,7 +16,7 @@ volumes:
 
 services:
   timescale:
-    image: timescale/timescaledb:2.13.1-pg16
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/timescaledb:2.13.1-pg16
     container_name: magistrala-timescale
     logging:  
       driver: "json-file"  
