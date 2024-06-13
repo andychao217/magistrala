@@ -898,8 +898,11 @@ services:
       restart: on-failure
       ports:
         - ${MG_SOCKET_BRIDGE_PORT}:${MG_SOCKET_BRIDGE_PORT}
-      networks:
-        - magistrala-base-net
+      environment:
+        MG_SOCKET_BRIDGE_PORT: ${MG_SOCKET_BRIDGE_PORT}
+        MG_SOCKET_BRIDGE_UDP_PORT: ${MG_SOCKET_BRIDGE_UDP_PORT}
+        MG_SOCKET_BRIDGE_UDP_IP: ${MG_SOCKET_BRIDGE_UDP_IP}
+      network_mode: "host"
   
   minio:
     image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/minio:latest
