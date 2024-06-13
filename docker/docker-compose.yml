@@ -887,9 +887,9 @@ services:
     volumes:
       - magistrala-ui-db-volume:/var/lib/postgresql/data
 
-  websocket_bridge:
-      image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-websocket_bridge:${MG_RELEASE_TAG}
-      container_name: magistrala-websocket_bridge
+  socket_bridge:
+      image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-socket_bridge:${MG_RELEASE_TAG}
+      container_name: magistrala-socket_bridge
       logging:  
         driver: "json-file"  
         options:  
@@ -897,7 +897,7 @@ services:
           max-file: "3"
       restart: on-failure
       ports:
-        - ${MG_WEBSOCKET_BRIDGE_PORT}:${MG_WEBSOCKET_BRIDGE_PORT}
+        - ${MG_SOCKET_BRIDGE_PORT}:${MG_SOCKET_BRIDGE_PORT}
       networks:
         - magistrala-base-net
   
