@@ -304,7 +304,13 @@ func updateClientConnectionStatus(ctx context.Context, s *session.Session, conne
 		SSLKey:      "",
 		SSLRootCert: "",
 	}
-	database, _ := pgclient.Connect(dbConfig)
+	database, err := pgclient.Connect(dbConfig)
+	if err != nil {
+		fmt.Printf("Failed to connect to database: %v\n", err)
+		return
+	}
+	defer database.Close() // 确保在函数结束时关闭数据库连接
+
 	cRepo := clientspg.NewRepository(database)
 	thing, _ := cRepo.RetrieveByIdentity(ctx, s.Username)
 	if thing.ID != "" {
@@ -315,20 +321,6 @@ func updateClientConnectionStatus(ctx context.Context, s *session.Session, conne
 		if thing.Metadata["isOnline"] != onlineStatus {
 			thing.Metadata["isOnline"] = onlineStatus
 			_, _ = cRepo.Update(ctx, thing)
-
-			// 暂停1秒钟
-			// time.Sleep(500 * time.Millisecond)
-			// if PublicTopics != nil && len(*PublicTopics) != 0 {
-			// 	for _, topic := range *PublicTopics {
-			// 		// 定义一个字符串
-			// 		// str := "refreshPage"
-			// 		str := connectionType + "_refreshPage"
-			// 		// 将字符串转换为字节切片
-			// 		payload := []byte(str)
-			// 		// 传递字节切片的地址给函数
-			// 		handler.Publish(ctx, &topic, &payload)
-			// 	}
-			// }
 		}
 	}
 }
