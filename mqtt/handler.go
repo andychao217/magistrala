@@ -318,8 +318,8 @@ func updateClientConnectionStatus(ctx context.Context, s *session.Session, conne
 		if connectionType == "connect" || connectionType == "subscribe" {
 			onlineStatus = "1"
 		}
-		if thing.Metadata["isOnline"] != onlineStatus {
-			thing.Metadata["isOnline"] = onlineStatus
+		if thing.Metadata["is_online"] != onlineStatus {
+			thing.Metadata["is_online"] = onlineStatus
 			_, _ = cRepo.Update(ctx, thing)
 		}
 	}
