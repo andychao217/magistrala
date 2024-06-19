@@ -230,16 +230,16 @@ func httpGetUserInfo(token string) (UserInfoResponseBody, error) {
 }
 
 // 创建默认domain
-func createDefaultDomain(token string) (auth.Domain, error) {
+func createDefaultDomain(token string, user mgclients.Client) (auth.Domain, error) {
 	// 创建用户默认创建一个domain
 	// 要发送的数据
 	var domain auth.Domain
-	postData := []byte(`{
-			"name": "默认机构",
-			"tags": [],
-			"metadata": {},
-			"alias": "默认机构"
-		}`)
+	postData := []byte(fmt.Sprintf(`{
+        "name": "%s默认机构",
+        "tags": [],
+        "metadata": {},
+        "alias": "%s默认机构"
+    }`, user.Name, user.Name))
 	url := "http://auth:8189/domains"
 	// 创建请求
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(postData))
@@ -334,7 +334,7 @@ func (svc service) RegisterClient(ctx context.Context, token string, cli mgclien
 	newToken := tokenResponseBody.AccessToken
 
 	//创建默认domain
-	domain, err := createDefaultDomain(newToken)
+	domain, err := createDefaultDomain(newToken, client)
 	if err != nil {
 		fmt.Printf("Failed to call the second API: %v\n", err)
 		return client, nil

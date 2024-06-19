@@ -9,7 +9,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -18,7 +20,11 @@ import (
 	"github.com/absmach/magistrala/pkg/errors"
 	svcerr "github.com/absmach/magistrala/pkg/errors/service"
 	"github.com/go-redis/redis/v8"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 )
+
+var minioClient *minio.Client
 
 const recoveryDuration = 5 * time.Minute
 
@@ -821,6 +827,63 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 	dom, err := svc.domains.Save(ctx, d)
 	if err != nil {
 		return Domain{}, errors.Wrap(svcerr.ErrCreateEntity, err)
+	}
+
+	// 创建domain之后，使用domainID创建一个minio的文件夹
+	// 初始化 MinIO 客户端
+	var minioErr error
+	endpoint := os.Getenv("MINIO_ENDPOINT")
+	if endpoint == "" {
+		endpoint = "minio:9100"
+	}
+	accessKey := os.Getenv("MINIO_ACCESS_KEY")
+	if accessKey == "" {
+		accessKey = "admin"
+	}
+	secretKey := os.Getenv("MINIO_SECRET_KEY")
+	if secretKey == "" {
+		secretKey = "12345678"
+	}
+	bucketName := os.Getenv("MINIO_BUCKET_NAME")
+	if bucketName == "" {
+		bucketName = "nxt-tenant"
+	}
+
+	minioClient, minioErr = minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
+		Secure: false,
+	})
+
+	if minioErr != nil {
+		log.Fatalln(minioErr)
+	}
+
+	// 要创建的“文件夹”路径
+	folderName := dom.ID + "/"
+
+	// 检查存储桶是否存在
+	exists, err := minioClient.BucketExists(context.Background(), bucketName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if !exists {
+		// 创建存储桶
+		err = minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Println("Successfully created bucket:", bucketName)
+	} else {
+		fmt.Println("Bucket already exists:", bucketName)
+	}
+
+	// 创建一个空的对象，以模拟“文件夹”
+	objectName := folderName
+
+	_, err = minioClient.PutObject(context.Background(), bucketName, objectName, nil, 0, minio.PutObjectOptions{})
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	// 连接到Redis服务器
