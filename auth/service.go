@@ -702,6 +702,7 @@ func updateUserInfo(token string, userInfo UserInfoResponseBody, channelID strin
 		metadata = userInfo.Metadata
 	}
 	metadata[domainID] = channelID
+	metadata["comID"] = channelID
 	postUser := UserPostData{
 		Metadata: metadata,
 		Name:     userInfo.Name,

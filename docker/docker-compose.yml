@@ -339,6 +339,7 @@ services:
       - 6006:5432
     volumes:
       - magistrala-things-db-volume:/var/lib/postgresql/data
+      - ./reset_device_online_status.sh:/docker-entrypoint-initdb.d/reset_device_online_status.sh
 
   things-redis:
     image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/redis:7.2.4-alpine
