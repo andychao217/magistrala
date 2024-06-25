@@ -89,11 +89,21 @@ func getChannelIDs(token string) ([]string, error) {
 		fmt.Printf("Error unmarshaling JSON: %s\n", err)
 		return []string{}, err
 	}
+
+	// 筛选出 Name 为 "default_channel" 的 Channel
+	var defaultChannels []Channel
+	for _, channel := range response.Channels {
+		if channel.Name == "default_channel" {
+			defaultChannels = append(defaultChannels, channel)
+		}
+	}
+
 	// 提取所有channel的id并组合为[]string数组
-	channelIDs := make([]string, len(response.Channels))
-	for i, channel := range response.Channels {
+	channelIDs := make([]string, len(defaultChannels))
+	for i, channel := range defaultChannels {
 		channelIDs[i] = channel.ID
 	}
+
 	// 打印结果
 	fmt.Println(channelIDs)
 
