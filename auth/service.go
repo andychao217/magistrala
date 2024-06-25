@@ -939,8 +939,8 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 				fmt.Printf("Failed to UpdateDomain: %v\n", err)
 			}
 
-			//创建默认minio bucket文件夹
-			createDefaultMinioFolder(newChannel.ID)
+			// 创建默认minio bucket文件夹
+			// createDefaultMinioFolder(newChannel.ID)
 
 			userInfo, err := httpGetUserInfo(newToken)
 			if err != nil {
