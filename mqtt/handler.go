@@ -57,9 +57,6 @@ var (
 
 var channelRegExp = regexp.MustCompile(`^\/?channels\/([\w\-]+)\/messages(\/[^?]*)?(\?.*)?$`)
 
-// 公共变量来保存*[]string
-var PublicTopics *[]string
-
 // Event implements events.Event interface.
 type handler struct {
 	publisher messaging.Publisher
@@ -117,7 +114,6 @@ func (h *handler) AuthPublish(ctx context.Context, topic *string, payload *[]byt
 // prior forwarding to the MQTT broker.
 func (h *handler) AuthSubscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
-	SaveTopics(topics)
 	if !ok {
 		return ErrClientNotInitialized
 	}
@@ -193,7 +189,6 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 		return errors.Wrap(ErrFailedSubscribe, ErrClientNotInitialized)
 	}
 	h.logger.Info(fmt.Sprintf(LogInfoSubscribed, s.ID, strings.Join(*topics, ",")))
-	SaveTopics(topics)
 	if s.Username != "" {
 		updateClientConnectionStatus(ctx, s, "subscribe", h)
 	}
@@ -203,7 +198,6 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 // Unsubscribe - after client unsubscribed.
 func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
-	SaveTopics(topics)
 	// if s.Username != "" {
 	// 	updateClientConnectionStatus(ctx, s, "unsubscribe", h)
 	// }
@@ -313,6 +307,7 @@ func updateClientConnectionStatus(ctx context.Context, s *session.Session, conne
 
 	cRepo := clientspg.NewRepository(database)
 	thing, _ := cRepo.RetrieveByIdentity(ctx, s.Username)
+
 	if thing.ID != "" {
 		onlineStatus := "0"
 		if connectionType == "connect" || connectionType == "subscribe" {
@@ -322,17 +317,31 @@ func updateClientConnectionStatus(ctx context.Context, s *session.Session, conne
 			thing.Metadata["is_online"] = onlineStatus
 			_, _ = cRepo.Update(ctx, thing)
 		}
-	}
-}
 
-// 函数接收*[]string参数并保存为公共变量
-func SaveTopics(newTopics *[]string) {
-	// 在保存之前确保PublicTopics不是nil
-	if PublicTopics == nil {
-		PublicTopics = &[]string{}
+		// out_channel 大于1, 且is_channel等于0时，说明是多通道设备，需要把多通道都同时修改onlineStatus
+		// 从 Metadata 中获取 "out_channel" 的值，并进行类型断言
+		outChannel, ok := thing.Metadata["out_channel"].(int)
+		if ok {
+			if outChannel > 1 {
+				is_channel, ok := thing.Metadata["is_channel"].(string)
+				if ok {
+					if is_channel == "0" {
+						for i := 2; i <= outChannel; i++ {
+							newThing, _ := cRepo.RetrieveByIdentity(ctx, thing.Credentials.Identity+"_"+string(i))
+							if newThing.ID != "" {
+								netThingOnlineStatus := "0"
+								if connectionType == "connect" || connectionType == "subscribe" {
+									netThingOnlineStatus = "1"
+								}
+								if newThing.Metadata["is_online"] != netThingOnlineStatus {
+									newThing.Metadata["is_online"] = netThingOnlineStatus
+									_, _ = cRepo.Update(ctx, newThing)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
-	// 清空PublicTopics指向的切片的内容
-	*PublicTopics = (*PublicTopics)[:0]
-	// 现在将newTopics的内容追加到PublicTopics指向的切片中
-	*PublicTopics = append(*PublicTopics, *newTopics...)
 }
