@@ -502,7 +502,27 @@ func (svc service) Assign(ctx context.Context, token, groupID, relation, memberK
 	policies := magistrala.AddPoliciesReq{}
 	switch memberKind {
 	case auth.ThingsKind:
+		// 分区关联设备后，把已关联的设备id添加到分区的metadata.thing_ids中
+		channel, _ := svc.ViewGroup(ctx, token, groupID)
+		// 将 channel 序列化为 JSON
+		jsonData, _ := json.MarshalIndent(channel, "", "  ")
+		// 打印 JSON 数据
+		fmt.Println("channel: ", string(jsonData))
+
+		// 获取当前的 thing_ids
+		thingIDs, ok := channel.Metadata["thing_ids"].([]interface{})
+		if !ok {
+			// 如果不存在，则新增 thing_ids 字段
+			channel.Metadata["thing_ids"] = []interface{}{}
+			thingIDs = channel.Metadata["thing_ids"].([]interface{})
+		}
+
+		fmt.Println("thingIDs: ", thingIDs)
+		fmt.Println("channel.Metadata: ", channel.Metadata)
+
 		for _, memberID := range memberIDs {
+			// 将 memberIDs 添加到 thing_ids
+			channel.Metadata["thing_ids"] = append(thingIDs, memberID)
 			policies.AddPoliciesReq = append(policies.AddPoliciesReq, &magistrala.AddPolicyReq{
 				Domain:      res.GetDomainId(),
 				SubjectType: auth.GroupType,
@@ -513,6 +533,7 @@ func (svc service) Assign(ctx context.Context, token, groupID, relation, memberK
 				Object:      memberID,
 			})
 		}
+		_, _ = svc.UpdateGroup(ctx, token, channel)
 	case auth.ChannelsKind:
 		for _, memberID := range memberIDs {
 			policies.AddPoliciesReq = append(policies.AddPoliciesReq, &magistrala.AddPolicyReq{
@@ -654,6 +675,36 @@ func (svc service) Unassign(ctx context.Context, token, groupID, relation, membe
 
 	switch memberKind {
 	case auth.ThingsKind:
+		// 分区解除关联设备后，把已解除关联的设备id从分区的metadata.thing_ids中删除
+		channel, _ := svc.ViewGroup(ctx, token, groupID)
+		// 获取当前的 thing_ids
+		// 获取当前的 thing_ids
+		thingIDs, ok := channel.Metadata["thing_ids"].([]interface{})
+		if !ok {
+			// 如果不存在，则新增 thing_ids 字段
+			channel.Metadata["thing_ids"] = []interface{}{}
+			thingIDs = channel.Metadata["thing_ids"].([]interface{})
+		}
+
+		// 创建一个新的切片来存储过滤后的 thing_ids
+		filteredThingIDs := []interface{}{}
+		// 遍历 thing_ids，如果不在 memberIDs 中，则添加到 filteredThingIDs
+		for _, thingID := range thingIDs {
+			found := false
+			for _, memberID := range memberIDs {
+				if thingID == memberID {
+					found = true
+					break
+				}
+			}
+			if !found {
+				filteredThingIDs = append(filteredThingIDs, thingID)
+			}
+		}
+		// 更新 thing_ids
+		channel.Metadata["thing_ids"] = filteredThingIDs
+		_, _ = svc.UpdateGroup(ctx, token, channel)
+
 		for _, memberID := range memberIDs {
 			policies.DeletePoliciesReq = append(policies.DeletePoliciesReq, &magistrala.DeletePolicyReq{
 				Domain:      res.GetDomainId(),
