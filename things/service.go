@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -452,7 +453,7 @@ func (svc service) UpdateClient(ctx context.Context, token string, cli mgclients
 
 					cRepo := postgres.NewRepository(database)
 					for i := 2; i <= outChannel; i++ {
-						thing, _ := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+string(i))
+						thing, _ := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+strconv.Itoa(i))
 						oriName := thing.Name
 						thing.Name = client.Name
 						alias, ok := thing.Metadata["aliase"].(string)
@@ -615,35 +616,44 @@ func (svc service) DeleteClient(ctx context.Context, token, id string) error {
 
 	client, _ := svc.ViewClient(ctx, token, id)
 	if client.ID != "" {
-		outChannel, ok := client.Metadata["out_channel"].(int)
+		outChannelStr, ok := client.Metadata["out_channel"].(string)
+		fmt.Println("delete outChannel 1234: ", outChannelStr)
 		if ok {
-			if outChannel > 1 {
-				is_channel, ok := client.Metadata["is_channel"].(string)
-				if ok {
-					if is_channel == "0" {
-						dbConfig := pgclient.Config{
-							Host:        "things-db",
-							Port:        "5432",
-							User:        "magistrala",
-							Pass:        "magistrala",
-							Name:        "things",
-							SSLMode:     "disable",
-							SSLCert:     "",
-							SSLKey:      "",
-							SSLRootCert: "",
-						}
-						database, err := pgclient.Connect(dbConfig)
-						if err != nil {
-							fmt.Printf("Failed to connect to database: %v\n", err)
-						}
-						defer database.Close() // 确保在函数结束时关闭数据库连接
-
-						cRepo := postgres.NewRepository(database)
-						for i := 2; i <= outChannel; i++ {
-							thing, _ := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+string(i))
-							err = svc.DeleteClient(ctx, token, thing.ID)
+			outChannelInt, err := strconv.Atoi(outChannelStr)
+			if err != nil {
+				fmt.Println("Failed to convert out_channel to int:", err)
+			} else {
+				if outChannelInt > 1 {
+					is_channel, ok := client.Metadata["is_channel"].(string)
+					fmt.Println("delete is_channel 1234: ", is_channel)
+					if ok {
+						if is_channel == "0" {
+							dbConfig := pgclient.Config{
+								Host:        "things-db",
+								Port:        "5432",
+								User:        "magistrala",
+								Pass:        "magistrala",
+								Name:        "things",
+								SSLMode:     "disable",
+								SSLCert:     "",
+								SSLKey:      "",
+								SSLRootCert: "",
+							}
+							database, err := pgclient.Connect(dbConfig)
 							if err != nil {
-								fmt.Println("DeleteClient Error: ", err)
+								fmt.Printf("Failed to connect to database: %v\n", err)
+							}
+							defer database.Close() // 确保在函数结束时关闭数据库连接
+
+							cRepo := postgres.NewRepository(database)
+							for i := 2; i <= outChannelInt; i++ {
+								fmt.Println("delete newThing identity:", client.Credentials.Identity+"_"+strconv.Itoa(i))
+								newThing, _ := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+strconv.Itoa(i))
+								fmt.Println("delete newThing:", newThing.ID)
+								err = svc.DeleteClient(ctx, token, newThing.ID)
+								if err != nil {
+									fmt.Println("DeleteClient Error: ", err)
+								}
 							}
 						}
 					}

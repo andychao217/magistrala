@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -286,7 +287,6 @@ func parseSubtopic(subtopic string) (string, error) {
 }
 
 func updateClientConnectionStatus(ctx context.Context, s *session.Session, connectionType string, handler *handler) {
-	fmt.Printf("updateClientConnectionStatus: %v\n", connectionType)
 	dbConfig := pgclient.Config{
 		Host:        "things-db",
 		Port:        "5432",
@@ -320,21 +320,25 @@ func updateClientConnectionStatus(ctx context.Context, s *session.Session, conne
 
 		// out_channel 大于1, 且is_channel等于0时，说明是多通道设备，需要把多通道都同时修改onlineStatus
 		// 从 Metadata 中获取 "out_channel" 的值，并进行类型断言
-		outChannel, ok := thing.Metadata["out_channel"].(int)
+		outChannelStr, ok := thing.Metadata["out_channel"].(string)
+		fmt.Println("mqtt out_channelStr 1234:", outChannelStr)
 		if ok {
-			if outChannel > 1 {
-				is_channel, ok := thing.Metadata["is_channel"].(string)
-				if ok {
-					if is_channel == "0" {
-						for i := 2; i <= outChannel; i++ {
-							newThing, _ := cRepo.RetrieveByIdentity(ctx, thing.Credentials.Identity+"_"+string(i))
-							if newThing.ID != "" {
-								netThingOnlineStatus := "0"
-								if connectionType == "connect" || connectionType == "subscribe" {
-									netThingOnlineStatus = "1"
-								}
-								if newThing.Metadata["is_online"] != netThingOnlineStatus {
-									newThing.Metadata["is_online"] = netThingOnlineStatus
+			outChannelInt, err := strconv.Atoi(outChannelStr)
+			fmt.Println("outChannelInt 1234:", outChannelInt)
+			if err != nil {
+				fmt.Println("Failed to convert out_channel to int:", err)
+			} else {
+				if outChannelInt > 1 {
+					is_channel, ok := thing.Metadata["is_channel"].(string)
+					fmt.Println("mqtt is_channel 1234:", is_channel)
+					if ok {
+						if is_channel == "0" {
+							for i := 2; i <= outChannelInt; i++ {
+								fmt.Println("mqtt newThing identity:", thing.Credentials.Identity+"_"+strconv.Itoa(i))
+								newThing, _ := cRepo.RetrieveByIdentity(ctx, thing.Credentials.Identity+"_"+strconv.Itoa(i))
+								fmt.Println("mqtt newThing:", newThing.ID)
+								if newThing.ID != "" {
+									newThing.Metadata["is_online"] = onlineStatus
 									_, _ = cRepo.Update(ctx, newThing)
 								}
 							}
