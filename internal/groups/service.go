@@ -490,6 +490,19 @@ func (svc service) DisableGroup(ctx context.Context, token, id string) (groups.G
 	return group, nil
 }
 
+func removeDuplicates(slice []interface{}) []interface{} {
+	encountered := map[interface{}]bool{}
+	result := []interface{}{}
+
+	for _, v := range slice {
+		if !encountered[v] {
+			encountered[v] = true
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
 func (svc service) Assign(ctx context.Context, token, groupID, relation, memberKind string, memberIDs ...string) error {
 	res, err := svc.identify(ctx, token)
 	if err != nil {
@@ -522,7 +535,7 @@ func (svc service) Assign(ctx context.Context, token, groupID, relation, memberK
 
 		for _, memberID := range memberIDs {
 			// 将 memberIDs 添加到 thing_ids
-			channel.Metadata["thing_ids"] = append(thingIDs, memberID)
+			thingIDs = append(thingIDs, memberID)
 			policies.AddPoliciesReq = append(policies.AddPoliciesReq, &magistrala.AddPolicyReq{
 				Domain:      res.GetDomainId(),
 				SubjectType: auth.GroupType,
@@ -533,6 +546,7 @@ func (svc service) Assign(ctx context.Context, token, groupID, relation, memberK
 				Object:      memberID,
 			})
 		}
+		channel.Metadata["thing_ids"] = removeDuplicates(thingIDs)
 		_, _ = svc.UpdateGroup(ctx, token, channel)
 	case auth.ChannelsKind:
 		for _, memberID := range memberIDs {
