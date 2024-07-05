@@ -650,9 +650,8 @@ func (svc service) DeleteClient(ctx context.Context, token, id string) error {
 								fmt.Println("delete newThing identity:", client.Credentials.Identity+"_"+strconv.Itoa(i))
 								newThing, _ := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+strconv.Itoa(i))
 								fmt.Println("delete newThing:", newThing.ID)
-								err = svc.DeleteClient(ctx, token, newThing.ID)
-								if err != nil {
-									fmt.Println("DeleteClient Error: ", err)
+								if newThing.ID != "" {
+									_ = svc.DeleteClient(ctx, token, newThing.ID)
 								}
 							}
 						}

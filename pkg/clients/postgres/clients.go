@@ -469,11 +469,10 @@ func PageQuery(pm clients.Page) (string, error) {
 	// }
 	// 不显示名称为Platform的thing，这个thing是新建domain时默认创建的，只用做平台和设备通信用
 	// 处理name字段，排除"Platform"
-	if pm.Name != "" && pm.Name != "Platform" {
-		query = append(query, "c.name = :name")
+	if pm.Name != "" && pm.Name != "Platform" && !strings.Contains(pm.Name, "Platform") {
+		query = append(query, "name ~ :name AND name NOT LIKE '%Platform%'")
 	} else if pm.Name == "" {
-		// 如果pm.Name没有被设置，并且你想排除"Platform"，则添加条件
-		query = append(query, "c.name <> 'Platform'")
+		query = append(query, "name ~ :name AND name NOT LIKE '%Platform%'")
 	}
 	if pm.Tag != "" {
 		query = append(query, ":tag = ANY(c.tags)")
@@ -503,10 +502,10 @@ func constructSearchQuery(pm clients.Page) (string, string) {
 	// 	query = append(query, "name ~ :name")
 	// }
 	// 不显示名称为Platform的thing，这个thing是新建domain时默认创建的，只用做平台和设备通信用
-	if pm.Name != "" && pm.Name != "Platform" {
-		query = append(query, "name ~ :name")
+	if pm.Name != "" && pm.Name != "Platform" && !strings.Contains(pm.Name, "Platform") {
+		query = append(query, "name ~ :name AND name NOT LIKE '%Platform%'")
 	} else if pm.Name == "" {
-		query = append(query, "name ~ :name AND name <> 'Platform'")
+		query = append(query, "name ~ :name AND name NOT LIKE '%Platform%'")
 	}
 	if pm.Identity != "" {
 		query = append(query, "identity ~ :identity")

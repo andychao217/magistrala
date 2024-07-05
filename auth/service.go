@@ -743,7 +743,7 @@ func updateUserInfo(token string, userInfo UserInfoResponseBody, channelID strin
 }
 
 // 创建默认thing: platform
-func createDefaultThing(token string) (mgclients.Client, error) {
+func createDefaultThing(token, comID string) (mgclients.Client, error) {
 	// 要发送的数据
 	var thing mgclients.Client
 	type ThingPostData struct {
@@ -751,10 +751,10 @@ func createDefaultThing(token string) (mgclients.Client, error) {
 		Credentials mgclients.Credentials `json:"credentials"`
 	}
 	postThing := ThingPostData{
-		Name: "Platform",
+		Name: "Platform" + comID,
 		Credentials: mgclients.Credentials{
-			Identity: "platform",
-			Secret:   "platform",
+			Identity: "platform" + comID,
+			Secret:   "platform" + comID,
 		},
 	}
 	jsonBytes, err := json.Marshal(postThing)
@@ -939,6 +939,12 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 				fmt.Printf("Failed to UpdateDomain: %v\n", err)
 			}
 
+			//创建默认thing: platform
+			_, err = createDefaultThing(newToken, newChannel.ID)
+			if err != nil {
+				fmt.Printf("Failed to call the third API: %v\n", err)
+			}
+
 			// 创建默认minio bucket文件夹
 			// createDefaultMinioFolder(newChannel.ID)
 
@@ -948,12 +954,6 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 			} else {
 				_ = updateUserInfo(newToken, userInfo, newChannel.ID, dom.ID)
 			}
-		}
-
-		//创建默认thing: platform
-		_, err = createDefaultThing(newToken)
-		if err != nil {
-			fmt.Printf("Failed to call the third API: %v\n", err)
 		}
 	}
 
