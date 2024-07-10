@@ -82,7 +82,7 @@ The service is configured using the environment variables presented in the follo
 | MG_AUTH_GRPC_SERVER_CA_CERTS   | Path to the PEM encoded gRPC server CA certificate file                 | ""                               |
 | MG_AUTH_GRPC_CLIENT_CA_CERTS   | Path to the PEM encoded gRPC client CA certificate file                 | ""                               |
 | MG_AUTH_SECRET_KEY             | String used for signing tokens                                          | secret                           |
-| MG_AUTH_ACCESS_TOKEN_DURATION  | The access token expiration period                                      | 1h                               |
+| MG_AUTH_ACCESS_TOKEN_DURATION  | The access token expiration period                                      | 8h                               |
 | MG_AUTH_REFRESH_TOKEN_DURATION | The refresh token expiration period                                     | 24h                              |
 | MG_AUTH_INVITATION_DURATION    | The invitation token expiration period                                  | 168h                             |
 | MG_SPICEDB_HOST                | SpiceDB host address                                                    | localhost                        |
@@ -135,7 +135,7 @@ MG_AUTH_GRPC_SERVER_KEY="" \
 MG_AUTH_GRPC_SERVER_CA_CERTS="" \
 MG_AUTH_GRPC_CLIENT_CA_CERTS="" \
 MG_AUTH_SECRET_KEY=secret \
-MG_AUTH_ACCESS_TOKEN_DURATION=1h \
+MG_AUTH_ACCESS_TOKEN_DURATION=8h \
 MG_AUTH_REFRESH_TOKEN_DURATION=24h \
 MG_AUTH_INVITATION_DURATION=168h \
 MG_SPICEDB_HOST=localhost \

@@ -7,8 +7,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"time"
 
 	"github.com/absmach/magistrala"
@@ -46,78 +44,6 @@ func NewService(g groups.Repository, idp magistrala.IDProvider, authClient magis
 		groups:     g,
 		idProvider: idp,
 		auth:       authClient,
-	}
-}
-
-// 获取名为Platform的thing id
-func getPlatformThingID(token string) (string, error) {
-	url := "http://things:9000/things?limit=1000&name=Platform"
-	// 创建HTTP GET请求
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		fmt.Println(err)
-		return "", err
-	}
-	// 在请求头中添加token
-	req.Header.Set("Authorization", "Bearer "+token) // 假设token是一个Bearer token
-	// 创建一个HTTP客户端
-	client := &http.Client{}
-	// 发送请求
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err)
-		return "", err
-	}
-	defer resp.Body.Close()
-	// 读取响应体
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println(err)
-		return "", err
-	}
-	// 打印响应体
-	fmt.Println("getPlatformThingID 1234")
-	fmt.Println(string(body))
-
-	// 创建一个Response变量来存储解析后的数据
-	var response ThingsListResponse
-	// 使用json.Unmarshal来解析JSON字符串到Go结构体
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		fmt.Printf("Error unmarshaling JSON: %s\n", err)
-		return "", err
-	}
-
-	if len(response.Things) > 0 {
-		// 将Person实例转换为JSON格式的字节切片
-		jsonData, _ := json.Marshal(response.Things[0])
-		// 将字节切片转换为字符串并打印
-		jsonStr := string(jsonData)
-		fmt.Printf("response.Things[0]: %s\n", jsonStr)
-		return response.Things[0].ID, nil
-	} else {
-		return "", nil
-	}
-}
-
-// 新建channels后默认关联things
-func connectPlatformThingAndChannel(thingID, channelID, token string) {
-	// 设置请求URL
-	url := "http://things:9000/channels/" + channelID + "/things/" + thingID + "/connect"
-	// 创建一个HTTP客户端
-	client := &http.Client{}
-	// 创建一个请求
-	req, err := http.NewRequest(http.MethodPost, url, nil)
-	if err != nil {
-		fmt.Printf("http.NewRequest: %s\n", err)
-	}
-	// 设置请求头
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
-	// 发送请求
-	_, err = client.Do(req)
-	if err != nil {
-		fmt.Printf("client.Do: %s\n", err)
 	}
 }
 
@@ -191,14 +117,6 @@ func (svc service) CreateGroup(ctx context.Context, token, kind string, g groups
 	}
 	if _, err := svc.auth.AddPolicies(ctx, &policies); err != nil {
 		return g, errors.Wrap(svcerr.ErrAddPolicies, err)
-	}
-
-	platformThingID, err := getPlatformThingID(token)
-	if err != nil {
-		fmt.Println("error get platform ThingsID")
-	}
-	if platformThingID != "" && g.ID != "" {
-		connectPlatformThingAndChannel(platformThingID, g.ID, token)
 	}
 	return g, nil
 }
@@ -547,7 +465,9 @@ func (svc service) Assign(ctx context.Context, token, groupID, relation, memberK
 			})
 		}
 		channel.Metadata["thing_ids"] = removeDuplicates(thingIDs)
-		_, _ = svc.UpdateGroup(ctx, token, channel)
+		if channel.Name != "default_channel" {
+			_, _ = svc.UpdateGroup(ctx, token, channel)
+		}
 	case auth.ChannelsKind:
 		for _, memberID := range memberIDs {
 			policies.AddPoliciesReq = append(policies.AddPoliciesReq, &magistrala.AddPolicyReq{
@@ -717,8 +637,9 @@ func (svc service) Unassign(ctx context.Context, token, groupID, relation, membe
 		}
 		// 更新 thing_ids
 		channel.Metadata["thing_ids"] = filteredThingIDs
-		_, _ = svc.UpdateGroup(ctx, token, channel)
-
+		if channel.Name != "default_channel" {
+			_, _ = svc.UpdateGroup(ctx, token, channel)
+		}
 		for _, memberID := range memberIDs {
 			policies.DeletePoliciesReq = append(policies.DeletePoliciesReq, &magistrala.DeletePolicyReq{
 				Domain:      res.GetDomainId(),

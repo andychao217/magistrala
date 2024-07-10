@@ -59,7 +59,7 @@ type config struct {
 	JaegerURL           url.URL       `env:"MG_JAEGER_URL"                   envDefault:"http://localhost:14268/api/traces"`
 	SendTelemetry       bool          `env:"MG_SEND_TELEMETRY"               envDefault:"true"`
 	InstanceID          string        `env:"MG_AUTH_ADAPTER_INSTANCE_ID"     envDefault:""`
-	AccessDuration      time.Duration `env:"MG_AUTH_ACCESS_TOKEN_DURATION"   envDefault:"1h"`
+	AccessDuration      time.Duration `env:"MG_AUTH_ACCESS_TOKEN_DURATION"   envDefault:"8h"`
 	RefreshDuration     time.Duration `env:"MG_AUTH_REFRESH_TOKEN_DURATION"  envDefault:"24h"`
 	InvitationDuration  time.Duration `env:"MG_AUTH_INVITATION_DURATION"     envDefault:"168h"`
 	SpicedbHost         string        `env:"MG_SPICEDB_HOST"                 envDefault:"localhost"`

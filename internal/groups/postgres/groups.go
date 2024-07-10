@@ -336,9 +336,9 @@ func buildQuery(gm mggroups.Page, ids ...string) string {
 	// }
 	// 不显示名称为default_channel的channel，这个channel是新建domain时默认创建的，只用做平台和设备通信用
 	// 处理name字段，排除"default_channel"
-	if gm.Name != "" && gm.Name != "default_channel" {
+	if gm.Name != "" {
 		queries = append(queries, "g.name = :name")
-	} else if gm.Name == "" {
+	} else {
 		// 如果gm.Name没有被设置，并且你想排除"default_channel"，则添加条件
 		queries = append(queries, "g.name <> 'default_channel'")
 	}
