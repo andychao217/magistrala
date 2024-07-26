@@ -457,6 +457,9 @@ func (svc service) UpdateClient(ctx context.Context, token string, cli mgclients
 						thing, _ := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+strconv.Itoa(i))
 						oriName := thing.Name
 						thing.Name = client.Name
+						if client.Metadata["info"] != nil {
+							thing.Metadata["info"] = client.Metadata["info"]
+						}
 						alias, ok := thing.Metadata["aliase"].(string)
 						if !ok {
 							fmt.Println("Invalid type for out_channel")
