@@ -9,7 +9,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala/readers"
+	"github.com/andychao217/magistrala/readers"
 )
 
 var _ readers.MessageRepository = (*loggingMiddleware)(nil)

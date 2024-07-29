@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/twins"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/twins"
 )
 
 var (

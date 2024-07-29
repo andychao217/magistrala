@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/absmach/magistrala/twins"
+	"github.com/andychao217/magistrala/twins"
 )
 
 var _ twins.StateRepository = (*stateRepositoryMock)(nil)

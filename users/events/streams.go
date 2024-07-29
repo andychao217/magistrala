@@ -6,12 +6,12 @@ package events
 import (
 	"context"
 
-	"github.com/absmach/magistrala"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/events"
-	"github.com/absmach/magistrala/pkg/events/store"
-	mgoauth2 "github.com/absmach/magistrala/pkg/oauth2"
-	"github.com/absmach/magistrala/users"
+	"github.com/andychao217/magistrala"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/events"
+	"github.com/andychao217/magistrala/pkg/events/store"
+	mgoauth2 "github.com/andychao217/magistrala/pkg/oauth2"
+	"github.com/andychao217/magistrala/users"
 )
 
 const streamID = "magistrala.users"

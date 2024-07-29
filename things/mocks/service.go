@@ -7,9 +7,9 @@ package mocks
 import (
 	context "context"
 
-	clients "github.com/absmach/magistrala/pkg/clients"
+	clients "github.com/andychao217/magistrala/pkg/clients"
 
-	magistrala "github.com/absmach/magistrala"
+	magistrala "github.com/andychao217/magistrala"
 
 	mock "github.com/stretchr/testify/mock"
 )

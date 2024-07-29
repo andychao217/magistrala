@@ -6,8 +6,8 @@ package keys
 import (
 	"testing"
 
-	"github.com/absmach/magistrala/auth"
-	"github.com/absmach/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/auth"
+	"github.com/andychao217/magistrala/internal/apiutil"
 	"github.com/stretchr/testify/assert"
 )
 

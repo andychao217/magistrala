@@ -11,7 +11,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala/auth"
+	"github.com/andychao217/magistrala/auth"
 )
 
 var _ auth.Service = (*loggingMiddleware)(nil)

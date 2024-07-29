@@ -10,14 +10,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/absmach/magistrala/auth"
-	"github.com/absmach/magistrala/internal/apiutil"
-	"github.com/absmach/magistrala/internal/testsutil"
-	"github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	"github.com/absmach/magistrala/pkg/groups"
-	"github.com/absmach/magistrala/pkg/groups/mocks"
+	"github.com/andychao217/magistrala/auth"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/internal/testsutil"
+	"github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/pkg/groups/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

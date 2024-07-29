@@ -7,7 +7,7 @@ package mocks
 import (
 	context "context"
 
-	invitations "github.com/absmach/magistrala/invitations"
+	invitations "github.com/andychao217/magistrala/invitations"
 	mock "github.com/stretchr/testify/mock"
 )
 

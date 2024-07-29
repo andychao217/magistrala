@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/absmach/magistrala/internal/apiutil"
-	"github.com/absmach/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/errors"
 )
 
 const channelParts = 2

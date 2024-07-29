@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/pkg/groups"
 )
 
 var _ groups.Service = (*loggingMiddleware)(nil)

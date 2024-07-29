@@ -1,8 +1,8 @@
 # Magistrala
 
-[![Check License Header](https://github.com/absmach/magistrala/actions/workflows/check-license.yaml/badge.svg?branch=main)](https://github.com/absmach/magistrala/actions/workflows/check-license.yaml)
-[![Check the consistency of generated files](https://github.com/absmach/magistrala/actions/workflows/check-generated-files.yml/badge.svg?branch=main)](https://github.com/absmach/magistrala/actions/workflows/check-generated-files.yml)
-[![Continuous Delivery](https://github.com/absmach/magistrala/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/absmach/magistrala/actions/workflows/build.yml)
+[![Check License Header](https://github.com/andychao217/magistrala/actions/workflows/check-license.yaml/badge.svg?branch=main)](https://github.com/andychao217/magistrala/actions/workflows/check-license.yaml)
+[![Check the consistency of generated files](https://github.com/andychao217/magistrala/actions/workflows/check-generated-files.yml/badge.svg?branch=main)](https://github.com/andychao217/magistrala/actions/workflows/check-generated-files.yml)
+[![Continuous Delivery](https://github.com/andychao217/magistrala/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/andychao217/magistrala/actions/workflows/build.yml)
 [![go report card][grc-badge]][grc-url]
 [![coverage][cov-badge]][cov-url]
 [![license][license]](LICENSE)
@@ -90,7 +90,7 @@ Additional details on using the CLI can be found in the [CLI documentation](http
 
 ## Documentation
 
-Official documentation is hosted at [Magistrala official docs page][docs]. Documentation is auto-generated, checkout the instructions on [official docs repository](https://github.com/absmach/magistrala-docs):
+Official documentation is hosted at [Magistrala official docs page][docs]. Documentation is auto-generated, checkout the instructions on [official docs repository](https://github.com/andychao217/magistrala-docs):
 
 If you spot an error or a need for corrections, please let us know - or even better: send us a PR.
 
@@ -116,7 +116,7 @@ If you need this kind of support, best is to reach out to [@drasko][drasko] dire
 
 Thank you for your interest in Magistrala and the desire to contribute!
 
-1. Take a look at our [open issues](https://github.com/absmach/magistrala/issues). The [good-first-issue](https://github.com/absmach/magistrala/labels/good-first-issue) label is specifically for issues that are great for getting started.
+1. Take a look at our [open issues](https://github.com/andychao217/magistrala/issues). The [good-first-issue](https://github.com/andychao217/magistrala/labels/good-first-issue) label is specifically for issues that are great for getting started.
 2. Checkout the [contribution guide](CONTRIBUTING.md) to learn more about our style and conventions.
 3. Make your changes compatible to our workflow.
 
@@ -155,14 +155,14 @@ Data collection is on by default and can be disabled by setting the env variable
 
 By utilizing Magistrala, you actively contribute to its improvement. Together, we can build a more robust and efficient IoT platform. Thank you for your trust in Magistrala!
 
-[banner]: https://github.com/absmach/magistrala-docs/blob/main/docs/img/gopherBanner.jpg
+[banner]: https://github.com/andychao217/magistrala-docs/blob/main/docs/img/gopherBanner.jpg
 [docs]: https://docs.magistrala.abstractmachines.fr
 [docker]: https://www.docker.com
 [forum]: https://groups.google.com/forum/#!forum/mainflux
 [gitter]: https://gitter.im/absmach/magistrala?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 [gitter-badge]: https://badges.gitter.im/Join%20Chat.svg
-[grc-badge]: https://goreportcard.com/badge/github.com/absmach/magistrala
-[grc-url]: https://goreportcard.com/report/github.com/absmach/magistrala
+[grc-badge]: https://goreportcard.com/badge/github.com/andychao217/magistrala
+[grc-url]: https://goreportcard.com/report/github.com/andychao217/magistrala
 [cov-badge]: https://codecov.io/gh/absmach/magistrala/graph/badge.svg?token=SEMDAO3L09
 [cov-url]: https://codecov.io/gh/absmach/magistrala
 [license]: https://img.shields.io/badge/license-Apache%20v2.0-blue.svg
@@ -172,7 +172,7 @@ By utilizing Magistrala, you actively contribute to its improvement. Together, w
 [agent]: https://github.com/absmach/agent
 [export]: https://github.com/absmach/export
 [kubernetes]: https://kubernetes.io/
-[releases]: https://github.com/absmach/magistrala/releases
+[releases]: https://github.com/andychao217/magistrala/releases
 [drasko]: https://github.com/drasko
 [nikola]: https://github.com/nmarcetic
 [dejan]: https://github.com/mijicd

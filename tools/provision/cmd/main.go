@@ -7,7 +7,7 @@ package main
 import (
 	"log"
 
-	"github.com/absmach/magistrala/tools/provision"
+	"github.com/andychao217/magistrala/tools/provision"
 	"github.com/spf13/cobra"
 )
 

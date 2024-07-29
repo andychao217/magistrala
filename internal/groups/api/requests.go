@@ -4,10 +4,10 @@
 package api
 
 import (
-	"github.com/absmach/magistrala/auth"
-	"github.com/absmach/magistrala/internal/api"
-	"github.com/absmach/magistrala/internal/apiutil"
-	mggroups "github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/auth"
+	"github.com/andychao217/magistrala/internal/api"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	mggroups "github.com/andychao217/magistrala/pkg/groups"
 )
 
 type createGroupReq struct {

@@ -13,15 +13,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/auth"
-	pgclient "github.com/absmach/magistrala/internal/clients/postgres"
-	"github.com/absmach/magistrala/mqtt/events"
-	"github.com/absmach/magistrala/pkg/errors"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	"github.com/absmach/magistrala/pkg/messaging"
-	clientspg "github.com/absmach/magistrala/things/postgres"
 	"github.com/absmach/mproxy/pkg/session"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/auth"
+	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
+	"github.com/andychao217/magistrala/mqtt/events"
+	"github.com/andychao217/magistrala/pkg/errors"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala/pkg/messaging"
+	clientspg "github.com/andychao217/magistrala/things/postgres"
 )
 
 var _ session.Handler = (*handler)(nil)

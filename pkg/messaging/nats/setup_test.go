@@ -12,9 +12,9 @@ import (
 	"syscall"
 	"testing"
 
-	mglog "github.com/absmach/magistrala/logger"
-	"github.com/absmach/magistrala/pkg/messaging"
-	"github.com/absmach/magistrala/pkg/messaging/nats"
+	mglog "github.com/andychao217/magistrala/logger"
+	"github.com/andychao217/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/pkg/messaging/nats"
 	"github.com/ory/dockertest/v3"
 )
 

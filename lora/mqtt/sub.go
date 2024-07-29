@@ -11,7 +11,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala/lora"
+	"github.com/andychao217/magistrala/lora"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 

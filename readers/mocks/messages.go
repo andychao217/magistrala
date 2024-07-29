@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/absmach/magistrala/pkg/transformers/senml"
-	"github.com/absmach/magistrala/readers"
+	"github.com/andychao217/magistrala/pkg/transformers/senml"
+	"github.com/andychao217/magistrala/readers"
 )
 
 var _ readers.MessageRepository = (*messageRepositoryMock)(nil)

@@ -11,12 +11,12 @@ import (
 	"time"
 
 	"github.com/0x6flab/namegenerator"
-	"github.com/absmach/magistrala/internal/groups/postgres"
-	"github.com/absmach/magistrala/internal/testsutil"
-	"github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
-	mggroups "github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/internal/groups/postgres"
+	"github.com/andychao217/magistrala/internal/testsutil"
+	"github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	mggroups "github.com/andychao217/magistrala/pkg/groups"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

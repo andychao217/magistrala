@@ -8,10 +8,10 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	mgoauth2 "github.com/absmach/magistrala/pkg/oauth2"
-	"github.com/absmach/magistrala/users"
+	"github.com/andychao217/magistrala"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	mgoauth2 "github.com/andychao217/magistrala/pkg/oauth2"
+	"github.com/andychao217/magistrala/users"
 )
 
 var _ users.Service = (*loggingMiddleware)(nil)

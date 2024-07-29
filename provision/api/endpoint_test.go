@@ -11,13 +11,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/absmach/magistrala/internal/apiutil"
-	"github.com/absmach/magistrala/internal/testsutil"
-	mglog "github.com/absmach/magistrala/logger"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	"github.com/absmach/magistrala/provision"
-	"github.com/absmach/magistrala/provision/api"
-	"github.com/absmach/magistrala/provision/mocks"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/internal/testsutil"
+	mglog "github.com/andychao217/magistrala/logger"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala/provision"
+	"github.com/andychao217/magistrala/provision/api"
+	"github.com/andychao217/magistrala/provision/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/pkg/messaging"
 )
 
 const protocol = "lora"

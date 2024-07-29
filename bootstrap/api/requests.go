@@ -4,8 +4,8 @@
 package api
 
 import (
-	"github.com/absmach/magistrala/bootstrap"
-	"github.com/absmach/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/bootstrap"
+	"github.com/andychao217/magistrala/internal/apiutil"
 )
 
 const maxLimitSize = 1000

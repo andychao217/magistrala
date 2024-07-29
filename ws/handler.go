@@ -12,12 +12,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/auth"
-	"github.com/absmach/magistrala/pkg/errors"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	"github.com/absmach/magistrala/pkg/messaging"
 	"github.com/absmach/mproxy/pkg/session"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/auth"
+	"github.com/andychao217/magistrala/pkg/errors"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala/pkg/messaging"
 )
 
 var _ session.Handler = (*handler)(nil)

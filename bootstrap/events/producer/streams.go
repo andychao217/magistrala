@@ -6,8 +6,8 @@ package producer
 import (
 	"context"
 
-	"github.com/absmach/magistrala/bootstrap"
-	"github.com/absmach/magistrala/pkg/events"
+	"github.com/andychao217/magistrala/bootstrap"
+	"github.com/andychao217/magistrala/pkg/events"
 )
 
 var _ bootstrap.Service = (*eventStore)(nil)

@@ -7,7 +7,7 @@ package mocks
 import (
 	context "context"
 
-	messaging "github.com/absmach/magistrala/pkg/messaging"
+	messaging "github.com/andychao217/magistrala/pkg/messaging"
 	mock "github.com/stretchr/testify/mock"
 )
 

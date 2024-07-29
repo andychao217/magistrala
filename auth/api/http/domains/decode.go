@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/absmach/magistrala/auth"
-	"github.com/absmach/magistrala/internal/api"
-	"github.com/absmach/magistrala/internal/apiutil"
-	"github.com/absmach/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/auth"
+	"github.com/andychao217/magistrala/internal/api"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/go-chi/chi/v5"
 )
 

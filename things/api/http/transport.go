@@ -7,9 +7,9 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/pkg/groups"
-	"github.com/absmach/magistrala/things"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/things"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )

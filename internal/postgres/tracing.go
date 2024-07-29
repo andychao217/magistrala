@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/absmach/magistrala/internal/clients/postgres"
+	"github.com/andychao217/magistrala/internal/clients/postgres"
 	"github.com/jmoiron/sqlx"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"

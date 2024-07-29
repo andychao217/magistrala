@@ -11,10 +11,10 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/absmach/magistrala/pkg/errors"
-	jsont "github.com/absmach/magistrala/pkg/transformers/json"
-	"github.com/absmach/magistrala/pkg/transformers/senml"
-	"github.com/absmach/magistrala/readers"
+	"github.com/andychao217/magistrala/pkg/errors"
+	jsont "github.com/andychao217/magistrala/pkg/transformers/json"
+	"github.com/andychao217/magistrala/pkg/transformers/senml"
+	"github.com/andychao217/magistrala/readers"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 )
 

@@ -6,8 +6,8 @@ package things
 import (
 	"context"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/pkg/clients"
 )
 
 // Service specifies an API that must be fullfiled by the domain service

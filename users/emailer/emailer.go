@@ -6,8 +6,8 @@ package emailer
 import (
 	"fmt"
 
-	"github.com/absmach/magistrala/internal/email"
-	"github.com/absmach/magistrala/users"
+	"github.com/andychao217/magistrala/internal/email"
+	"github.com/andychao217/magistrala/users"
 )
 
 var _ users.Emailer = (*emailer)(nil)

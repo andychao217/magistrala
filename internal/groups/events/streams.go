@@ -6,9 +6,9 @@ package events
 import (
 	"context"
 
-	"github.com/absmach/magistrala/pkg/events"
-	"github.com/absmach/magistrala/pkg/events/store"
-	"github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/pkg/events"
+	"github.com/andychao217/magistrala/pkg/events/store"
+	"github.com/andychao217/magistrala/pkg/groups"
 )
 
 var _ groups.Service = (*eventStore)(nil)

@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/absmach/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 

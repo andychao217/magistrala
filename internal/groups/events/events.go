@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/events"
-	groups "github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/pkg/events"
+	groups "github.com/andychao217/magistrala/pkg/groups"
 )
 
 const (

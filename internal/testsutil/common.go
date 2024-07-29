@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/absmach/magistrala/pkg/uuid"
+	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/stretchr/testify/require"
 )
 

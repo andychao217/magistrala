@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/absmach/magistrala/twins"
-	"github.com/absmach/magistrala/twins/mongodb"
+	"github.com/andychao217/magistrala/twins"
+	"github.com/andychao217/magistrala/twins/mongodb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"

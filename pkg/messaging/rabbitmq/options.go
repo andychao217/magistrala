@@ -6,7 +6,7 @@ package rabbitmq
 import (
 	"errors"
 
-	"github.com/absmach/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/pkg/messaging"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 

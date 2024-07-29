@@ -10,12 +10,12 @@ import (
 	"testing"
 	"time"
 
-	writer "github.com/absmach/magistrala/consumers/writers/influxdb"
-	mglog "github.com/absmach/magistrala/logger"
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/pkg/transformers/json"
-	"github.com/absmach/magistrala/pkg/transformers/senml"
-	"github.com/absmach/magistrala/pkg/uuid"
+	writer "github.com/andychao217/magistrala/consumers/writers/influxdb"
+	mglog "github.com/andychao217/magistrala/logger"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/transformers/json"
+	"github.com/andychao217/magistrala/pkg/transformers/senml"
+	"github.com/andychao217/magistrala/pkg/uuid"
 	influxdata "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/stretchr/testify/assert"
 )

@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"time"
 
-	mgxsdk "github.com/absmach/magistrala/pkg/sdk/go"
+	mgxsdk "github.com/andychao217/magistrala/pkg/sdk/go"
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/spf13/cobra"
 )

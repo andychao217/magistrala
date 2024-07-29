@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/absmach/magistrala/opcua/db"
+	"github.com/andychao217/magistrala/opcua/db"
 )
 
 // Service specifies an API that must be fullfiled by the domain service

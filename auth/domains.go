@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/clients"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala/pkg/clients"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 )
 
 // Status represents Domain status.

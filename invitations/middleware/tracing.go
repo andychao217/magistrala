@@ -6,7 +6,7 @@ package middleware
 import (
 	"context"
 
-	"github.com/absmach/magistrala/invitations"
+	"github.com/andychao217/magistrala/invitations"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )

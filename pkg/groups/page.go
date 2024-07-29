@@ -3,7 +3,7 @@
 
 package groups
 
-import "github.com/absmach/magistrala/pkg/clients"
+import "github.com/andychao217/magistrala/pkg/clients"
 
 // PageMeta contains page metadata that helps navigation.
 type PageMeta struct {

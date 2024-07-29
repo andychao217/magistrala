@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/absmach/magistrala/internal/server"
+	"github.com/andychao217/magistrala/internal/server"
 )
 
 const (

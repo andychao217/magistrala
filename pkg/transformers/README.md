@@ -6,5 +6,5 @@ Magistrala [SenML transformer](transformer) is an example of Transformer service
 
 Magistrala [writers](writers) are using a standalone SenML transformer to preprocess messages before storing them.
 
-[transformers]: https://github.com/absmach/magistrala/tree/master/transformers/senml
-[writers]: https://github.com/absmach/magistrala/tree/master/writers
+[transformers]: https://github.com/andychao217/magistrala/tree/master/transformers/senml
+[writers]: https://github.com/andychao217/magistrala/tree/master/writers

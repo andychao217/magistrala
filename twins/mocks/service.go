@@ -8,12 +8,12 @@ import (
 	"strconv"
 	"time"
 
-	authmocks "github.com/absmach/magistrala/auth/mocks"
-	mglog "github.com/absmach/magistrala/logger"
-	"github.com/absmach/magistrala/pkg/messaging"
-	"github.com/absmach/magistrala/pkg/uuid"
-	"github.com/absmach/magistrala/twins"
 	"github.com/absmach/senml"
+	authmocks "github.com/andychao217/magistrala/auth/mocks"
+	mglog "github.com/andychao217/magistrala/logger"
+	"github.com/andychao217/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/pkg/uuid"
+	"github.com/andychao217/magistrala/twins"
 )
 
 const publisher = "twins"

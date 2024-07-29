@@ -11,7 +11,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/hashicorp/vault/api"
 	"github.com/hashicorp/vault/api/auth/approle"
 	"github.com/mitchellh/mapstructure"

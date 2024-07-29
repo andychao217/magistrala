@@ -7,7 +7,7 @@ import (
 	"context"
 	"errors"
 
-	mfclients "github.com/absmach/magistrala/pkg/clients"
+	mfclients "github.com/andychao217/magistrala/pkg/clients"
 	"golang.org/x/oauth2"
 )
 

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/absmach/magistrala/internal/apiutil"
-	"github.com/absmach/magistrala/readers"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/readers"
 )
 
 const maxLimitSize = 1000

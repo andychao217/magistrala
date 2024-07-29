@@ -7,12 +7,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/certs/pki"
-	"github.com/absmach/magistrala/pkg/errors"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	mgsdk "github.com/absmach/magistrala/pkg/sdk/go"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/certs/pki"
+	"github.com/andychao217/magistrala/pkg/errors"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	mgsdk "github.com/andychao217/magistrala/pkg/sdk/go"
 )
 
 var (

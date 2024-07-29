@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/absmach/magistrala"
-	authmocks "github.com/absmach/magistrala/auth/mocks"
-	"github.com/absmach/magistrala/internal/testsutil"
-	"github.com/absmach/magistrala/pkg/messaging"
-	"github.com/absmach/magistrala/pkg/messaging/mocks"
-	"github.com/absmach/magistrala/ws"
+	"github.com/andychao217/magistrala"
+	authmocks "github.com/andychao217/magistrala/auth/mocks"
+	"github.com/andychao217/magistrala/internal/testsutil"
+	"github.com/andychao217/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/pkg/messaging/mocks"
+	"github.com/andychao217/magistrala/ws"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

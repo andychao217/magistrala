@@ -3,7 +3,7 @@
 
 package service
 
-import "github.com/absmach/magistrala/pkg/errors"
+import "github.com/andychao217/magistrala/pkg/errors"
 
 // Wrapper for Service errors.
 var (

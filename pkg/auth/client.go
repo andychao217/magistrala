@@ -4,9 +4,9 @@
 package auth
 
 import (
-	"github.com/absmach/magistrala"
-	authgrpc "github.com/absmach/magistrala/auth/api/grpc"
-	thingsauth "github.com/absmach/magistrala/things/api/grpc"
+	"github.com/andychao217/magistrala"
+	authgrpc "github.com/andychao217/magistrala/auth/api/grpc"
+	thingsauth "github.com/andychao217/magistrala/things/api/grpc"
 )
 
 // Setup loads Auth gRPC configuration and creates new Auth gRPC client.

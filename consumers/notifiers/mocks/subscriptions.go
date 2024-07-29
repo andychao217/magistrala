@@ -8,8 +8,8 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/absmach/magistrala/consumers/notifiers"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
+	"github.com/andychao217/magistrala/consumers/notifiers"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
 )
 
 var _ notifiers.SubscriptionsRepository = (*subRepoMock)(nil)

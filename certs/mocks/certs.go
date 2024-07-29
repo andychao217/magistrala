@@ -7,8 +7,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/absmach/magistrala/certs"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
+	"github.com/andychao217/magistrala/certs"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
 )
 
 var _ certs.Repository = (*certsRepoMock)(nil)

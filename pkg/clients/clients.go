@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/errors"
 	"golang.org/x/net/idna"
 )
 

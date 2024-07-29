@@ -10,7 +10,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala/opcua"
+	"github.com/andychao217/magistrala/opcua"
 )
 
 var _ opcua.Service = (*loggingMiddleware)(nil)

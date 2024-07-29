@@ -9,7 +9,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/absmach/magistrala/ws"
+	"github.com/andychao217/magistrala/ws"
 	"github.com/go-kit/kit/metrics"
 )
 
