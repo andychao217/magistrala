@@ -13,7 +13,7 @@ import (
 	"os"
 	"time"
 
-	chclient "github.com/absmach/callhome/pkg/client"
+	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/internal"
 	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"

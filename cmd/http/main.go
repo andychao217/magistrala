@@ -13,9 +13,9 @@ import (
 	"net/url"
 	"os"
 
-	chclient "github.com/absmach/callhome/pkg/client"
 	mproxy "github.com/absmach/mproxy/pkg/http"
 	"github.com/absmach/mproxy/pkg/session"
+	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
 	adapter "github.com/andychao217/magistrala/http"
 	"github.com/andychao217/magistrala/http/api"
