@@ -8,10 +8,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/auth"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	mgsdk "github.com/absmach/magistrala/pkg/sdk/go"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/auth"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	mgsdk "github.com/andychao217/magistrala/pkg/sdk/go"
 )
 
 type service struct {

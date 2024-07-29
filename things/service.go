@@ -8,16 +8,19 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/auth"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	mggroups "github.com/absmach/magistrala/pkg/groups"
-	"github.com/absmach/magistrala/things/postgres"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/auth"
+	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	mggroups "github.com/andychao217/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/things/postgres"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -53,7 +56,8 @@ type ChannelListResponse struct {
 func getChannelIDs(token string) ([]string, error) {
 	// 创建domain时默认创建一个channel
 	// 要发送的数据
-	url := "http://things:9000/channels?limit=100"
+	// 只默认关联default_channel
+	url := "http://things:9000/channels?limit=1000&name=default_channel"
 	// 创建HTTP GET请求
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -88,10 +92,11 @@ func getChannelIDs(token string) ([]string, error) {
 		fmt.Printf("Error unmarshaling JSON: %s\n", err)
 		return []string{}, err
 	}
-	// 提取所有channel的id并组合为[]string数组
-	channelIDs := make([]string, len(response.Channels))
-	for i, channel := range response.Channels {
-		channelIDs[i] = channel.ID
+	var channelIDs []string
+	for _, channel := range response.Channels {
+		if channel.Name == "default_channel" {
+			channelIDs = append(channelIDs, channel.ID)
+		}
 	}
 	// 打印结果
 	fmt.Println(channelIDs)
@@ -226,6 +231,7 @@ func (svc service) CreateThings(ctx context.Context, token string, cls ...mgclie
 	if err != nil {
 		fmt.Println("error get ChannelIDs")
 	}
+	//新建things时，自动连接该domain下的default Channel
 	thingIDs := make([]string, len(saved))
 	for i, thing := range saved {
 		thingIDs[i] = thing.ID
@@ -420,6 +426,55 @@ func (svc service) UpdateClient(ctx context.Context, token string, cli mgclients
 	if err != nil {
 		return mgclients.Client{}, errors.Wrap(svcerr.ErrUpdateEntity, err)
 	}
+
+	// out_channel 大于1, 且is_channel等于0时，说明是多通道设备，需要把多通道都同时修改name、aliase
+	// 从 Metadata 中获取 "out_channel" 的值，并进行类型断言
+	outChannel, ok := client.Metadata["out_channel"].(int)
+	if ok {
+		if outChannel > 1 {
+			is_channel, ok := client.Metadata["is_channel"].(string)
+			if ok {
+				if is_channel == "0" {
+					dbConfig := pgclient.Config{
+						Host:        "things-db",
+						Port:        "5432",
+						User:        "magistrala",
+						Pass:        "magistrala",
+						Name:        "things",
+						SSLMode:     "disable",
+						SSLCert:     "",
+						SSLKey:      "",
+						SSLRootCert: "",
+					}
+					database, err := pgclient.Connect(dbConfig)
+					if err != nil {
+						fmt.Printf("Failed to connect to database: %v\n", err)
+					}
+					defer database.Close() // 确保在函数结束时关闭数据库连接
+
+					cRepo := postgres.NewRepository(database)
+					for i := 2; i <= outChannel; i++ {
+						thing, _ := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+strconv.Itoa(i))
+						oriName := thing.Name
+						thing.Name = client.Name
+						if client.Metadata["info"] != nil {
+							thing.Metadata["info"] = client.Metadata["info"]
+						}
+						alias, ok := thing.Metadata["aliase"].(string)
+						if !ok {
+							fmt.Println("Invalid type for out_channel")
+						} else {
+							thing.Metadata["aliase"] = strings.Replace(alias, oriName, client.Name, -1)
+						}
+						_, err = svc.UpdateClient(ctx, token, thing)
+						if err != nil {
+							fmt.Println("DeleteClient Error: ", err)
+						}
+					}
+				}
+			}
+		}
+	}
 	return client, nil
 }
 
@@ -561,6 +616,53 @@ func (svc service) DeleteClient(ctx context.Context, token, id string) error {
 	}
 	if _, err := svc.authorize(ctx, res.GetDomainId(), auth.UserType, auth.UsersKind, res.GetId(), auth.DeletePermission, auth.ThingType, id); err != nil {
 		return err
+	}
+
+	client, _ := svc.ViewClient(ctx, token, id)
+	if client.ID != "" {
+		outChannelStr, ok := client.Metadata["out_channel"].(string)
+		fmt.Println("delete outChannel 1234: ", outChannelStr)
+		if ok {
+			outChannelInt, err := strconv.Atoi(outChannelStr)
+			if err != nil {
+				fmt.Println("Failed to convert out_channel to int:", err)
+			} else {
+				if outChannelInt > 1 {
+					is_channel, ok := client.Metadata["is_channel"].(string)
+					fmt.Println("delete is_channel 1234: ", is_channel)
+					if ok {
+						if is_channel == "0" {
+							dbConfig := pgclient.Config{
+								Host:        "things-db",
+								Port:        "5432",
+								User:        "magistrala",
+								Pass:        "magistrala",
+								Name:        "things",
+								SSLMode:     "disable",
+								SSLCert:     "",
+								SSLKey:      "",
+								SSLRootCert: "",
+							}
+							database, err := pgclient.Connect(dbConfig)
+							if err != nil {
+								fmt.Printf("Failed to connect to database: %v\n", err)
+							}
+							defer database.Close() // 确保在函数结束时关闭数据库连接
+
+							cRepo := postgres.NewRepository(database)
+							for i := 2; i <= outChannelInt; i++ {
+								fmt.Println("delete newThing identity:", client.Credentials.Identity+"_"+strconv.Itoa(i))
+								newThing, _ := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+strconv.Itoa(i))
+								fmt.Println("delete newThing:", newThing.ID)
+								if newThing.ID != "" {
+									_ = svc.DeleteClient(ctx, token, newThing.ID)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	// Remove from cache

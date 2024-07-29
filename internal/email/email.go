@@ -10,7 +10,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/absmach/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/errors"
 	"gopkg.in/gomail.v2"
 )
 

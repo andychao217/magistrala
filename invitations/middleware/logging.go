@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala/invitations"
+	"github.com/andychao217/magistrala/invitations"
 )
 
 var _ invitations.Service = (*logging)(nil)

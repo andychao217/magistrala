@@ -10,7 +10,7 @@ import (
 	"encoding/pem"
 	"os"
 
-	"github.com/absmach/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/errors"
 )
 
 // ConfigsPage contains page related metadata as well as list.

@@ -16,8 +16,13 @@ volumes:
 
 services:
   timescale:
-    image: timescale/timescaledb:2.13.1-pg16
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/timescaledb:2.13.1-pg16
     container_name: magistrala-timescale
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       POSTGRES_PASSWORD: ${MG_TIMESCALE_PASS}
@@ -31,8 +36,13 @@ services:
       - magistrala-timescale-writer-volume:/var/lib/timescalesql/data
 
   timescale-writer:
-    image: magistrala/timescale-writer:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-timescale-writer:${MG_RELEASE_TAG}
     container_name: magistrala-timescale-writer
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - timescale
     restart: on-failure

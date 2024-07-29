@@ -6,11 +6,11 @@ package api
 import (
 	"errors"
 
-	"github.com/absmach/magistrala/internal/apiutil"
-	"github.com/absmach/magistrala/invitations"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/invitations"
 )
 
-const maxLimitSize = 100
+const maxLimitSize = 1000
 
 var errMissingDomain = errors.New("missing domain")
 

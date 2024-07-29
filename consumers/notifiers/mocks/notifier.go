@@ -4,8 +4,8 @@
 package mocks
 
 import (
-	"github.com/absmach/magistrala/consumers/notifiers"
-	"github.com/absmach/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/consumers/notifiers"
+	"github.com/andychao217/magistrala/pkg/messaging"
 )
 
 var _ notifiers.Notifier = (*notifier)(nil)

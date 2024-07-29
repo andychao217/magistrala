@@ -6,7 +6,7 @@ package notifiers
 import (
 	"errors"
 
-	"github.com/absmach/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/pkg/messaging"
 )
 
 // ErrNotify wraps sending notification errors.

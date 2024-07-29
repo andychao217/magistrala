@@ -12,8 +12,13 @@ networks:
 
 services:
   postgres-reader:
-    image: magistrala/postgres-reader:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-postgres-reader:${MG_RELEASE_TAG}
     container_name: magistrala-postgres-reader
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MG_POSTGRES_READER_LOG_LEVEL: ${MG_POSTGRES_READER_LOG_LEVEL}

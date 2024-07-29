@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/events"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/events"
 )
 
 const (

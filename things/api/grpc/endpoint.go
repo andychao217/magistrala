@@ -6,8 +6,8 @@ package grpc
 import (
 	"context"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/things"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/things"
 	"github.com/go-kit/kit/endpoint"
 )
 

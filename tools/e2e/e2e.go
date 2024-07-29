@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/0x6flab/namegenerator"
-	sdk "github.com/absmach/magistrala/pkg/sdk/go"
+	sdk "github.com/andychao217/magistrala/pkg/sdk/go"
 	"github.com/gookit/color"
 	"github.com/gorilla/websocket"
 	"golang.org/x/sync/errgroup"

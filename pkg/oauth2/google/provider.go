@@ -11,9 +11,9 @@ import (
 	"net/url"
 	"time"
 
-	mfclients "github.com/absmach/magistrala/pkg/clients"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	mgoauth2 "github.com/absmach/magistrala/pkg/oauth2"
+	mfclients "github.com/andychao217/magistrala/pkg/clients"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	mgoauth2 "github.com/andychao217/magistrala/pkg/oauth2"
 	"golang.org/x/oauth2"
 	googleoauth2 "golang.org/x/oauth2/google"
 )

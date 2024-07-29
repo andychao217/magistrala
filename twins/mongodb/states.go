@@ -6,7 +6,7 @@ package mongodb
 import (
 	"context"
 
-	"github.com/absmach/magistrala/twins"
+	"github.com/andychao217/magistrala/twins"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

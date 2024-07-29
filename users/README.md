@@ -15,7 +15,7 @@ The service is configured using the environment variables presented in the follo
 | Variable                      | Description                                                             | Default                             |
 | ----------------------------- | ----------------------------------------------------------------------- | ----------------------------------- |
 | MG_USERS_LOG_LEVEL            | Log level for users service (debug, info, warn, error)                  | info                                |
-| MG_USERS_ADMIN_EMAIL          | Default user, created on startup                                        | <admin@example.com>                 |
+| MG_USERS_ADMIN_EMAIL          | Default user, created on startup                                        | <admin@sponxt.com>                 |
 | MG_USERS_ADMIN_PASSWORD       | Default user password, created on startup                               | 12345678                            |
 | MG_USERS_PASS_REGEX           | Password regex                                                          | ^.{8,}$                             |
 | MG_TOKEN_RESET_ENDPOINT       | Password request reset endpoint, for constructing link                  | /reset-request                      |
@@ -54,13 +54,13 @@ The service is configured using the environment variables presented in the follo
 
 ## Deployment
 
-The service itself is distributed as Docker container. Check the [`users`](https://github.com/absmach/magistrala/blob/main/docker/docker-compose.yml) service section in docker-compose file to see how service is deployed.
+The service itself is distributed as Docker container. Check the [`users`](https://github.com/andychao217/magistrala/blob/main/docker/docker-compose.yml) service section in docker-compose file to see how service is deployed.
 
 To start the service outside of the container, execute the following shell script:
 
 ```bash
 # download the latest version of the service
-git clone https://github.com/absmach/magistrala
+git clone https://github.com/andychao217/magistrala
 
 cd magistrala
 
@@ -72,7 +72,7 @@ make install
 
 # set the environment variables and run the service
 MG_USERS_LOG_LEVEL=info \
-MG_USERS_ADMIN_EMAIL=admin@example.com \
+MG_USERS_ADMIN_EMAIL=admin@sponxt.com \
 MG_USERS_ADMIN_PASSWORD=12345678 \
 MG_USERS_PASS_REGEX="^.{8,}$" \
 MG_TOKEN_RESET_ENDPOINT="/reset-request" \
@@ -111,7 +111,7 @@ MG_USERS_INSTANCE_ID="" \
 $GOBIN/magistrala-users
 ```
 
-If `MG_EMAIL_TEMPLATE` doesn't point to any file service will function but password reset functionality will not work. The email environment variables are used to send emails with password reset link. The service expects a file in Go template format. The template should be something like [this](https://github.com/absmach/magistrala/blob/main/docker/templates/users.tmpl).
+If `MG_EMAIL_TEMPLATE` doesn't point to any file service will function but password reset functionality will not work. The email environment variables are used to send emails with password reset link. The service expects a file in Go template format. The template should be something like [this](https://github.com/andychao217/magistrala/blob/main/docker/templates/users.tmpl).
 
 Setting `MG_USERS_HTTP_SERVER_CERT` and `MG_USERS_HTTP_SERVER_KEY` will enable TLS against the service. The service expects a file in PEM format for both the certificate and the key. Setting `MG_USERS_HTTP_SERVER_CA_CERTS` will enable TLS against the service trusting only those CAs that are provided. The service expects a file in PEM format of trusted CAs. Setting `MG_USERS_HTTP_CLIENT_CA_CERTS` will enable TLS against the service trusting only those CAs that are provided. The service expects a file in PEM format of trusted CAs.
 

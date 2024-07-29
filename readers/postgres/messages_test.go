@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	pwriter "github.com/absmach/magistrala/consumers/writers/postgres"
-	"github.com/absmach/magistrala/internal/testsutil"
-	"github.com/absmach/magistrala/pkg/transformers/json"
-	"github.com/absmach/magistrala/pkg/transformers/senml"
-	"github.com/absmach/magistrala/readers"
-	preader "github.com/absmach/magistrala/readers/postgres"
+	pwriter "github.com/andychao217/magistrala/consumers/writers/postgres"
+	"github.com/andychao217/magistrala/internal/testsutil"
+	"github.com/andychao217/magistrala/pkg/transformers/json"
+	"github.com/andychao217/magistrala/pkg/transformers/senml"
+	"github.com/andychao217/magistrala/readers"
+	preader "github.com/andychao217/magistrala/readers/postgres"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

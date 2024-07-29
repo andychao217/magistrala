@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/absmach/magistrala/twins"
-	"github.com/absmach/magistrala/twins/events"
-	"github.com/absmach/magistrala/twins/mocks"
+	"github.com/andychao217/magistrala/twins"
+	"github.com/andychao217/magistrala/twins/events"
+	"github.com/andychao217/magistrala/twins/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

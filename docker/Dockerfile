@@ -15,7 +15,7 @@ ARG VERSION
 ARG COMMIT
 ARG TIME
 
-WORKDIR /go/src/github.com/absmach/magistrala
+WORKDIR /go/src/github.com/andychao217/magistrala
 COPY . .
 
 RUN echo http://mirrors.aliyun.com/alpine/v3.19/main/ > /etc/apk/repositories && \

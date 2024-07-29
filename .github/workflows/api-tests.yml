@@ -25,7 +25,7 @@ on:
 env:
   TOKENS_URL: http://localhost:9002/users/tokens/issue
   DOMAINS_URL: http://localhost:8189/domains
-  USER_IDENTITY: admin@example.com
+  USER_IDENTITY: admin@sponxt.com
   USER_SECRET: 12345678
   DOMAIN_NAME: demo-test
   USERS_URL: http://localhost:9002

@@ -15,8 +15,13 @@ volumes:
 
 services:
   opcua-redis:
-    image: redis:7.2.4-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/redis:7.2.4-alpine
     container_name: magistrala-opcua-redis
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     networks:
       - magistrala-base-net
@@ -24,8 +29,13 @@ services:
       - magistrala-opcua-redis-volume:/data
 
   opcua-adapter:
-    image: magistrala/opcua:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-opcua:${MG_RELEASE_TAG}
     container_name: magistrala-opcua
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MG_OPCUA_ADAPTER_LOG_LEVEL: ${MG_OPCUA_ADAPTER_LOG_LEVEL}

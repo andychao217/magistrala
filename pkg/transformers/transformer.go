@@ -3,7 +3,7 @@
 
 package transformers
 
-import "github.com/absmach/magistrala/pkg/messaging"
+import "github.com/andychao217/magistrala/pkg/messaging"
 
 // Transformer specifies API form Message transformer.
 type Transformer interface {

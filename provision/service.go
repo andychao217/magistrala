@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/absmach/magistrala/pkg/errors"
-	sdk "github.com/absmach/magistrala/pkg/sdk/go"
+	"github.com/andychao217/magistrala/pkg/errors"
+	sdk "github.com/andychao217/magistrala/pkg/sdk/go"
 )
 
 const (

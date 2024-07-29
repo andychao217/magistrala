@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/pkg/groups"
-	"github.com/absmach/magistrala/pkg/oauth2"
-	"github.com/absmach/magistrala/users"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/pkg/oauth2"
+	"github.com/andychao217/magistrala/users"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )

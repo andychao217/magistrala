@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/absmach/magistrala/lora"
-	"github.com/absmach/magistrala/lora/mocks"
-	"github.com/absmach/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/lora"
+	"github.com/andychao217/magistrala/lora/mocks"
+	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

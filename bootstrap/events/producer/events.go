@@ -6,8 +6,8 @@ package producer
 import (
 	"encoding/json"
 
-	"github.com/absmach/magistrala/bootstrap"
-	"github.com/absmach/magistrala/pkg/events"
+	"github.com/andychao217/magistrala/bootstrap"
+	"github.com/andychao217/magistrala/pkg/events"
 )
 
 const (

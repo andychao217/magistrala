@@ -6,9 +6,9 @@ package smtp
 import (
 	"fmt"
 
-	"github.com/absmach/magistrala/consumers/notifiers"
-	"github.com/absmach/magistrala/internal/email"
-	"github.com/absmach/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/consumers/notifiers"
+	"github.com/andychao217/magistrala/internal/email"
+	"github.com/andychao217/magistrala/pkg/messaging"
 )
 
 const (

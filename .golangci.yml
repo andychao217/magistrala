@@ -20,13 +20,13 @@ linters-settings:
     alias:
       - pkg: github.com/absmach/callhome/pkg/client
         alias: chclient
-      - pkg: github.com/absmach/magistrala/logger
+      - pkg: github.com/andychao217/magistrala/logger
         alias: mglog
-      - pkg: github.com/absmach/magistrala/pkg/errors/service
+      - pkg: github.com/andychao217/magistrala/pkg/errors/service
         alias: svcerr
-      - pkg: github.com/absmach/magistrala/pkg/errors/repository
+      - pkg: github.com/andychao217/magistrala/pkg/errors/repository
         alias: repoerr
-      - pkg: github.com/absmach/magistrala/pkg/sdk/mocks
+      - pkg: github.com/andychao217/magistrala/pkg/sdk/mocks
         alias: sdkmocks
 
   gocritic:

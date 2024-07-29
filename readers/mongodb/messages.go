@@ -7,9 +7,9 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/pkg/transformers/senml"
-	"github.com/absmach/magistrala/readers"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/transformers/senml"
+	"github.com/andychao217/magistrala/readers"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

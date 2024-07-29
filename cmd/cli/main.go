@@ -7,8 +7,8 @@ package main
 import (
 	"log"
 
-	"github.com/absmach/magistrala/cli"
-	sdk "github.com/absmach/magistrala/pkg/sdk/go"
+	"github.com/andychao217/magistrala/cli"
+	sdk "github.com/andychao217/magistrala/pkg/sdk/go"
 	"github.com/spf13/cobra"
 )
 

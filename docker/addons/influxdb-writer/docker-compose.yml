@@ -14,8 +14,13 @@ volumes:
 
 services:
   influxdb:
-    image: influxdb:2.7.5-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/influxdb:2.7.5-alpine
     container_name: magistrala-influxdb
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       DOCKER_INFLUXDB_INIT_MODE: ${MG_INFLUXDB_INIT_MODE}
@@ -34,8 +39,13 @@ services:
       - magistrala-influxdb-volume:/var/lib/influxdb
 
   influxdb-writer:
-    image: magistrala/influxdb-writer:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-influxdb-writer:${MG_RELEASE_TAG}
     container_name: magistrala-influxdb-writer
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - influxdb
     restart: on-failure

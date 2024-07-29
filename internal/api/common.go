@@ -8,12 +8,12 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/bootstrap"
-	"github.com/absmach/magistrala/internal/apiutil"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/bootstrap"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	"github.com/gofrs/uuid"
 )
 
@@ -62,7 +62,7 @@ const (
 	ContentType = "application/json"
 
 	// MaxNameSize limits name size to prevent making them too complex.
-	MaxLimitSize = 100
+	MaxLimitSize = 1000
 	MaxNameSize  = 1024
 	NameOrder    = "name"
 	IDOrder      = "id"

@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/absmach/magistrala/internal/postgres"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
-	mggroups "github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/internal/postgres"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	mggroups "github.com/andychao217/magistrala/pkg/groups"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -154,7 +154,7 @@ func (repo groupRepository) RetrieveAll(ctx context.Context, gm mggroups.Page) (
 	}
 	if gm.ID == "" {
 		q = `SELECT DISTINCT g.id, g.domain_id, COALESCE(g.parent_id, '') AS parent_id, g.name, g.description,
-		g.metadata, g.created_at, g.updated_at, g.updated_by, g.status FROM groups g`
+          g.metadata, g.created_at, g.updated_at, g.updated_by, g.status FROM groups g`
 	}
 	q = fmt.Sprintf("%s %s ORDER BY g.created_at LIMIT :limit OFFSET :offset;", q, query)
 
@@ -331,8 +331,16 @@ func buildQuery(gm mggroups.Page, ids ...string) string {
 	if len(ids) > 0 {
 		queries = append(queries, fmt.Sprintf(" id in ('%s') ", strings.Join(ids, "', '")))
 	}
+	// if gm.Name != "" {
+	// 	queries = append(queries, "g.name = :name")
+	// }
+	// 不显示名称为default_channel的channel，这个channel是新建domain时默认创建的，只用做平台和设备通信用
+	// 处理name字段，排除"default_channel"
 	if gm.Name != "" {
 		queries = append(queries, "g.name = :name")
+	} else {
+		// 如果gm.Name没有被设置，并且你想排除"default_channel"，则添加条件
+		queries = append(queries, "g.name <> 'default_channel'")
 	}
 	if gm.Status != mgclients.AllStatus {
 		queries = append(queries, "g.status = :status")

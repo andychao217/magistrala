@@ -9,16 +9,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
-	"github.com/absmach/magistrala"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	"github.com/go-redis/redis/v8"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 )
+
+var minioClient *minio.Client
 
 const recoveryDuration = 5 * time.Minute
 
@@ -606,7 +612,7 @@ func createDefaultChannel(token string, domain Domain) (Channel, error) {
 	}
 	// 创建一个Channel结构体的实例
 	postChannel := ChannelPostData{
-		Name: "Default Channel",
+		Name: "default_channel",
 		ID:   "",
 	}
 	jsonBytes, err := json.Marshal(postChannel)
@@ -696,6 +702,7 @@ func updateUserInfo(token string, userInfo UserInfoResponseBody, channelID strin
 		metadata = userInfo.Metadata
 	}
 	metadata[domainID] = channelID
+	metadata["comID"] = channelID
 	postUser := UserPostData{
 		Metadata: metadata,
 		Name:     userInfo.Name,
@@ -736,7 +743,7 @@ func updateUserInfo(token string, userInfo UserInfoResponseBody, channelID strin
 }
 
 // 创建默认thing: platform
-func createDefaultThing(token string) (mgclients.Client, error) {
+func createDefaultThing(token, comID string) (mgclients.Client, error) {
 	// 要发送的数据
 	var thing mgclients.Client
 	type ThingPostData struct {
@@ -744,10 +751,10 @@ func createDefaultThing(token string) (mgclients.Client, error) {
 		Credentials mgclients.Credentials `json:"credentials"`
 	}
 	postThing := ThingPostData{
-		Name: "Platform",
+		Name: "Platform" + comID,
 		Credentials: mgclients.Credentials{
-			Identity: "platform",
-			Secret:   "platform",
+			Identity: "platform" + comID,
+			Secret:   "platform" + comID,
 		},
 	}
 	jsonBytes, err := json.Marshal(postThing)
@@ -784,6 +791,66 @@ func createDefaultThing(token string) (mgclients.Client, error) {
 	// 解析JSON字符串到User结构体
 	_ = json.Unmarshal(body, &thing)
 	return thing, nil
+}
+
+// 创建默认minio bucket文件夹
+func createDefaultMinioFolder(comID string) {
+	// 创建domain之后，使用domainID创建一个minio的文件夹
+	// 初始化 MinIO 客户端
+	var minioErr error
+	endpoint := os.Getenv("MINIO_ENDPOINT")
+	if endpoint == "" {
+		endpoint = "minio:9100"
+	}
+	accessKey := os.Getenv("MINIO_ACCESS_KEY")
+	if accessKey == "" {
+		accessKey = "admin"
+	}
+	secretKey := os.Getenv("MINIO_SECRET_KEY")
+	if secretKey == "" {
+		secretKey = "12345678"
+	}
+	bucketName := os.Getenv("MINIO_BUCKET_NAME")
+	if bucketName == "" {
+		bucketName = "nxt-tenant"
+	}
+
+	minioClient, minioErr = minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
+		Secure: false,
+	})
+
+	if minioErr != nil {
+		log.Fatalln(minioErr)
+	}
+
+	// 要创建的“文件夹”路径
+	folderName := comID + "/"
+
+	// 检查存储桶是否存在
+	exists, err := minioClient.BucketExists(context.Background(), bucketName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if !exists {
+		// 创建存储桶
+		err = minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Println("Successfully created bucket:", bucketName)
+	} else {
+		fmt.Println("Bucket already exists:", bucketName)
+	}
+
+	// 创建一个空的对象，以模拟“文件夹”
+	objectName := folderName
+
+	_, err = minioClient.PutObject(context.Background(), bucketName, objectName, nil, 0, minio.PutObjectOptions{})
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do Domain, err error) {
@@ -850,29 +917,43 @@ func (svc service) CreateDomain(ctx context.Context, token string, d Domain) (do
 		}
 		newToken := tokenResponseBody.AccessToken
 
-		//创建默认channel
+		//创建默认channel,之后把默认channel的id写入domain的metadata.comID
 		newChannel, err := createDefaultChannel(newToken, dom)
 		if err != nil {
 			fmt.Printf("Failed to call the second API: %v\n", err)
 		}
 		if newChannel.ID != "" {
-			userInfo, err := httpGetUserInfo(newToken)
-			// 将结构体转换为JSON格式的字节切片
-			jsonData, _ := json.Marshal(userInfo)
-			// 打印JSON格式的字节切片（这将以二进制形式显示）
-			fmt.Println("authService userinfo data: ", string(jsonData))
-
+			if dom.Metadata == nil {
+				dom.Metadata = make(mgclients.Metadata)
+			}
+			dom.Metadata["comID"] = newChannel.ID
+			domainReqData := DomainReq{
+				Name:     &dom.Name,
+				Tags:     &dom.Tags,
+				Alias:    &dom.Alias,
+				Status:   &dom.Status,
+				Metadata: &dom.Metadata,
+			}
+			_, err = svc.UpdateDomain(ctx, newToken, dom.ID, domainReqData)
 			if err != nil {
-				fmt.Printf("Failed to set value in Redis: %v\n", err)
+				fmt.Printf("Failed to UpdateDomain: %v\n", err)
+			}
+
+			//创建默认thing: platform
+			_, err = createDefaultThing(newToken, newChannel.ID)
+			if err != nil {
+				fmt.Printf("Failed to call the third API: %v\n", err)
+			}
+
+			// 创建默认minio bucket文件夹
+			// createDefaultMinioFolder(newChannel.ID)
+
+			userInfo, err := httpGetUserInfo(newToken)
+			if err != nil {
+				fmt.Printf("Failed to httpGetUserInfo: %v\n", err)
 			} else {
 				_ = updateUserInfo(newToken, userInfo, newChannel.ID, dom.ID)
 			}
-		}
-
-		//创建默认thing: platform
-		_, err = createDefaultThing(newToken)
-		if err != nil {
-			fmt.Printf("Failed to call the third API: %v\n", err)
 		}
 	}
 

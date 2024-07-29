@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	pgClient "github.com/absmach/magistrala/internal/clients/postgres"
-	"github.com/absmach/magistrala/internal/postgres"
-	upostgres "github.com/absmach/magistrala/users/postgres"
+	pgClient "github.com/andychao217/magistrala/internal/clients/postgres"
+	"github.com/andychao217/magistrala/internal/postgres"
+	upostgres "github.com/andychao217/magistrala/users/postgres"
 	"github.com/jmoiron/sqlx"
 	dockertest "github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"

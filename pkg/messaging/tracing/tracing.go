@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/absmach/magistrala/internal/server"
+	"github.com/andychao217/magistrala/internal/server"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/pkg/groups"
 )
 
 var (

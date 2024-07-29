@@ -3,7 +3,7 @@
 
 package groups
 
-import svcerr "github.com/absmach/magistrala/pkg/errors/service"
+import svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 
 // Status represents Group status.
 type Status uint8

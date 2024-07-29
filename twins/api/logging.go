@@ -10,8 +10,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/messaging"
-	"github.com/absmach/magistrala/twins"
+	"github.com/andychao217/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/twins"
 )
 
 var _ twins.Service = (*loggingMiddleware)(nil)

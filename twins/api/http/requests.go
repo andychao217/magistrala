@@ -4,13 +4,13 @@
 package http
 
 import (
-	"github.com/absmach/magistrala/internal/apiutil"
-	"github.com/absmach/magistrala/twins"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/twins"
 )
 
 const (
 	maxNameSize  = 1024
-	maxLimitSize = 100
+	maxLimitSize = 1000
 )
 
 type addTwinReq struct {

@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/events"
+	"github.com/andychao217/magistrala/pkg/events"
 	"github.com/go-redis/redis/v8"
 )
 

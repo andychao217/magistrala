@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/absmach/magistrala/bootstrap"
-	"github.com/absmach/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/bootstrap"
+	"github.com/andychao217/magistrala/internal/apiutil"
 	"github.com/stretchr/testify/assert"
 )
 

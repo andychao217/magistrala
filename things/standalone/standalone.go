@@ -6,8 +6,8 @@ package standalone
 import (
 	"context"
 
-	"github.com/absmach/magistrala"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	"google.golang.org/grpc"
 )
 

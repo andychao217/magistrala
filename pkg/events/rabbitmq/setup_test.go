@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/absmach/magistrala/pkg/events/rabbitmq"
+	"github.com/andychao217/magistrala/pkg/events/rabbitmq"
 	"github.com/ory/dockertest/v3"
 )
 

@@ -9,11 +9,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/absmach/magistrala/internal/api"
-	"github.com/absmach/magistrala/internal/apiutil"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	mggroups "github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/internal/api"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	mggroups "github.com/andychao217/magistrala/pkg/groups"
 	"github.com/go-chi/chi/v5"
 )
 

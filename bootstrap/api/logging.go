@@ -10,7 +10,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala/bootstrap"
+	"github.com/andychao217/magistrala/bootstrap"
 )
 
 var _ bootstrap.Service = (*loggingMiddleware)(nil)

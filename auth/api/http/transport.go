@@ -6,10 +6,10 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/auth"
-	"github.com/absmach/magistrala/auth/api/http/domains"
-	"github.com/absmach/magistrala/auth/api/http/keys"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/auth"
+	"github.com/andychao217/magistrala/auth/api/http/domains"
+	"github.com/andychao217/magistrala/auth/api/http/keys"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )

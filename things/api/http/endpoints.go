@@ -6,12 +6,12 @@ package http
 import (
 	"context"
 
-	"github.com/absmach/magistrala/auth"
-	"github.com/absmach/magistrala/internal/apiutil"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/pkg/groups"
-	"github.com/absmach/magistrala/things"
+	"github.com/andychao217/magistrala/auth"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/things"
 	"github.com/go-kit/kit/endpoint"
 )
 

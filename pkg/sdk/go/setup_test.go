@@ -9,12 +9,12 @@ import (
 	"regexp"
 	"testing"
 
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	mggroups "github.com/absmach/magistrala/pkg/groups"
-	sdk "github.com/absmach/magistrala/pkg/sdk/go"
-	"github.com/absmach/magistrala/pkg/uuid"
-	"github.com/absmach/magistrala/users/hasher"
-	umocks "github.com/absmach/magistrala/users/mocks"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	mggroups "github.com/andychao217/magistrala/pkg/groups"
+	sdk "github.com/andychao217/magistrala/pkg/sdk/go"
+	"github.com/andychao217/magistrala/pkg/uuid"
+	"github.com/andychao217/magistrala/users/hasher"
+	umocks "github.com/andychao217/magistrala/users/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

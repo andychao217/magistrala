@@ -11,15 +11,25 @@ networks:
 
 services:
   lora-redis:
-    image: redis:7.2.4-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/redis:7.2.4-alpine
     container_name: magistrala-lora-redis
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     networks:
       - magistrala-base-net
 
   lora-adapter:
-    image: magistrala/lora:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-lora:${MG_RELEASE_TAG}
     container_name: magistrala-lora
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MG_LORA_ADAPTER_LOG_LEVEL: ${MG_LORA_ADAPTER_LOG_LEVEL}

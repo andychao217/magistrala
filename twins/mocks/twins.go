@@ -10,9 +10,9 @@ import (
 	"strings"
 	"sync"
 
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
-	"github.com/absmach/magistrala/pkg/uuid"
-	"github.com/absmach/magistrala/twins"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	"github.com/andychao217/magistrala/pkg/uuid"
+	"github.com/andychao217/magistrala/twins"
 )
 
 var _ twins.TwinRepository = (*twinRepositoryMock)(nil)

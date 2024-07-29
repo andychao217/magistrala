@@ -6,8 +6,8 @@ package domains
 import (
 	"context"
 
-	"github.com/absmach/magistrala/auth"
-	"github.com/absmach/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/auth"
+	"github.com/andychao217/magistrala/pkg/clients"
 	"github.com/go-kit/kit/endpoint"
 )
 

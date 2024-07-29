@@ -7,10 +7,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/consumers"
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/consumers"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/messaging"
 )
 
 // ErrMessage indicates an error converting a message to Magistrala message.

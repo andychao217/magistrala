@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	mglog "github.com/absmach/magistrala/logger"
-	"github.com/absmach/magistrala/pkg/messaging"
-	mqttpubsub "github.com/absmach/magistrala/pkg/messaging/mqtt"
+	mglog "github.com/andychao217/magistrala/logger"
+	"github.com/andychao217/magistrala/pkg/messaging"
+	mqttpubsub "github.com/andychao217/magistrala/pkg/messaging/mqtt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"

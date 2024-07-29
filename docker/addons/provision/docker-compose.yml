@@ -11,8 +11,13 @@ networks:
 
 services:
   provision:
-    image: magistrala/provision:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-provision:${MG_RELEASE_TAG}
     container_name: magistrala-provision
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     networks:
       - magistrala-base-net

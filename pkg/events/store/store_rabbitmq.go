@@ -11,8 +11,8 @@ import (
 	"log"
 	"log/slog"
 
-	"github.com/absmach/magistrala/pkg/events"
-	"github.com/absmach/magistrala/pkg/events/rabbitmq"
+	"github.com/andychao217/magistrala/pkg/events"
+	"github.com/andychao217/magistrala/pkg/events/rabbitmq"
 )
 
 func init() {

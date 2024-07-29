@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/absmach/magistrala"
+	"github.com/andychao217/magistrala"
 )
 
 // Prefix represents the prefix used to generate UUID mocks.

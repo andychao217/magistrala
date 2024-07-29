@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/absmach/magistrala/opcua"
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/opcua"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/messaging"
 	opcuagopcua "github.com/gopcua/opcua"
 	uagopcua "github.com/gopcua/opcua/ua"
 )

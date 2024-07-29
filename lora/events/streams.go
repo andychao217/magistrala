@@ -8,8 +8,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/absmach/magistrala/lora"
-	"github.com/absmach/magistrala/pkg/events"
+	"github.com/andychao217/magistrala/lora"
+	"github.com/andychao217/magistrala/pkg/events"
 )
 
 const (

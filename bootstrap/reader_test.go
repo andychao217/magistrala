@@ -11,9 +11,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/bootstrap"
-	"github.com/absmach/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/bootstrap"
+	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 

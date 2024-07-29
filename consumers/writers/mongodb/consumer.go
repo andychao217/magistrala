@@ -6,10 +6,10 @@ package mongodb
 import (
 	"context"
 
-	"github.com/absmach/magistrala/consumers"
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/pkg/transformers/json"
-	"github.com/absmach/magistrala/pkg/transformers/senml"
+	"github.com/andychao217/magistrala/consumers"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/transformers/json"
+	"github.com/andychao217/magistrala/pkg/transformers/senml"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )

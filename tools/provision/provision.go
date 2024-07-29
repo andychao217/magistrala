@@ -19,7 +19,7 @@ import (
 	"os"
 	"time"
 
-	sdk "github.com/absmach/magistrala/pkg/sdk/go"
+	sdk "github.com/andychao217/magistrala/pkg/sdk/go"
 	"github.com/docker/docker/pkg/namesgenerator"
 )
 

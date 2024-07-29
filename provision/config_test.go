@@ -8,10 +8,10 @@ import (
 	"os"
 	"testing"
 
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/pkg/groups"
-	"github.com/absmach/magistrala/provision"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/provision"
 	"github.com/pelletier/go-toml"
 	"github.com/stretchr/testify/assert"
 )

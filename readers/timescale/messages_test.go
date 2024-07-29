@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	twriter "github.com/absmach/magistrala/consumers/writers/timescale"
-	"github.com/absmach/magistrala/internal/testsutil"
-	"github.com/absmach/magistrala/pkg/transformers/json"
-	"github.com/absmach/magistrala/pkg/transformers/senml"
-	"github.com/absmach/magistrala/readers"
-	treader "github.com/absmach/magistrala/readers/timescale"
+	twriter "github.com/andychao217/magistrala/consumers/writers/timescale"
+	"github.com/andychao217/magistrala/internal/testsutil"
+	"github.com/andychao217/magistrala/pkg/transformers/json"
+	"github.com/andychao217/magistrala/pkg/transformers/senml"
+	"github.com/andychao217/magistrala/readers"
+	treader "github.com/andychao217/magistrala/readers/timescale"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

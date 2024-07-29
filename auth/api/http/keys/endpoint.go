@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/absmach/magistrala/auth"
+	"github.com/andychao217/magistrala/auth"
 	"github.com/go-kit/kit/endpoint"
 )
 

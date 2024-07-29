@@ -14,8 +14,13 @@ volumes:
 
 services:
   smtp-notifier-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-smtp-notifier-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       POSTGRES_USER: ${MG_SMTP_NOTIFIER_DB_USER}
@@ -27,8 +32,13 @@ services:
       - magistrala-smtp-notifier-volume:/var/lib/postgresql/datab
 
   smtp-notifier:
-    image: magistrala/smtp-notifier:latest
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-smtp-notifier:${MG_RELEASE_TAG}
     container_name: magistrala-smtp-notifier
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - smtp-notifier-db
     restart: on-failure

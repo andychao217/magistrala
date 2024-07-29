@@ -6,9 +6,9 @@ package api
 import (
 	"context"
 
-	"github.com/absmach/magistrala/internal/apiutil"
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/groups"
 	"github.com/go-kit/kit/endpoint"
 )
 

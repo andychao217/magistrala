@@ -4,11 +4,11 @@
 package http
 
 import (
-	"github.com/absmach/magistrala/internal/api"
-	"github.com/absmach/magistrala/internal/apiutil"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala/internal/api"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 )
 
 type createClientReq struct {

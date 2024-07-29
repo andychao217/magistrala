@@ -4,8 +4,8 @@
 package hasher
 
 import (
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/users"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/users"
 	"golang.org/x/crypto/bcrypt"
 )
 

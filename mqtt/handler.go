@@ -9,18 +9,19 @@ import (
 	"log/slog"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/auth"
-	pgclient "github.com/absmach/magistrala/internal/clients/postgres"
-	"github.com/absmach/magistrala/mqtt/events"
-	"github.com/absmach/magistrala/pkg/errors"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	"github.com/absmach/magistrala/pkg/messaging"
-	clientspg "github.com/absmach/magistrala/things/postgres"
 	"github.com/absmach/mproxy/pkg/session"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/auth"
+	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
+	"github.com/andychao217/magistrala/mqtt/events"
+	"github.com/andychao217/magistrala/pkg/errors"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala/pkg/messaging"
+	clientspg "github.com/andychao217/magistrala/things/postgres"
 )
 
 var _ session.Handler = (*handler)(nil)
@@ -56,9 +57,6 @@ var (
 )
 
 var channelRegExp = regexp.MustCompile(`^\/?channels\/([\w\-]+)\/messages(\/[^?]*)?(\?.*)?$`)
-
-// 公共变量来保存*[]string
-var PublicTopics *[]string
 
 // Event implements events.Event interface.
 type handler struct {
@@ -117,7 +115,6 @@ func (h *handler) AuthPublish(ctx context.Context, topic *string, payload *[]byt
 // prior forwarding to the MQTT broker.
 func (h *handler) AuthSubscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
-	SaveTopics(topics)
 	if !ok {
 		return ErrClientNotInitialized
 	}
@@ -193,7 +190,6 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 		return errors.Wrap(ErrFailedSubscribe, ErrClientNotInitialized)
 	}
 	h.logger.Info(fmt.Sprintf(LogInfoSubscribed, s.ID, strings.Join(*topics, ",")))
-	SaveTopics(topics)
 	if s.Username != "" {
 		updateClientConnectionStatus(ctx, s, "subscribe", h)
 	}
@@ -203,10 +199,9 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 // Unsubscribe - after client unsubscribed.
 func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
-	SaveTopics(topics)
-	if s.Username != "" {
-		updateClientConnectionStatus(ctx, s, "unsubscribe", h)
-	}
+	// if s.Username != "" {
+	// 	updateClientConnectionStatus(ctx, s, "unsubscribe", h)
+	// }
 	if !ok {
 		return errors.Wrap(ErrFailedUnsubscribe, ErrClientNotInitialized)
 	}
@@ -292,7 +287,6 @@ func parseSubtopic(subtopic string) (string, error) {
 }
 
 func updateClientConnectionStatus(ctx context.Context, s *session.Session, connectionType string, handler *handler) {
-	fmt.Printf("updateClientConnectionStatus: %v\n", connectionType)
 	dbConfig := pgclient.Config{
 		Host:        "things-db",
 		Port:        "5432",
@@ -304,43 +298,54 @@ func updateClientConnectionStatus(ctx context.Context, s *session.Session, conne
 		SSLKey:      "",
 		SSLRootCert: "",
 	}
-	database, _ := pgclient.Connect(dbConfig)
+	database, err := pgclient.Connect(dbConfig)
+	if err != nil {
+		fmt.Printf("Failed to connect to database: %v\n", err)
+		return
+	}
+	defer database.Close() // 确保在函数结束时关闭数据库连接
+
 	cRepo := clientspg.NewRepository(database)
 	thing, _ := cRepo.RetrieveByIdentity(ctx, s.Username)
+
 	if thing.ID != "" {
 		onlineStatus := "0"
 		if connectionType == "connect" || connectionType == "subscribe" {
 			onlineStatus = "1"
 		}
-		if thing.Metadata["isOnline"] != onlineStatus {
-			thing.Metadata["isOnline"] = onlineStatus
+		if thing.Metadata["is_online"] != onlineStatus {
+			thing.Metadata["is_online"] = onlineStatus
 			_, _ = cRepo.Update(ctx, thing)
+		}
 
-			// 暂停1秒钟
-			time.Sleep(500 * time.Millisecond)
-			if PublicTopics != nil && len(*PublicTopics) != 0 {
-				for _, topic := range *PublicTopics {
-					// 定义一个字符串
-					// str := "refreshPage"
-					str := connectionType + "_refreshPage"
-					// 将字符串转换为字节切片
-					payload := []byte(str)
-					// 传递字节切片的地址给函数
-					handler.Publish(ctx, &topic, &payload)
+		// out_channel 大于1, 且is_channel等于0时，说明是多通道设备，需要把多通道都同时修改onlineStatus
+		// 从 Metadata 中获取 "out_channel" 的值，并进行类型断言
+		outChannelStr, ok := thing.Metadata["out_channel"].(string)
+		fmt.Println("mqtt out_channelStr 1234:", outChannelStr)
+		if ok {
+			outChannelInt, err := strconv.Atoi(outChannelStr)
+			fmt.Println("outChannelInt 1234:", outChannelInt)
+			if err != nil {
+				fmt.Println("Failed to convert out_channel to int:", err)
+			} else {
+				if outChannelInt > 1 {
+					is_channel, ok := thing.Metadata["is_channel"].(string)
+					fmt.Println("mqtt is_channel 1234:", is_channel)
+					if ok {
+						if is_channel == "0" {
+							for i := 2; i <= outChannelInt; i++ {
+								fmt.Println("mqtt newThing identity:", thing.Credentials.Identity+"_"+strconv.Itoa(i))
+								newThing, _ := cRepo.RetrieveByIdentity(ctx, thing.Credentials.Identity+"_"+strconv.Itoa(i))
+								fmt.Println("mqtt newThing:", newThing.ID)
+								if newThing.ID != "" {
+									newThing.Metadata["is_online"] = onlineStatus
+									_, _ = cRepo.Update(ctx, newThing)
+								}
+							}
+						}
+					}
 				}
 			}
 		}
 	}
-}
-
-// 函数接收*[]string参数并保存为公共变量
-func SaveTopics(newTopics *[]string) {
-	// 在保存之前确保PublicTopics不是nil
-	if PublicTopics == nil {
-		PublicTopics = &[]string{}
-	}
-	// 清空PublicTopics指向的切片的内容
-	*PublicTopics = (*PublicTopics)[:0]
-	// 现在将newTopics的内容追加到PublicTopics指向的切片中
-	*PublicTopics = append(*PublicTopics, *newTopics...)
 }

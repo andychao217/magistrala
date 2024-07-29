@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/absmach/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/internal/apiutil"
 )
 
 // State represents invitation state.

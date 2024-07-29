@@ -26,13 +26,13 @@ default values.
 
 ## Deployment
 
-The service itself is distributed as Docker container. Check the [`mongodb-writer`](https://github.com/absmach/magistrala/blob/main/docker/addons/mongodb-writer/docker-compose.yml#L36-L55) service section in docker-compose file to see how service is deployed.
+The service itself is distributed as Docker container. Check the [`mongodb-writer`](https://github.com/andychao217/magistrala/blob/main/docker/addons/mongodb-writer/docker-compose.yml#L36-L55) service section in docker-compose file to see how service is deployed.
 
 To start the service, execute the following shell script:
 
 ```bash
 # download the latest version of the service
-git clone https://github.com/absmach/magistrala
+git clone https://github.com/andychao217/magistrala
 
 cd magistrala
 

@@ -34,14 +34,14 @@ default values.
 
 ## Deployment
 
-The service itself is distributed as Docker container. Check the [`cassandra-reader`](https://github.com/absmach/magistrala/blob/main/docker/addons/cassandra-reader/docker-compose.yml#L15-L35) service section in
+The service itself is distributed as Docker container. Check the [`cassandra-reader`](https://github.com/andychao217/magistrala/blob/main/docker/addons/cassandra-reader/docker-compose.yml#L15-L35) service section in
 docker-compose file to see how service is deployed.
 
 To start the service, execute the following shell script:
 
 ```bash
 # download the latest version of the service
-git clone https://github.com/absmach/magistrala
+git clone https://github.com/andychao217/magistrala
 
 cd magistrala
 

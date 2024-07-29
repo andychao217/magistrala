@@ -5,7 +5,7 @@
 package mocks
 
 import (
-	provision "github.com/absmach/magistrala/provision"
+	provision "github.com/andychao217/magistrala/provision"
 	mock "github.com/stretchr/testify/mock"
 )
 

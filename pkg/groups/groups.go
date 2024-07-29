@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/clients"
 )
 
 // MaxLevel represents the maximum group hierarchy level.

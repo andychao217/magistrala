@@ -6,7 +6,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/absmach/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/pkg/messaging"
 )
 
 type mockPublisher struct{}

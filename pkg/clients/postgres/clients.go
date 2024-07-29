@@ -11,12 +11,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/absmach/magistrala/internal/api"
-	"github.com/absmach/magistrala/internal/postgres"
-	"github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
-	"github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/internal/api"
+	"github.com/andychao217/magistrala/internal/postgres"
+	"github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	"github.com/andychao217/magistrala/pkg/groups"
 	"github.com/jackc/pgtype"
 )
 
@@ -464,8 +464,15 @@ func PageQuery(pm clients.Page) (string, error) {
 	if pm.Identity != "" {
 		query = append(query, "c.identity = :identity")
 	}
-	if pm.Name != "" {
-		query = append(query, "c.name = :name")
+	// if pm.Name != "" {
+	// 	query = append(query, "c.name = :name")
+	// }
+	// 不显示名称为Platform的thing，这个thing是新建domain时默认创建的，只用做平台和设备通信用
+	// 处理name字段，排除"Platform"
+	if pm.Name != "" && pm.Name != "Platform" && !strings.Contains(pm.Name, "Platform") {
+		query = append(query, "name ~ :name AND name NOT LIKE '%Platform%'")
+	} else if pm.Name == "" {
+		query = append(query, "name ~ :name AND name NOT LIKE '%Platform%'")
 	}
 	if pm.Tag != "" {
 		query = append(query, ":tag = ANY(c.tags)")
@@ -491,8 +498,14 @@ func constructSearchQuery(pm clients.Page) (string, string) {
 	var emq string
 	var tq string
 
-	if pm.Name != "" {
-		query = append(query, "name ~ :name")
+	// if pm.Name != "" {
+	// 	query = append(query, "name ~ :name")
+	// }
+	// 不显示名称为Platform的thing，这个thing是新建domain时默认创建的，只用做平台和设备通信用
+	if pm.Name != "" && pm.Name != "Platform" && !strings.Contains(pm.Name, "Platform") {
+		query = append(query, "name ~ :name AND name NOT LIKE '%Platform%'")
+	} else if pm.Name == "" {
+		query = append(query, "name ~ :name AND name NOT LIKE '%Platform%'")
 	}
 	if pm.Identity != "" {
 		query = append(query, "identity ~ :identity")

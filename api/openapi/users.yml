@@ -7,12 +7,12 @@ info:
   description: |
     This is the Users Server based on the OpenAPI 3.0 specification.  It is the HTTP API for managing platform users. You can now help us improve the API whether it's by making changes to the definition itself or to the code.
     Some useful links:
-    - [The Magistrala repository](https://github.com/absmach/magistrala)
+    - [The Magistrala repository](https://github.com/andychao217/magistrala)
   contact:
     email: info@abstractmachines.fr
   license:
     name: Apache 2.0
-    url: https://github.com/absmach/magistrala/blob/main/LICENSE
+    url: https://github.com/andychao217/magistrala/blob/main/LICENSE
   version: 0.14.0
 
 servers:
@@ -1031,7 +1031,7 @@ components:
           properties:
             identity:
               type: string
-              example: "admin@example.com"
+              example: "admin@sponxt.com"
               description: User's identity for example email address will be used as its unique identifier
             secret:
               type: string
@@ -1534,7 +1534,7 @@ components:
         type: string
         pattern: "^[^\u0000-\u001F]*$"
       required: false
-      example: "admin@example.com"
+      example: "admin@sponxt.com"
 
     Status:
       name: status
@@ -1669,8 +1669,8 @@ components:
       in: query
       schema:
         type: integer
-        default: 10
-        maximum: 100
+        default: 20
+        maximum: 1000
         minimum: 1
       required: false
       example: "100"

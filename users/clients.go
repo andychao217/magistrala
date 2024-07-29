@@ -6,9 +6,9 @@ package users
 import (
 	"context"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/pkg/clients"
-	mgoauth2 "github.com/absmach/magistrala/pkg/oauth2"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/pkg/clients"
+	mgoauth2 "github.com/andychao217/magistrala/pkg/oauth2"
 )
 
 // Service specifies an API that must be fullfiled by the domain service

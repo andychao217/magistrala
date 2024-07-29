@@ -1,12 +1,14 @@
 # Copyright (c) Abstract Machines
 # SPDX-License-Identifier: Apache-2.0
 
+MG_DOCKER_IMAGE_ALIYUN_PREFIX ?= registry.cn-hangzhou.aliyuncs.com
 MG_DOCKER_IMAGE_USERNAME_PREFIX ?= andychao217
 MG_DOCKER_IMAGE_NAME_PREFIX ?= magistrala
 BUILD_DIR = build
-SERVICES = auth users things http coap ws lora influxdb-writer influxdb-reader mongodb-writer \
-	mongodb-reader cassandra-writer cassandra-reader postgres-writer postgres-reader timescale-writer timescale-reader cli \
-	bootstrap opcua twins mqtt provision certs smtp-notifier smpp-notifier invitations
+SERVICES = auth users things http coap ws mqtt invitations \
+	influxdb-writer influxdb-reader mongodb-writer mongodb-reader smtp-notifier smpp-notifier \
+	cassandra-writer cassandra-reader postgres-writer postgres-reader timescale-writer timescale-reader \
+	cli bootstrap opcua twins lora provision certs vault
 TEST_API_SERVICES = auth bootstrap certs http invitations notifiers provision readers things twins users
 TEST_API = $(addprefix test_api_,$(TEST_API_SERVICES))
 DOCKERS = $(addprefix docker_,$(SERVICES))
@@ -41,22 +43,23 @@ endif
 define compile_service
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH) GOARM=$(GOARM) \
 	go build -tags $(MG_MESSAGE_BROKER_TYPE) --tags $(MG_ES_TYPE) -ldflags "-s -w \
-	-X 'github.com/absmach/magistrala.BuildTime=$(TIME)' \
-	-X 'github.com/absmach/magistrala.Version=$(VERSION)' \
-	-X 'github.com/absmach/magistrala.Commit=$(COMMIT)'" \
+	-X 'github.com/andychao217/magistrala.BuildTime=$(TIME)' \
+	-X 'github.com/andychao217/magistrala.Version=$(VERSION)' \
+	-X 'github.com/andychao217/magistrala.Commit=$(COMMIT)'" \
 	-o ${BUILD_DIR}/$(1) cmd/$(1)/main.go
 endef
 
 define make_docker
 	$(eval svc=$(subst docker_,,$(1)))
 
-	docker buildx build --platform=linux/amd64,linux/arm64 \
+	docker buildx build --platform=linux/amd64,linux/arm64,windows/amd64,windows/arm64 \
 		--no-cache \
 		--build-arg SVC=$(svc) \
 		--build-arg VERSION=$(VERSION) \
 		--build-arg COMMIT=$(COMMIT) \
 		--build-arg TIME=$(TIME) \
 		--tag=$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(svc) \
+		--tag=$(MG_DOCKER_IMAGE_ALIYUN_PREFIX)/$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(svc) \
 		-f docker/Dockerfile .
 endef
 
@@ -71,9 +74,9 @@ define make_docker_dev
 endef
 
 ADDON_SERVICES = bootstrap cassandra-reader cassandra-writer certs \
-					influxdb-reader influxdb-writer lora-adapter mongodb-reader mongodb-writer \
-					opcua-adapter postgres-reader postgres-writer provision smpp-notifier smtp-notifier \
-					timescale-reader timescale-writer twins
+	influxdb-reader influxdb-writer lora-adapter mongodb-reader mongodb-writer \
+	opcua-adapter postgres-reader postgres-writer provision smpp-notifier smtp-notifier \
+	timescale-reader timescale-writer twins vault
 
 EXTERNAL_SERVICES = vault prometheus
 
@@ -178,7 +181,8 @@ dockers_dev: $(DOCKERS_DEV)
 
 define docker_push
 	for svc in $(SERVICES); do \
-		docker push $(MG_DOCKER_IMAGE_NAME_PREFIX)/$$svc:$(1); \
+		docker push $(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(SVC):$(1); \
+		docker push ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/$(MG_DOCKER_IMAGE_USERNAME_PREFIX)/$(MG_DOCKER_IMAGE_NAME_PREFIX)-$(SVC):$(1) \
 	done
 endef
 

@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/absmach/magistrala/auth/mocks"
+	"github.com/andychao217/magistrala/auth/mocks"
 )
 
 var svc *mocks.Service

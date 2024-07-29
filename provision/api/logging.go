@@ -9,7 +9,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/absmach/magistrala/provision"
+	"github.com/andychao217/magistrala/provision"
 )
 
 var _ provision.Service = (*loggingMiddleware)(nil)

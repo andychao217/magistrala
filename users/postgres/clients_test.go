@@ -10,11 +10,11 @@ import (
 	"testing"
 
 	"github.com/0x6flab/namegenerator"
-	"github.com/absmach/magistrala/internal/testsutil"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
-	cpostgres "github.com/absmach/magistrala/users/postgres"
+	"github.com/andychao217/magistrala/internal/testsutil"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	cpostgres "github.com/andychao217/magistrala/users/postgres"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

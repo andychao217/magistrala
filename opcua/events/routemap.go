@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/absmach/magistrala/opcua"
+	"github.com/andychao217/magistrala/opcua"
 	"github.com/go-redis/redis/v8"
 )
 

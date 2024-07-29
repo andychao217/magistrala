@@ -18,9 +18,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/absmach/magistrala/certs/pki"
-	"github.com/absmach/magistrala/pkg/errors"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
+	"github.com/andychao217/magistrala/certs/pki"
+	"github.com/andychao217/magistrala/pkg/errors"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
 )
 
 const keyBits = 2048

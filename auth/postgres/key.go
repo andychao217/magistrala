@@ -8,10 +8,10 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/absmach/magistrala/auth"
-	"github.com/absmach/magistrala/internal/postgres"
-	"github.com/absmach/magistrala/pkg/errors"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
+	"github.com/andychao217/magistrala/auth"
+	"github.com/andychao217/magistrala/internal/postgres"
+	"github.com/andychao217/magistrala/pkg/errors"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
 )
 
 var (

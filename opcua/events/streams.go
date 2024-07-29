@@ -9,8 +9,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/absmach/magistrala/opcua"
-	"github.com/absmach/magistrala/pkg/events"
+	"github.com/andychao217/magistrala/opcua"
+	"github.com/andychao217/magistrala/pkg/events"
 )
 
 const (

@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/clients"
 )
 
 // Config represents Configuration entity. It wraps information about external entity

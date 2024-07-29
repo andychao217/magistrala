@@ -6,7 +6,7 @@ package tracing
 import (
 	"context"
 
-	"github.com/absmach/magistrala/ws"
+	"github.com/andychao217/magistrala/ws"
 	"go.opentelemetry.io/otel/trace"
 )
 

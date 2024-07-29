@@ -6,8 +6,8 @@ package events
 import (
 	"context"
 
-	"github.com/absmach/magistrala/pkg/events"
-	"github.com/absmach/magistrala/pkg/events/store"
+	"github.com/andychao217/magistrala/pkg/events"
+	"github.com/andychao217/magistrala/pkg/events/store"
 )
 
 const streamID = "magistrala.mqtt"

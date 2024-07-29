@@ -4,7 +4,7 @@
 package ws
 
 import (
-	"github.com/absmach/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/pkg/messaging"
 	"github.com/gorilla/websocket"
 )
 

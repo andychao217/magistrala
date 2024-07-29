@@ -10,13 +10,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/absmach/magistrala/internal/apiutil"
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/pkg/messaging"
-	"github.com/absmach/magistrala/pkg/messaging/brokers"
-	"github.com/absmach/magistrala/pkg/transformers"
-	"github.com/absmach/magistrala/pkg/transformers/json"
-	"github.com/absmach/magistrala/pkg/transformers/senml"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/pkg/messaging/brokers"
+	"github.com/andychao217/magistrala/pkg/transformers"
+	"github.com/andychao217/magistrala/pkg/transformers/json"
+	"github.com/andychao217/magistrala/pkg/transformers/senml"
 	"github.com/pelletier/go-toml"
 )
 

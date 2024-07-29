@@ -17,11 +17,18 @@ volumes:
   magistrala-auth-db-volume:
   magistrala-invitations-db-volume:
   magistrala-ui-db-volume:
+  magistrala-minio-data-volume:
+  # magistrala-portainer-data-volume:
 
 services:
   spicedb:
-    image: "authzed/spicedb:v1.30.0"
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/spicedb:v1.30.0
     container_name: magistrala-spicedb
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     command: "serve"
     restart: "always"
     networks:
@@ -31,6 +38,8 @@ services:
       - "9091:9090"
       - "50051:50051"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       SPICEDB_GRPC_PRESHARED_KEY: ${MG_SPICEDB_PRE_SHARED_KEY}
       SPICEDB_DATASTORE_ENGINE: ${MG_SPICEDB_DATASTORE_ENGINE}
       SPICEDB_DATASTORE_CONN_URI: "${MG_SPICEDB_DATASTORE_ENGINE}://${MG_SPICEDB_DB_USER}:${MG_SPICEDB_DB_PASS}@spicedb-db:${MG_SPICEDB_DB_PORT}/${MG_SPICEDB_DB_NAME}?sslmode=disable"
@@ -38,8 +47,13 @@ services:
       - spicedb-migrate
 
   spicedb-migrate:
-    image: "authzed/spicedb:v1.30.0"
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/spicedb:v1.30.0
     container_name: magistrala-spicedb-migrate
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     command: "migrate head"
     restart: "on-failure"
     networks:
@@ -51,13 +65,20 @@ services:
       - spicedb-db
 
   spicedb-db:
-    image: "postgres:16.2-alpine"
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-spicedb-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     networks:
       - magistrala-base-net
     ports:
       - "6010:5432"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_SPICEDB_DB_USER}
       POSTGRES_PASSWORD: ${MG_SPICEDB_DB_PASS}
       POSTGRES_DB: ${MG_SPICEDB_DB_NAME}
@@ -65,12 +86,19 @@ services:
       - magistrala-spicedb-db-volume:/var/lib/postgresql/data
 
   auth-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-auth-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     ports:
       - 6004:5432
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_AUTH_DB_USER}
       POSTGRES_PASSWORD: ${MG_AUTH_DB_PASS}
       POSTGRES_DB: ${MG_AUTH_DB_NAME}
@@ -80,8 +108,13 @@ services:
       - magistrala-auth-db-volume:/var/lib/postgresql/data
 
   auth:
-    image: andychao217/magistrala-auth:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-auth:${MG_RELEASE_TAG}
     container_name: magistrala-auth
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - auth-db
       - spicedb
@@ -124,6 +157,10 @@ services:
       MG_JAEGER_TRACE_RATIO: ${MG_JAEGER_TRACE_RATIO}
       MG_SEND_TELEMETRY: ${MG_SEND_TELEMETRY}
       MG_AUTH_ADAPTER_INSTANCE_ID: ${MG_AUTH_ADAPTER_INSTANCE_ID}
+      MINIO_ENDPOINT: "minio:${MINIO_PORT}"
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
     ports:
       - ${MG_AUTH_HTTP_PORT}:${MG_AUTH_HTTP_PORT}
       - ${MG_AUTH_GRPC_PORT}:${MG_AUTH_GRPC_PORT}
@@ -154,11 +191,18 @@ services:
           create_host_path: true
 
   invitations-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-invitations-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_INVITATIONS_DB_USER}
       POSTGRES_PASSWORD: ${MG_INVITATIONS_DB_PASS}
       POSTGRES_DB: ${MG_INVITATIONS_DB_NAME}
@@ -171,8 +215,13 @@ services:
       - magistrala-invitations-db-volume:/var/lib/postgresql/data
 
   invitations:
-    image: andychao217/magistrala-invitations:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-invitations:${MG_RELEASE_TAG}
     container_name: magistrala-invitations
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     depends_on:
       - invitations-db
@@ -225,8 +274,13 @@ services:
           create_host_path: true
 
   nginx:
-    image: nginx:1.25.4-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/nginx:1.25.4-alpine
     container_name: magistrala-nginx
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     volumes:
       - ./nginx/nginx-${AUTH-key}.conf:/etc/nginx/nginx.conf.template
@@ -263,11 +317,18 @@ services:
       - coap-adapter
 
   things-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-things-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_THINGS_DB_USER}
       POSTGRES_PASSWORD: ${MG_THINGS_DB_PASS}
       POSTGRES_DB: ${MG_THINGS_DB_NAME}
@@ -278,10 +339,16 @@ services:
       - 6006:5432
     volumes:
       - magistrala-things-db-volume:/var/lib/postgresql/data
+      - ./reset_device_online_status.sh:/docker-entrypoint-initdb.d/reset_device_online_status.sh
 
   things-redis:
-    image: redis:7.2.4-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/redis:7.2.4-alpine
     container_name: magistrala-things-redis
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     networks:
       - magistrala-base-net
@@ -289,8 +356,13 @@ services:
       - magistrala-things-redis-volume:/data
 
   things:
-    image: andychao217/magistrala-things:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-things:${MG_RELEASE_TAG}
     container_name: magistrala-things
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - things-db
       - users
@@ -377,11 +449,18 @@ services:
           create_host_path: true
 
   users-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-users-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_USERS_DB_USER}
       POSTGRES_PASSWORD: ${MG_USERS_DB_PASS}
       POSTGRES_DB: ${MG_USERS_DB_NAME}
@@ -394,8 +473,13 @@ services:
       - magistrala-users-db-volume:/var/lib/postgresql/data
 
   users:
-    image: andychao217/magistrala-users:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-users:${MG_RELEASE_TAG}
     container_name: magistrala-users
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - users-db
       - auth
@@ -470,8 +554,13 @@ services:
           create_host_path: true
 
   jaeger:
-    image: jaegertracing/all-in-one:1.53.0
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/jaegertracing:1.53.0
     container_name: magistrala-jaeger
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     environment:
       COLLECTOR_OTLP_ENABLED: ${MG_JAEGER_COLLECTOR_OTLP_ENABLED}
     command: --memory.max-traces ${MG_JAEGER_MEMORY_MAX_TRACES}
@@ -482,8 +571,13 @@ services:
       - magistrala-base-net
 
   mqtt-adapter:
-    image: andychao217/magistrala-mqtt:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-mqtt:${MG_RELEASE_TAG}
     container_name: magistrala-mqtt
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - things
       - vernemq
@@ -534,8 +628,13 @@ services:
           create_host_path: true
 
   http-adapter:
-    image: andychao217/magistrala-http:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-http:${MG_RELEASE_TAG}
     container_name: magistrala-http
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - things
       - nats
@@ -579,8 +678,13 @@ services:
           create_host_path: true
 
   coap-adapter:
-    image: andychao217/magistrala-coap:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-coap:${MG_RELEASE_TAG}
     container_name: magistrala-coap
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - things
       - nats
@@ -629,8 +733,13 @@ services:
           create_host_path: true
 
   ws-adapter:
-    image: andychao217/magistrala-ws:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-ws:${MG_RELEASE_TAG}
     container_name: magistrala-ws
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     depends_on:
       - things
       - nats
@@ -674,8 +783,13 @@ services:
           create_host_path: true
 
   vernemq:
-    image: vernemq/vernemq:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/vernemq:latest
     container_name: magistrala-vernemq
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       VERNEMQ_ACCEPT_EULA: yes
@@ -688,8 +802,13 @@ services:
       - magistrala-mqtt-broker-volume:/var/lib/vernemq
 
   nats:
-    image: nats:2.10.9-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/nats:2.10.9-alpine
     container_name: magistrala-nats
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     command: "--config=/etc/nats/nats.conf"
     environment:
@@ -706,8 +825,13 @@ services:
       - magistrala-base-net
 
   ui:
-    image: andychao217/magistrala-ui:${MG_RELEASE_TAG}
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-ui:${MG_RELEASE_TAG}
     container_name: magistrala-ui
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     environment:
       MG_UI_LOG_LEVEL: ${MG_UI_LOG_LEVEL}
@@ -739,17 +863,27 @@ services:
       MG_UI_HASH_KEY: ${MG_UI_HASH_KEY}
       MG_UI_BLOCK_KEY: ${MG_UI_BLOCK_KEY}
       MG_UI_PATH_PREFIX: ${MG_UI_PATH_PREFIX}
+      MG_SOCKET_BRIDGE_PORT: ${MG_SOCKET_BRIDGE_PORT}
+      MG_SOCKET_BRIDGE_UDP_PORT: ${MG_SOCKET_BRIDGE_UDP_PORT}
+      MG_SOCKET_BRIDGE_UDP_IP: ${MG_SOCKET_BRIDGE_UDP_IP}
     ports:
       - ${MG_UI_PORT}:${MG_UI_PORT}
     networks:
       - magistrala-base-net
 
   ui-db:
-    image: postgres:16.2-alpine
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/postgres:16.2-alpine
     container_name: magistrala-ui-db
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     command: postgres -c "max_connections=${MG_POSTGRES_MAX_CONNECTIONS}"
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       POSTGRES_USER: ${MG_UI_DB_USER}
       POSTGRES_PASSWORD: ${MG_UI_DB_PASS}
       POSTGRES_DB: ${MG_UI_DB_NAME}
@@ -761,11 +895,79 @@ services:
     volumes:
       - magistrala-ui-db-volume:/var/lib/postgresql/data
 
-  websocket_bridge:
-      image: andychao217/magistrala-websocket_bridge:${MG_RELEASE_TAG}
-      container_name: magistrala-websocket_bridge
+  socket_bridge:
+      image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-socket_bridge:${MG_RELEASE_TAG}
+      container_name: magistrala-socket_bridge
+      logging:  
+        driver: "json-file"  
+        options:  
+          max-size: "10m"  
+          max-file: "3"
       restart: on-failure
       ports:
-        - 63000:63000
+        - ${MG_SOCKET_BRIDGE_PORT}:${MG_SOCKET_BRIDGE_PORT}
+      environment:
+        MG_SOCKET_BRIDGE_PORT: ${MG_SOCKET_BRIDGE_PORT}
+        MG_SOCKET_BRIDGE_UDP_PORT: ${MG_SOCKET_BRIDGE_UDP_PORT}
+        MG_SOCKET_BRIDGE_UDP_IP: ${MG_SOCKET_BRIDGE_UDP_IP}
+        MINIO_ENDPOINT: "minio:${MINIO_PORT}"
+        MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+        MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+        MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+        MINIO_BRIDGE_PORT: ${MINIO_BRIDGE_PORT}
+      network_mode: "host"
+  
+  minio:
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/minio:latest
+    container_name: magistrala-minio
+    ports:
+      - ${MINIO_PORT}:${MINIO_PORT}
+      - ${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    networks:
+      - magistrala-base-net
+    restart: on-failure
+    volumes:
+      - magistrala-minio-data-volume:/data
+    command: server /data --address ":${MINIO_PORT}" --console-address ":${MINIO_CONSOLE_PORT}"
+
+  minio_bridge:
+      image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-minio_bridge:${MG_RELEASE_TAG}
+      container_name: magistrala-minio_bridge
+      depends_on:
+        - minio
+      logging:  
+        driver: "json-file"  
+        options:  
+          max-size: "10m"  
+          max-file: "3"
+      restart: on-failure
+      environment:
+        MINIO_ENDPOINT: "minio:${MINIO_PORT}"
+        MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+        MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+        MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+        MINIO_BRIDGE_PORT: ${MINIO_BRIDGE_PORT} # 添加环境变量来配置端口
+      ports:
+        - "${MINIO_BRIDGE_PORT}:${MINIO_BRIDGE_PORT}" # 这里你也可以更改宿主机的端口，比如 "9090:8080"
       networks:
         - magistrala-base-net
+
+  # portainer:
+  #   image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/portainer-ce:latest
+  #   container_name: magistrala-portainer
+  #   logging:  
+  #       driver: "json-file"  
+  #       options:  
+  #         max-size: "10m"  
+  #         max-file: "3"
+  #   restart: on-failure
+  #   ports:
+  #     - ${PORTAINER_PORT}:${PORTAINER_PORT}
+  #   networks:
+  #       - magistrala-base-net
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - magistrala-portainer-data-volume:/data

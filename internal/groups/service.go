@@ -5,17 +5,18 @@ package groups
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/auth"
-	"github.com/absmach/magistrala/internal/apiutil"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	repoerr "github.com/absmach/magistrala/pkg/errors/repository"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	"github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/auth"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	"github.com/andychao217/magistrala/pkg/groups"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -29,6 +30,12 @@ type service struct {
 	groups     groups.Repository
 	auth       magistrala.AuthServiceClient
 	idProvider magistrala.IDProvider
+}
+
+type ThingsListResponse struct {
+	Total  int                `json:"total"`
+	Offset int                `json:"offset"`
+	Things []mgclients.Client `json:"things"`
 }
 
 // NewService returns a new Clients service implementation.
@@ -111,7 +118,6 @@ func (svc service) CreateGroup(ctx context.Context, token, kind string, g groups
 	if _, err := svc.auth.AddPolicies(ctx, &policies); err != nil {
 		return g, errors.Wrap(svcerr.ErrAddPolicies, err)
 	}
-
 	return g, nil
 }
 
@@ -402,6 +408,19 @@ func (svc service) DisableGroup(ctx context.Context, token, id string) (groups.G
 	return group, nil
 }
 
+func removeDuplicates(slice []interface{}) []interface{} {
+	encountered := map[interface{}]bool{}
+	result := []interface{}{}
+
+	for _, v := range slice {
+		if !encountered[v] {
+			encountered[v] = true
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
 func (svc service) Assign(ctx context.Context, token, groupID, relation, memberKind string, memberIDs ...string) error {
 	res, err := svc.identify(ctx, token)
 	if err != nil {
@@ -414,7 +433,27 @@ func (svc service) Assign(ctx context.Context, token, groupID, relation, memberK
 	policies := magistrala.AddPoliciesReq{}
 	switch memberKind {
 	case auth.ThingsKind:
+		// 分区关联设备后，把已关联的设备id添加到分区的metadata.thing_ids中
+		channel, _ := svc.ViewGroup(ctx, token, groupID)
+		// 将 channel 序列化为 JSON
+		jsonData, _ := json.MarshalIndent(channel, "", "  ")
+		// 打印 JSON 数据
+		fmt.Println("channel: ", string(jsonData))
+
+		// 获取当前的 thing_ids
+		thingIDs, ok := channel.Metadata["thing_ids"].([]interface{})
+		if !ok {
+			// 如果不存在，则新增 thing_ids 字段
+			channel.Metadata["thing_ids"] = []interface{}{}
+			thingIDs = channel.Metadata["thing_ids"].([]interface{})
+		}
+
+		fmt.Println("thingIDs: ", thingIDs)
+		fmt.Println("channel.Metadata: ", channel.Metadata)
+
 		for _, memberID := range memberIDs {
+			// 将 memberIDs 添加到 thing_ids
+			thingIDs = append(thingIDs, memberID)
 			policies.AddPoliciesReq = append(policies.AddPoliciesReq, &magistrala.AddPolicyReq{
 				Domain:      res.GetDomainId(),
 				SubjectType: auth.GroupType,
@@ -424,6 +463,10 @@ func (svc service) Assign(ctx context.Context, token, groupID, relation, memberK
 				ObjectType:  auth.ThingType,
 				Object:      memberID,
 			})
+		}
+		channel.Metadata["thing_ids"] = removeDuplicates(thingIDs)
+		if channel.Name != "default_channel" {
+			_, _ = svc.UpdateGroup(ctx, token, channel)
 		}
 	case auth.ChannelsKind:
 		for _, memberID := range memberIDs {
@@ -566,6 +609,37 @@ func (svc service) Unassign(ctx context.Context, token, groupID, relation, membe
 
 	switch memberKind {
 	case auth.ThingsKind:
+		// 分区解除关联设备后，把已解除关联的设备id从分区的metadata.thing_ids中删除
+		channel, _ := svc.ViewGroup(ctx, token, groupID)
+		// 获取当前的 thing_ids
+		// 获取当前的 thing_ids
+		thingIDs, ok := channel.Metadata["thing_ids"].([]interface{})
+		if !ok {
+			// 如果不存在，则新增 thing_ids 字段
+			channel.Metadata["thing_ids"] = []interface{}{}
+			thingIDs = channel.Metadata["thing_ids"].([]interface{})
+		}
+
+		// 创建一个新的切片来存储过滤后的 thing_ids
+		filteredThingIDs := []interface{}{}
+		// 遍历 thing_ids，如果不在 memberIDs 中，则添加到 filteredThingIDs
+		for _, thingID := range thingIDs {
+			found := false
+			for _, memberID := range memberIDs {
+				if thingID == memberID {
+					found = true
+					break
+				}
+			}
+			if !found {
+				filteredThingIDs = append(filteredThingIDs, thingID)
+			}
+		}
+		// 更新 thing_ids
+		channel.Metadata["thing_ids"] = filteredThingIDs
+		if channel.Name != "default_channel" {
+			_, _ = svc.UpdateGroup(ctx, token, channel)
+		}
 		for _, memberID := range memberIDs {
 			policies.DeletePoliciesReq = append(policies.DeletePoliciesReq, &magistrala.DeletePolicyReq{
 				Domain:      res.GetDomainId(),

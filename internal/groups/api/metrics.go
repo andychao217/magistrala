@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/pkg/groups"
 	"github.com/go-kit/kit/metrics"
 )
 

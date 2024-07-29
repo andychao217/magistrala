@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/absmach/magistrala/invitations"
+	"github.com/andychao217/magistrala/invitations"
 	"github.com/go-kit/kit/metrics"
 )
 

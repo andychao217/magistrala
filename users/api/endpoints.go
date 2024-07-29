@@ -7,10 +7,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/absmach/magistrala/internal/apiutil"
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	"github.com/absmach/magistrala/pkg/errors"
-	"github.com/absmach/magistrala/users"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/users"
 	"github.com/go-kit/kit/endpoint"
 )
 

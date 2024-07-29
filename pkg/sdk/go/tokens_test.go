@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/internal/apiutil"
-	"github.com/absmach/magistrala/pkg/errors"
-	svcerr "github.com/absmach/magistrala/pkg/errors/service"
-	sdk "github.com/absmach/magistrala/pkg/sdk/go"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/errors"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	sdk "github.com/andychao217/magistrala/pkg/sdk/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

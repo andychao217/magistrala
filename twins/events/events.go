@@ -7,9 +7,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/absmach/magistrala/pkg/events"
-	"github.com/absmach/magistrala/pkg/messaging"
-	"github.com/absmach/magistrala/twins"
+	"github.com/andychao217/magistrala/pkg/events"
+	"github.com/andychao217/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/twins"
 )
 
 const (

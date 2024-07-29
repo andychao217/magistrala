@@ -6,10 +6,10 @@ package smpp
 import (
 	"time"
 
-	"github.com/absmach/magistrala/consumers/notifiers"
-	"github.com/absmach/magistrala/pkg/messaging"
-	"github.com/absmach/magistrala/pkg/transformers"
-	"github.com/absmach/magistrala/pkg/transformers/json"
+	"github.com/andychao217/magistrala/consumers/notifiers"
+	"github.com/andychao217/magistrala/pkg/messaging"
+	"github.com/andychao217/magistrala/pkg/transformers"
+	"github.com/andychao217/magistrala/pkg/transformers/json"
 	"github.com/fiorix/go-smpp/smpp"
 	"github.com/fiorix/go-smpp/smpp/pdu/pdufield"
 	"github.com/fiorix/go-smpp/smpp/pdu/pdutext"

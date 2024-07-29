@@ -6,8 +6,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/opcua"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/opcua"
 )
 
 var _ magistrala.Response = (*browseRes)(nil)

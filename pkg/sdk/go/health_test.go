@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/absmach/magistrala"
-	"github.com/absmach/magistrala/pkg/errors"
-	sdk "github.com/absmach/magistrala/pkg/sdk/go"
+	"github.com/andychao217/magistrala"
+	"github.com/andychao217/magistrala/pkg/errors"
+	sdk "github.com/andychao217/magistrala/pkg/sdk/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

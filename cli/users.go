@@ -6,8 +6,8 @@ package cli
 import (
 	"encoding/json"
 
-	mgclients "github.com/absmach/magistrala/pkg/clients"
-	mgxsdk "github.com/absmach/magistrala/pkg/sdk/go"
+	mgclients "github.com/andychao217/magistrala/pkg/clients"
+	mgxsdk "github.com/andychao217/magistrala/pkg/sdk/go"
 	"github.com/spf13/cobra"
 )
 

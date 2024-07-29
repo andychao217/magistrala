@@ -35,7 +35,7 @@ default values.
 
 ## Deployment
 
-The service itself is distributed as Docker container. Check the [`twins`](https://github.com/absmach/magistrala/blob/main/docker/addons/twins/docker-compose.yml#L35-L58) service section in
+The service itself is distributed as Docker container. Check the [`twins`](https://github.com/andychao217/magistrala/blob/main/docker/addons/twins/docker-compose.yml#L35-L58) service section in
 docker-compose file to see how service is deployed.
 
 To start the service outside of the container, execute the following shell
@@ -43,9 +43,9 @@ script:
 
 ```bash
 # download the latest version of the service
-go get github.com/absmach/magistrala
+go get github.com/andychao217/magistrala
 
-cd $GOPATH/src/github.com/absmach/magistrala
+cd $GOPATH/src/github.com/andychao217/magistrala
 
 # compile the twins
 make twins
