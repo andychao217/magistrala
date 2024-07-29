@@ -169,7 +169,7 @@ By utilizing Magistrala, you actively contribute to its improvement. Together, w
 [twitter]: https://twitter.com/absmach
 [lora]: https://lora-alliance.org/
 [opcua]: https://opcfoundation.org/about/opc-technologies/opc-ua/
-[agent]: https://github.com/absmach/agent
+[agent]: https://github.com/andychao217/agent
 [export]: https://github.com/absmach/export
 [kubernetes]: https://kubernetes.io/
 [releases]: https://github.com/andychao217/magistrala/releases

@@ -11,7 +11,7 @@ import (
 	"log/slog"
 	"os"
 
-	chclient "github.com/absmach/callhome/pkg/client"
+	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/internal"
 	mongoclient "github.com/andychao217/magistrala/internal/clients/mongo"

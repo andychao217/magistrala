@@ -17,10 +17,10 @@ import (
 	"syscall"
 	"time"
 
-	chclient "github.com/absmach/callhome/pkg/client"
 	mp "github.com/absmach/mproxy/pkg/mqtt"
 	"github.com/absmach/mproxy/pkg/mqtt/websocket"
 	"github.com/absmach/mproxy/pkg/session"
+	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
 	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
 	"github.com/andychao217/magistrala/internal/server"

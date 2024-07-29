@@ -14,7 +14,7 @@ import (
 	"regexp"
 	"time"
 
-	chclient "github.com/absmach/callhome/pkg/client"
+	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
 	authSvc "github.com/andychao217/magistrala/auth"
 	"github.com/andychao217/magistrala/internal"

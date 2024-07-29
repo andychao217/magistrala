@@ -12,9 +12,9 @@ import (
 	"net/url"
 	"os"
 
-	chclient "github.com/absmach/callhome/pkg/client"
 	"github.com/absmach/mproxy/pkg/session"
 	"github.com/absmach/mproxy/pkg/websockets"
+	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/internal"
 	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
