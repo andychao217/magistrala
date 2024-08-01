@@ -21,6 +21,7 @@ import (
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	mggroups "github.com/andychao217/magistrala/pkg/groups"
 	"github.com/andychao217/magistrala/things/postgres"
+	"github.com/mohae/deepcopy"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -175,7 +176,50 @@ func (svc service) CreateThings(ctx context.Context, token string, cls ...mgclie
 	}
 
 	var clients []mgclients.Client
+	var query []mgclients.Client
+
 	for _, c := range cls {
+		// 使用 deepcopy 进行深拷贝
+		oriQuery := deepcopy.Copy(c).(mgclients.Client)
+		query = append(query, oriQuery)
+		// 将 query 转换为 JSON 字符串
+		jsonData, _ := json.Marshal(query)
+		// 打印 JSON 字符串
+		fmt.Println("query 123: ", string(jsonData))
+		// 处理 multi-channel logic
+		if outChannel, ok := oriQuery.Metadata["out_channel"].(string); ok {
+			// 转换为整数
+			outChannelNum, _ := strconv.Atoi(outChannel)
+			if outChannelNum > 1 {
+				// 根据 out_channel 生成多个通道设备
+				if outChannelArray, ok := oriQuery.Metadata["out_channel_array"].([]interface{}); ok {
+					for j := 2; j <= len(outChannelArray); j++ {
+						// 创建新设备，使用结构体的值进行复制
+						newThing := deepcopy.Copy(oriQuery).(mgclients.Client)
+						if channelInfo, ok := outChannelArray[j-1].(map[string]interface{}); ok {
+							// 获取 alias
+							alias := channelInfo["aliase"].(string)
+							name := oriQuery.Name
+							newThing.Name = fmt.Sprintf("%s_%s", name, alias)
+							newThing.Credentials.Identity = fmt.Sprintf("%s_%d", oriQuery.Credentials.Identity, j)
+							newThing.Credentials.Secret = fmt.Sprintf("%s_%d", oriQuery.Credentials.Secret, j)
+							newThing.Metadata["aliase"] = fmt.Sprintf("%s_%s", name, alias)
+							newThing.Metadata["is_channel"] = "1"
+							query = append(query, newThing)
+
+							// 将 query 转换为 JSON 字符串
+							jsonData, _ := json.Marshal(query)
+							// 打印 JSON 字符串
+							fmt.Println("query 234: ", string(jsonData))
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 处理每个设备的基本信息
+	for _, c := range query {
 		if c.ID == "" {
 			clientID, err := svc.idProvider.ID()
 			if err != nil {
