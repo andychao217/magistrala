@@ -18,7 +18,7 @@ volumes:
   magistrala-invitations-db-volume:
   magistrala-ui-db-volume:
   magistrala-minio-data-volume:
-  # magistrala-portainer-data-volume:
+  magistrala-portainer-data-volume:
 
 services:
   spicedb:
@@ -955,19 +955,19 @@ services:
       networks:
         - magistrala-base-net
 
-  # portainer:
-  #   image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/portainer-ce:latest
-  #   container_name: magistrala-portainer
-  #   logging:  
-  #       driver: "json-file"  
-  #       options:  
-  #         max-size: "10m"  
-  #         max-file: "3"
-  #   restart: on-failure
-  #   ports:
-  #     - ${PORTAINER_PORT}:${PORTAINER_PORT}
-  #   networks:
-  #       - magistrala-base-net
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - magistrala-portainer-data-volume:/data
+  portainer:
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/portainer-ce:latest
+    container_name: magistrala-portainer
+    logging:  
+        driver: "json-file"  
+        options:  
+          max-size: "10m"  
+          max-file: "3"
+    restart: on-failure
+    ports:
+      - ${PORTAINER_PORT}:9000
+    networks:
+        - magistrala-base-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - magistrala-portainer-data-volume:/data
