@@ -242,7 +242,15 @@ func (svc service) CreateThings(ctx context.Context, token string, cls ...mgclie
 		clients = append(clients, c)
 	}
 
-	saved, err := svc.clients.Save(ctx, clients...)
+	// 过滤出 Credentials.Identity 不为空的 Client
+	var filteredClients []mgclients.Client
+	for _, client := range clients {
+		if client.Credentials.Identity != "" {
+			filteredClients = append(filteredClients, client)
+		}
+	}
+
+	saved, err := svc.clients.Save(ctx, filteredClients...)
 	if err != nil {
 		return nil, errors.Wrap(repoerr.ErrCreateEntity, err)
 	}
