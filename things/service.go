@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/andychao217/magistrala"
@@ -506,21 +505,40 @@ func (svc service) UpdateClient(ctx context.Context, token string, cli mgclients
 
 					cRepo := postgres.NewRepository(database)
 					for i := 2; i <= outChannel; i++ {
-						thing, _ := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+strconv.Itoa(i))
-						oriName := thing.Name
-						thing.Name = client.Name
-						if client.Metadata["info"] != nil {
-							thing.Metadata["info"] = client.Metadata["info"]
+						thing, err := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+strconv.Itoa(i))
+						if err != nil {
+							fmt.Println("RetrieveByIdentity Error: ", err)
+							continue // 如果检索失败，继续下一个循环
 						}
-						alias, ok := thing.Metadata["aliase"].(string)
+						thing.Name = client.Name
+						// 类型断言
+						info, ok := client.Metadata["info"].(map[string]interface{})
 						if !ok {
-							fmt.Println("Invalid type for out_channel")
-						} else {
-							thing.Metadata["aliase"] = strings.Replace(alias, oriName, client.Name, -1)
+							fmt.Println("Invalid type for Metadata['info']")
+							continue
+						}
+
+						thing.Metadata["info"] = deepcopy.Copy(info).(map[string]interface{})
+						// 处理 out_channel
+						if outChannelData, ok := info["out_channel"].(map[string]interface{}); ok {
+							if channels, ok := outChannelData["channel"].([]interface{}); ok {
+								if len(channels) > 0 {
+									if i-1 < len(channels) {
+										channelInfo, ok := channels[i-1].(map[string]interface{})
+										if ok {
+											if aliase, exists := channelInfo["aliase"].(string); exists {
+												thing.Metadata["aliase"] = client.Name + "_" + aliase
+											}
+										}
+									}
+									thing.Metadata["out_channel_array"] = deepcopy.Copy(channels).([]interface{})
+								}
+								thing.Metadata["out_channel"] = strconv.Itoa(len(channels))
+							}
 						}
 						_, err = svc.UpdateClient(ctx, token, thing)
 						if err != nil {
-							fmt.Println("DeleteClient Error: ", err)
+							fmt.Println("UpdateClient Error: ", err)
 						}
 					}
 				}
