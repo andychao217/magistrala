@@ -199,9 +199,6 @@ func (h *handler) Subscribe(ctx context.Context, topics *[]string) error {
 // Unsubscribe - after client unsubscribed.
 func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 	s, ok := session.FromContext(ctx)
-	// if s.Username != "" {
-	// 	updateClientConnectionStatus(ctx, s, "unsubscribe", h)
-	// }
 	if !ok {
 		return errors.Wrap(ErrFailedUnsubscribe, ErrClientNotInitialized)
 	}
@@ -212,15 +209,15 @@ func (h *handler) Unsubscribe(ctx context.Context, topics *[]string) error {
 // Disconnect - connection with broker or client lost.
 func (h *handler) Disconnect(ctx context.Context) error {
 	s, ok := session.FromContext(ctx)
-	if s.Username != "" {
-		updateClientConnectionStatus(ctx, s, "disconnect", h)
-	}
 	if !ok {
 		return errors.Wrap(ErrFailedDisconnect, ErrClientNotInitialized)
 	}
 	h.logger.Error(fmt.Sprintf(LogInfoDisconnected, s.ID, s.Password))
 	if err := h.es.Disconnect(ctx, string(s.Password)); err != nil {
 		return errors.Wrap(ErrFailedPublishDisconnectEvent, err)
+	}
+	if s.Username != "" {
+		updateClientConnectionStatus(ctx, s, "disconnect", h)
 	}
 	return nil
 }
@@ -308,38 +305,37 @@ func updateClientConnectionStatus(ctx context.Context, s *session.Session, conne
 	cRepo := clientspg.NewRepository(database)
 	thing, _ := cRepo.RetrieveByIdentity(ctx, s.Username)
 
-	if thing.ID != "" {
-		onlineStatus := "0"
+	if thing.ID != "" && !strings.Contains(thing.Name, "Platform") {
+		var onlineStatus string
 		if connectionType == "connect" || connectionType == "subscribe" {
 			onlineStatus = "1"
+		} else if connectionType == "disconnect" {
+			onlineStatus = "0"
 		}
-		if thing.Metadata["is_online"] != onlineStatus {
+		if onlineStatus == "1" || onlineStatus == "0" {
 			thing.Metadata["is_online"] = onlineStatus
 			_, _ = cRepo.Update(ctx, thing)
-		}
 
-		// out_channel 大于1, 且is_channel等于0时，说明是多通道设备，需要把多通道都同时修改onlineStatus
-		// 从 Metadata 中获取 "out_channel" 的值，并进行类型断言
-		outChannelStr, ok := thing.Metadata["out_channel"].(string)
-		fmt.Println("mqtt out_channelStr 1234:", outChannelStr)
-		if ok {
-			outChannelInt, err := strconv.Atoi(outChannelStr)
-			fmt.Println("outChannelInt 1234:", outChannelInt)
-			if err != nil {
-				fmt.Println("Failed to convert out_channel to int:", err)
-			} else {
-				if outChannelInt > 1 {
-					is_channel, ok := thing.Metadata["is_channel"].(string)
-					fmt.Println("mqtt is_channel 1234:", is_channel)
-					if ok {
-						if is_channel == "0" {
-							for i := 2; i <= outChannelInt; i++ {
-								fmt.Println("mqtt newThing identity:", thing.Credentials.Identity+"_"+strconv.Itoa(i))
-								newThing, _ := cRepo.RetrieveByIdentity(ctx, thing.Credentials.Identity+"_"+strconv.Itoa(i))
-								fmt.Println("mqtt newThing:", newThing.ID)
-								if newThing.ID != "" {
-									newThing.Metadata["is_online"] = onlineStatus
-									_, _ = cRepo.Update(ctx, newThing)
+			// out_channel 大于1, 且is_channel等于0时，说明是多通道设备，需要把多通道都同时修改onlineStatus
+			// 从 Metadata 中获取 "out_channel" 的值，并进行类型断言
+			outChannelStr, ok := thing.Metadata["out_channel"].(string)
+			if ok {
+				outChannelInt, err := strconv.Atoi(outChannelStr)
+				if err != nil {
+					fmt.Println("Failed to convert out_channel to int:", err)
+				} else {
+					if outChannelInt > 1 {
+						is_channel, ok := thing.Metadata["is_channel"].(string)
+						if ok {
+							if is_channel == "0" {
+								for i := 2; i <= outChannelInt; i++ {
+									fmt.Println("mqtt newThing identity:", thing.Credentials.Identity+"_"+strconv.Itoa(i))
+									newThing, _ := cRepo.RetrieveByIdentity(ctx, thing.Credentials.Identity+"_"+strconv.Itoa(i))
+									fmt.Println("mqtt newThing:", newThing.ID)
+									if newThing.ID != "" {
+										newThing.Metadata["is_online"] = onlineStatus
+										_, _ = cRepo.Update(ctx, newThing)
+									}
 								}
 							}
 						}

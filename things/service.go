@@ -466,6 +466,28 @@ func (svc service) UpdateClient(ctx context.Context, token string, cli mgclients
 		return mgclients.Client{}, errors.Wrap(svcerr.ErrAuthorization, err)
 	}
 
+	dbConfig := pgclient.Config{
+		Host:        "things-db",
+		Port:        "5432",
+		User:        "magistrala",
+		Pass:        "magistrala",
+		Name:        "things",
+		SSLMode:     "disable",
+		SSLCert:     "",
+		SSLKey:      "",
+		SSLRootCert: "",
+	}
+	database, err := pgclient.Connect(dbConfig)
+	if err != nil {
+		fmt.Printf("Failed to connect to database: %v\n", err)
+	}
+	defer database.Close() // 确保在函数结束时关闭数据库连接
+
+	cRepo := postgres.NewRepository(database)
+	oldThing, _ := cRepo.RetrieveByIdentity(ctx, cli.Credentials.Identity)
+	onlineStatus, statusOk := oldThing.Metadata["online_status"].(string)
+	fmt.Println("thing onlineStatus 2345:", onlineStatus)
+
 	client := mgclients.Client{
 		ID:        cli.ID,
 		Name:      cli.Name,
@@ -473,73 +495,61 @@ func (svc service) UpdateClient(ctx context.Context, token string, cli mgclients
 		UpdatedAt: time.Now(),
 		UpdatedBy: userID,
 	}
+	if statusOk {
+		client.Metadata["online_status"] = onlineStatus
+	}
 	client, err = svc.clients.Update(ctx, client)
 	if err != nil {
+		fmt.Println("UpdateClient Error: ", err)
 		return mgclients.Client{}, errors.Wrap(svcerr.ErrUpdateEntity, err)
 	}
 
 	// out_channel 大于1, 且is_channel等于0时，说明是多通道设备，需要把多通道都同时修改name、aliase
-	// 从 Metadata 中获取 "out_channel" 的值，并进行类型断言
-	outChannel, ok := client.Metadata["out_channel"].(int)
-	if ok {
-		if outChannel > 1 {
-			is_channel, ok := client.Metadata["is_channel"].(string)
-			if ok {
-				if is_channel == "0" {
-					dbConfig := pgclient.Config{
-						Host:        "things-db",
-						Port:        "5432",
-						User:        "magistrala",
-						Pass:        "magistrala",
-						Name:        "things",
-						SSLMode:     "disable",
-						SSLCert:     "",
-						SSLKey:      "",
-						SSLRootCert: "",
-					}
-					database, err := pgclient.Connect(dbConfig)
+	if outChannel, ok := client.Metadata["out_channel"].(string); ok {
+		fmt.Println("thing is_channel 2345:", outChannel)
+		// 转换为整数
+		outChannelNum, _ := strconv.Atoi(outChannel)
+		if outChannelNum > 1 {
+			// 根据 out_channel 生成多个通道设备
+			if outChannelArray, ok := client.Metadata["out_channel_array"].([]interface{}); ok {
+				for i := 2; i <= len(outChannelArray); i++ {
+					thing, err := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+strconv.Itoa(i))
 					if err != nil {
-						fmt.Printf("Failed to connect to database: %v\n", err)
+						fmt.Println("RetrieveByIdentity Error: ", err)
+						continue // 如果检索失败，继续下一个循环
 					}
-					defer database.Close() // 确保在函数结束时关闭数据库连接
+					// 类型断言
+					info, ok := client.Metadata["info"].(map[string]interface{})
+					if !ok {
+						fmt.Println("Invalid type for Metadata['info']")
+						continue
+					}
 
-					cRepo := postgres.NewRepository(database)
-					for i := 2; i <= outChannel; i++ {
-						thing, err := cRepo.RetrieveByIdentity(ctx, client.Credentials.Identity+"_"+strconv.Itoa(i))
-						if err != nil {
-							fmt.Println("RetrieveByIdentity Error: ", err)
-							continue // 如果检索失败，继续下一个循环
-						}
-						thing.Name = client.Name
-						// 类型断言
-						info, ok := client.Metadata["info"].(map[string]interface{})
-						if !ok {
-							fmt.Println("Invalid type for Metadata['info']")
-							continue
-						}
-
-						thing.Metadata["info"] = deepcopy.Copy(info).(map[string]interface{})
-						// 处理 out_channel
-						if outChannelData, ok := info["out_channel"].(map[string]interface{}); ok {
-							if channels, ok := outChannelData["channel"].([]interface{}); ok {
-								if len(channels) > 0 {
-									if i-1 < len(channels) {
-										channelInfo, ok := channels[i-1].(map[string]interface{})
-										if ok {
-											if aliase, exists := channelInfo["aliase"].(string); exists {
-												thing.Metadata["aliase"] = client.Name + "_" + aliase
-											}
+					thing.Metadata["info"] = deepcopy.Copy(info).(map[string]interface{})
+					// 处理 out_channel
+					if outChannelData, ok := info["out_channel"].(map[string]interface{}); ok {
+						if channels, ok := outChannelData["channel"].([]interface{}); ok {
+							if len(channels) > 0 {
+								if i-1 < len(channels) {
+									channelInfo, ok := channels[i-1].(map[string]interface{})
+									if ok {
+										if aliase, exists := channelInfo["aliase"].(string); exists {
+											thing.Metadata["aliase"] = client.Name + "_" + aliase
+											thing.Name = client.Name + "_" + aliase
 										}
 									}
-									thing.Metadata["out_channel_array"] = deepcopy.Copy(channels).([]interface{})
 								}
-								thing.Metadata["out_channel"] = strconv.Itoa(len(channels))
+								thing.Metadata["out_channel_array"] = deepcopy.Copy(channels).([]interface{})
 							}
+							thing.Metadata["out_channel"] = strconv.Itoa(len(channels))
 						}
-						_, err = svc.UpdateClient(ctx, token, thing)
-						if err != nil {
-							fmt.Println("UpdateClient Error: ", err)
-						}
+					}
+					thing.UpdatedAt = time.Now()
+					_, err = cRepo.Update(ctx, thing)
+					// _, err = svc.UpdateClient(ctx, token, thing)
+					if err != nil {
+						fmt.Println("UpdateClient thingName 1234: ", thing.Name)
+						fmt.Println("UpdateClient Error 1234: ", err)
 					}
 				}
 			}
