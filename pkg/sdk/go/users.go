@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/andychao217/magistrala/internal/apiutil"
 	"github.com/andychao217/magistrala/pkg/errors"
 )
 
@@ -343,4 +344,13 @@ func (sdk mgSDK) changeClientStatus(token, id, status string) (User, errors.SDKE
 	}
 
 	return user, nil
+}
+
+func (sdk mgSDK) DeleteUser(id, token string) errors.SDKError {
+	if id == "" {
+		return errors.NewSDKError(apiutil.ErrMissingID)
+	}
+	url := fmt.Sprintf("%s/%s/%s", sdk.usersURL, usersEndpoint, id)
+	_, _, sdkerr := sdk.processRequest(http.MethodDelete, url, token, nil, nil, http.StatusNoContent)
+	return sdkerr
 }

@@ -174,6 +174,38 @@ func (pa *policyAgent) DeletePolicy(ctx context.Context, pr auth.PolicyReq) erro
 	return nil
 }
 
+func (pa *policyAgent) DeletePolicyFilter(ctx context.Context, pr auth.PolicyReq) error {
+	req := &v1.DeleteRelationshipsRequest{
+		RelationshipFilter: &v1.RelationshipFilter{
+			ResourceType:       pr.ObjectType,
+			OptionalResourceId: pr.Object,
+		},
+	}
+
+	if pr.Relation != "" {
+		req.RelationshipFilter.OptionalRelation = pr.Relation
+	}
+
+	if pr.SubjectType != "" {
+		req.RelationshipFilter.OptionalSubjectFilter = &v1.SubjectFilter{
+			SubjectType: pr.SubjectType,
+		}
+		if pr.Subject != "" {
+			req.RelationshipFilter.OptionalSubjectFilter.OptionalSubjectId = pr.Subject
+		}
+		if pr.SubjectRelation != "" {
+			req.RelationshipFilter.OptionalSubjectFilter.OptionalRelation = &v1.SubjectFilter_RelationFilter{
+				Relation: pr.SubjectRelation,
+			}
+		}
+	}
+
+	if _, err := pa.permissionClient.DeleteRelationships(ctx, req); err != nil {
+		return errors.Wrap(errRemovePolicies, handleSpicedbError(err))
+	}
+	return nil
+}
+
 // RetrieveObjects - Listing of things.
 func (pa *policyAgent) RetrieveObjects(ctx context.Context, pr auth.PolicyReq, nextPageToken string, limit uint64) ([]auth.PolicyRes, string, error) {
 	resourceReq := &v1.LookupResourcesRequest{

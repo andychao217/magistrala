@@ -48,6 +48,10 @@ The service is configured using the environment variables presented in the follo
 | MG_EMAIL_TEMPLATE             | Email template for sending emails with password reset link              | email.tmpl                          |
 | MG_USERS_ES_URL               | Event store URL                                                         | <nats://localhost:4222>             |
 | MG_JAEGER_URL                 | Jaeger server URL                                                       | <http://localhost:14268/api/traces> |
+| MG_OAUTH_UI_REDIRECT_URL      | OAuth UI redirect URL                                                   | <http://localhost:9095/domains>     |
+| MG_OAUTH_UI_ERROR_URL         | OAuth UI error URL                                                      | <http://localhost:9095/error>       |
+| MG_USERS_DELETE_INTERVAL      | Interval for deleting users                                             | 24h                                 |
+| MG_USERS_DELETE_AFTER         | Time after which users are deleted                                      | 720h                                |
 | MG_JAEGER_TRACE_RATIO         | Jaeger sampling ratio                                                   | 1.0                                 |
 | MG_SEND_TELEMETRY             | Send telemetry to magistrala call home server.                          | true                                |
 | MG_USERS_INSTANCE_ID          | Magistrala instance ID                                                  | ""                                  |

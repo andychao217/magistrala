@@ -1202,3 +1202,78 @@ func TestDisableClient(t *testing.T) {
 		repoCall2.Unset()
 	}
 }
+
+func TestDeleteUser(t *testing.T) {
+	ts, crepo, _, auth := setupUsers()
+	defer ts.Close()
+
+	conf := sdk.Config{
+		UsersURL: ts.URL,
+	}
+	mgsdk := sdk.NewSDK(conf)
+
+	enabledClient1 := sdk.User{ID: testsutil.GenerateUUID(t), Credentials: sdk.Credentials{Identity: "client1@example.com", Secret: "password"}, Status: mgclients.EnabledStatus.String()}
+	deletedClient1 := sdk.User{ID: testsutil.GenerateUUID(t), Credentials: sdk.Credentials{Identity: "client3@example.com", Secret: "password"}, Status: mgclients.DeletedStatus.String()}
+	deletedenabledClient1 := enabledClient1
+	deletedenabledClient1.Status = mgclients.DisabledStatus.String()
+	deletedenabledClient1.ID = testsutil.GenerateUUID(t)
+
+	cases := []struct {
+		desc     string
+		id       string
+		token    string
+		client   sdk.User
+		response sdk.User
+		repoErr  error
+		err      errors.SDKError
+	}{
+		{
+			desc:     "delete enabled client",
+			id:       enabledClient1.ID,
+			token:    validToken,
+			client:   enabledClient1,
+			response: deletedenabledClient1,
+			err:      nil,
+			repoErr:  nil,
+		},
+		{
+			desc:     "delete disabled client",
+			id:       deletedClient1.ID,
+			token:    validToken,
+			client:   deletedClient1,
+			response: sdk.User{},
+			repoErr:  sdk.ErrFailedDisable,
+			err:      errors.NewSDKErrorWithStatus(svcerr.ErrViewEntity, http.StatusBadRequest),
+		},
+		{
+			desc:     "delete non-existing client",
+			id:       wrongID,
+			client:   sdk.User{},
+			token:    validToken,
+			response: sdk.User{},
+			repoErr:  sdk.ErrFailedDisable,
+			err:      errors.NewSDKErrorWithStatus(svcerr.ErrViewEntity, http.StatusBadRequest),
+		},
+	}
+
+	for _, tc := range cases {
+		repoCall := auth.On("Identify", mock.Anything, &magistrala.IdentityReq{Token: validToken}).Return(&magistrala.IdentityRes{UserId: validID}, nil)
+		repoCall1 := auth.On("Authorize", mock.Anything, mock.Anything).Return(&magistrala.AuthorizeRes{Authorized: true}, nil)
+		repoCall2 := crepo.On("RetrieveByID", mock.Anything, tc.id).Return(convertClient(tc.client), tc.repoErr)
+		repoCall3 := crepo.On("ChangeStatus", mock.Anything, mock.Anything).Return(convertClient(tc.response), tc.repoErr)
+		err := mgsdk.DeleteUser(tc.id, tc.token)
+		assert.Equal(t, tc.err, err, fmt.Sprintf("%s: expected error %s, got %s", tc.desc, tc.err, err))
+		if tc.err == nil {
+			ok := repoCall.Parent.AssertCalled(t, "Identify", mock.Anything, mock.Anything)
+			assert.True(t, ok, fmt.Sprintf("Identify was not called on %s", tc.desc))
+			ok = repoCall2.Parent.AssertCalled(t, "RetrieveByID", mock.Anything, tc.id)
+			assert.True(t, ok, fmt.Sprintf("RetrieveByID was not called on %s", tc.desc))
+			ok = repoCall3.Parent.AssertCalled(t, "ChangeStatus", mock.Anything, mock.Anything)
+			assert.True(t, ok, fmt.Sprintf("ChangeStatus was not called on %s", tc.desc))
+		}
+		repoCall.Unset()
+		repoCall1.Unset()
+		repoCall2.Unset()
+		repoCall3.Unset()
+	}
+}
