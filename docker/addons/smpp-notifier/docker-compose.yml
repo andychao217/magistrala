@@ -29,7 +29,7 @@ services:
     networks:
       - magistrala-base-net
     volumes:
-      - magistrala-smpp-notifier-volume:/var/lib/postgresql/datab
+      - magistrala-smpp-notifier-volume:/var/lib/postgresql/data
 
   smpp-notifier:
     image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-smpp-notifier:${MG_RELEASE_TAG}
