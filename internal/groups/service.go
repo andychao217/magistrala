@@ -14,7 +14,6 @@ import (
 	"github.com/andychao217/magistrala/internal/apiutil"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/errors"
-	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	"github.com/andychao217/magistrala/pkg/groups"
 	"golang.org/x/sync/errgroup"
@@ -129,7 +128,7 @@ func (svc service) ViewGroup(ctx context.Context, token, id string) (groups.Grou
 
 	group, err := svc.groups.RetrieveByID(ctx, id)
 	if err != nil {
-		return groups.Group{}, errors.Wrap(repoerr.ErrViewEntity, err)
+		return groups.Group{}, errors.Wrap(svcerr.ErrViewEntity, err)
 	}
 
 	return group, nil
@@ -516,7 +515,7 @@ func (svc service) assignParentGroup(ctx context.Context, domain, parentGroupID 
 	var deletePolicies magistrala.DeletePoliciesReq
 	for _, group := range groupsPage.Groups {
 		if group.Parent != "" {
-			return errors.Wrap(repoerr.ErrConflict, fmt.Errorf("%s group already have parent", group.ID))
+			return errors.Wrap(svcerr.ErrConflict, fmt.Errorf("%s group already have parent", group.ID))
 		}
 		addPolicies.AddPoliciesReq = append(addPolicies.AddPoliciesReq, &magistrala.AddPolicyReq{
 			Domain:      domain,
@@ -562,7 +561,7 @@ func (svc service) unassignParentGroup(ctx context.Context, domain, parentGroupI
 	var deletePolicies magistrala.DeletePoliciesReq
 	for _, group := range groupsPage.Groups {
 		if group.Parent != "" && group.Parent != parentGroupID {
-			return errors.Wrap(repoerr.ErrConflict, fmt.Errorf("%s group doesn't have same parent", group.ID))
+			return errors.Wrap(svcerr.ErrConflict, fmt.Errorf("%s group doesn't have same parent", group.ID))
 		}
 		addPolicies.AddPoliciesReq = append(addPolicies.AddPoliciesReq, &magistrala.AddPolicyReq{
 			Domain:      domain,
