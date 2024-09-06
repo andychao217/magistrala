@@ -321,7 +321,7 @@ func (svc service) RegisterClient(ctx context.Context, token string, cli mgclien
 		if err != nil {
 			if errRollback := svc.addClientPolicyRollback(ctx, cli.ID, cli.Role); errRollback != nil {
 				fmt.Println("RegisterClient 66: ", err)
-				err = errors.Wrap(errors.Wrap(repoerr.ErrRollbackTx, errRollback), err)
+				err = errors.Wrap(errors.Wrap(errors.ErrRollbackTx, errRollback), err)
 			}
 		}
 	}()
