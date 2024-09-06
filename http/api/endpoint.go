@@ -6,11 +6,18 @@ package api
 import (
 	"context"
 
+	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/go-kit/kit/endpoint"
 )
 
 func sendMessageEndpoint() endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		return nil, nil
+		req := request.(publishReq)
+		if err := req.validate(); err != nil {
+			return nil, errors.Wrap(apiutil.ErrValidation, err)
+		}
+
+		return publishMessageRes{}, nil
 	}
 }

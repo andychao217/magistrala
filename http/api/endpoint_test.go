@@ -11,7 +11,8 @@ import (
 	"strings"
 	"testing"
 
-	mproxy "github.com/absmach/mproxy/pkg/http"
+	"github.com/absmach/mproxy"
+	mproxyhttp "github.com/absmach/mproxy/pkg/http"
 	"github.com/absmach/mproxy/pkg/session"
 	"github.com/andychao217/magistrala"
 	authmocks "github.com/andychao217/magistrala/auth/mocks"
@@ -32,16 +33,20 @@ func newService(auth magistrala.AuthzServiceClient) (session.Handler, *pubsub.Pu
 }
 
 func newTargetHTTPServer() *httptest.Server {
-	mux := api.MakeHandler(instanceID)
+	mux := api.MakeHandler(mglog.NewMock(), instanceID)
 	return httptest.NewServer(mux)
 }
 
 func newProxyHTPPServer(svc session.Handler, targetServer *httptest.Server) (*httptest.Server, error) {
-	mp, err := mproxy.NewProxy("", targetServer.URL, svc, mglog.NewMock())
+	config := mproxy.Config{
+		Address: "",
+		Target:  targetServer.URL,
+	}
+	mp, err := mproxyhttp.NewProxy(config, svc, mglog.NewMock())
 	if err != nil {
 		return nil, err
 	}
-	return httptest.NewServer(http.HandlerFunc(mp.Handler)), nil
+	return httptest.NewServer(http.HandlerFunc(mp.ServeHTTP)), nil
 }
 
 type testRequest struct {

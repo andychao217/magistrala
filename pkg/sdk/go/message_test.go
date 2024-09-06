@@ -9,7 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	mproxy "github.com/absmach/mproxy/pkg/http"
+	"github.com/absmach/mproxy"
+	mproxyhttp "github.com/absmach/mproxy/pkg/http"
 	"github.com/andychao217/magistrala"
 	authmocks "github.com/andychao217/magistrala/auth/mocks"
 	adapter "github.com/andychao217/magistrala/http"
@@ -29,15 +30,19 @@ func setupMessages() (*httptest.Server, *authmocks.AuthClient, *pubsub.PubSub) {
 	pub := new(pubsub.PubSub)
 	handler := adapter.NewHandler(pub, mglog.NewMock(), auth)
 
-	mux := api.MakeHandler("")
+	mux := api.MakeHandler(mglog.NewMock(), "")
 	target := httptest.NewServer(mux)
 
-	mp, err := mproxy.NewProxy("", target.URL, handler, mglog.NewMock())
+	config := mproxy.Config{
+		Address: "",
+		Target:  target.URL,
+	}
+	mp, err := mproxyhttp.NewProxy(config, handler, mglog.NewMock())
 	if err != nil {
 		return nil, nil, nil
 	}
 
-	return httptest.NewServer(http.HandlerFunc(mp.Handler)), auth, pub
+	return httptest.NewServer(http.HandlerFunc(mp.ServeHTTP)), auth, pub
 }
 
 func TestSendMessage(t *testing.T) {
