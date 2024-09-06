@@ -8,7 +8,6 @@ import (
 
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/pkg/clients"
-	mgoauth2 "github.com/andychao217/magistrala/pkg/oauth2"
 )
 
 // Service specifies an API that must be fullfiled by the domain service
@@ -80,5 +79,5 @@ type Service interface {
 
 	// OAuthCallback handles the callback from any supported OAuth provider.
 	// It processes the OAuth tokens and either signs in or signs up the user based on the provided state.
-	OAuthCallback(ctx context.Context, state mgoauth2.State, client clients.Client) (*magistrala.Token, error)
+	OAuthCallback(ctx context.Context, client clients.Client) (*magistrala.Token, error)
 }

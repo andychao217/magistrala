@@ -10,7 +10,6 @@ import (
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/events"
 	"github.com/andychao217/magistrala/pkg/events/store"
-	mgoauth2 "github.com/andychao217/magistrala/pkg/oauth2"
 	"github.com/andychao217/magistrala/users"
 )
 
@@ -297,14 +296,13 @@ func (es *eventStore) SendPasswordReset(ctx context.Context, host, email, user, 
 	return es.Publish(ctx, event)
 }
 
-func (es *eventStore) OAuthCallback(ctx context.Context, state mgoauth2.State, client mgclients.Client) (*magistrala.Token, error) {
-	token, err := es.svc.OAuthCallback(ctx, state, client)
+func (es *eventStore) OAuthCallback(ctx context.Context, client mgclients.Client) (*magistrala.Token, error) {
+	token, err := es.svc.OAuthCallback(ctx, client)
 	if err != nil {
 		return token, err
 	}
 
 	event := oauthCallbackEvent{
-		state:    state.String(),
 		clientID: client.ID,
 	}
 

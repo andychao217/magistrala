@@ -9,7 +9,6 @@ import (
 
 	"github.com/andychao217/magistrala"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
-	mgoauth2 "github.com/andychao217/magistrala/pkg/oauth2"
 	"github.com/andychao217/magistrala/users"
 	"github.com/go-kit/kit/metrics"
 )
@@ -193,13 +192,12 @@ func (ms *metricsMiddleware) Identify(ctx context.Context, token string) (string
 	return ms.svc.Identify(ctx, token)
 }
 
-func (ms *metricsMiddleware) OAuthCallback(ctx context.Context, state mgoauth2.State, client mgclients.Client) (*magistrala.Token, error) {
-	method := "oauth_callback_" + state.String()
+func (ms *metricsMiddleware) OAuthCallback(ctx context.Context, client mgclients.Client) (*magistrala.Token, error) {
 	defer func(begin time.Time) {
-		ms.counter.With("method", method).Add(1)
-		ms.latency.With("method", method).Observe(time.Since(begin).Seconds())
+		ms.counter.With("method", "oauth_callback").Add(1)
+		ms.latency.With("method", "oauth_callback").Observe(time.Since(begin).Seconds())
 	}(time.Now())
-	return ms.svc.OAuthCallback(ctx, state, client)
+	return ms.svc.OAuthCallback(ctx, client)
 }
 
 // DeleteClient instruments DeleteClient method with metrics.
