@@ -2454,7 +2454,7 @@ func TestGenerateResetToken(t *testing.T) {
 			retrieveByIdentityResponse: client,
 			issueResponse:              &magistrala.Token{},
 			issueErr:                   svcerr.ErrAuthorization,
-			err:                        svcerr.ErrRecoveryToken,
+			err:                        svcerr.ErrAuthorization,
 		},
 	}
 
