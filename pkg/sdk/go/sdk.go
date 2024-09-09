@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -16,6 +17,7 @@ import (
 	"time"
 
 	"github.com/andychao217/magistrala/pkg/errors"
+	"moul.io/http2curl"
 )
 
 const (
@@ -1175,6 +1177,7 @@ type mgSDK struct {
 
 	msgContentType ContentType
 	client         *http.Client
+	curlFlag       bool
 }
 
 // Config contains sdk configuration parameters.
@@ -1191,6 +1194,7 @@ type Config struct {
 
 	MsgContentType  ContentType
 	TLSVerification bool
+	CurlFlag        bool
 }
 
 // NewSDK returns new magistrala SDK instance.
@@ -1214,6 +1218,7 @@ func NewSDK(conf Config) SDK {
 				},
 			},
 		},
+		curlFlag: conf.CurlFlag,
 	}
 }
 
@@ -1238,6 +1243,14 @@ func (sdk mgSDK) processRequest(method, reqUrl, token string, data []byte, heade
 			token = BearerPrefix + token
 		}
 		req.Header.Set("Authorization", token)
+	}
+
+	if sdk.curlFlag {
+		curlCommand, err := http2curl.GetCurlCommand(req)
+		if err != nil {
+			return nil, nil, errors.NewSDKError(err)
+		}
+		log.Println(curlCommand.String())
 	}
 
 	resp, err := sdk.client.Do(req)
