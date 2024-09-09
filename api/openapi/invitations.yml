@@ -240,6 +240,7 @@ components:
             - editor
             - contributor
             - member
+            - guest
             - domain
             - parent_group
             - role_group
@@ -408,6 +409,8 @@ components:
           - editor
           - contributor
           - member
+          - guest
+          - guest
           - domain
           - parent_group
           - role_group
