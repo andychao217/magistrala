@@ -224,6 +224,7 @@ services:
         max-file: "3"
     restart: on-failure
     depends_on:
+      - auth
       - invitations-db
     environment:
       MG_INVITATIONS_LOG_LEVEL: ${MG_INVITATIONS_LOG_LEVEL}
@@ -309,6 +310,7 @@ services:
     env_file:
       - .env
     depends_on:
+      - auth
       - things
       - users
       - mqtt-adapter
