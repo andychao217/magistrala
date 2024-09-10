@@ -21,16 +21,16 @@ import (
 	"github.com/andychao217/magistrala"
 	adapter "github.com/andychao217/magistrala/http"
 	"github.com/andychao217/magistrala/http/api"
-	"github.com/andychao217/magistrala/internal"
-	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/pkg/auth"
+	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
 	brokerstracing "github.com/andychao217/magistrala/pkg/messaging/brokers/tracing"
 	"github.com/andychao217/magistrala/pkg/messaging/handler"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	"go.opentelemetry.io/otel/trace"
@@ -129,7 +129,7 @@ func main() {
 	svc := newService(pub, authClient, logger, tracer)
 	targetServerCfg := server.Config{Port: targetHTTPPort}
 
-	hs := httpserver.New(ctx, cancel, svcName, targetServerCfg, api.MakeHandler(logger, cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, targetServerCfg, api.MakeHandler(logger, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -157,7 +157,7 @@ func newService(pub messaging.Publisher, tc magistrala.AuthzServiceClient, logge
 	svc := adapter.NewHandler(pub, logger, tc)
 	svc = handler.NewTracing(tracer, svc)
 	svc = handler.LoggingMiddleware(svc, logger)
-	counter, latency := internal.MakeMetrics(svcName, "api")
+	counter, latency := prometheus.MakeMetrics(svcName, "api")
 	svc = handler.MetricsMiddleware(svc, counter, latency)
 	return svc
 }

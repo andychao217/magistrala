@@ -14,7 +14,7 @@ import (
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/bootstrap"
 	"github.com/andychao217/magistrala/internal/api"
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/go-chi/chi/v5"
 	kithttp "github.com/go-kit/kit/transport/http"

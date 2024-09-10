@@ -19,12 +19,12 @@ import (
 	"github.com/andychao217/magistrala/consumers/writers/api"
 	"github.com/andychao217/magistrala/consumers/writers/influxdb"
 	influxdbclient "github.com/andychao217/magistrala/internal/clients/influxdb"
-	"github.com/andychao217/magistrala/internal/clients/jaeger"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
+	"github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
 	brokerstracing "github.com/andychao217/magistrala/pkg/messaging/brokers/tracing"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	"golang.org/x/sync/errgroup"
@@ -140,7 +140,7 @@ func main() {
 		return
 	}
 
-	hs := httpserver.New(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svcName, cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svcName, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)

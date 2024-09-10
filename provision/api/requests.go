@@ -3,7 +3,7 @@
 
 package api
 
-import "github.com/andychao217/magistrala/internal/apiutil"
+import "github.com/andychao217/magistrala/pkg/apiutil"
 
 type provisionReq struct {
 	token       string

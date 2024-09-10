@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/andychao217/magistrala/consumers"
-	"github.com/andychao217/magistrala/internal/server"
+	"github.com/andychao217/magistrala/pkg/server"
 	mgjson "github.com/andychao217/magistrala/pkg/transformers/json"
 	"github.com/andychao217/magistrala/pkg/transformers/senml"
 	"go.opentelemetry.io/otel/attribute"

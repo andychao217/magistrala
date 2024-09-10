@@ -7,7 +7,7 @@ import (
 	"context"
 
 	notifiers "github.com/andychao217/magistrala/consumers/notifiers"
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/go-kit/kit/endpoint"
 )

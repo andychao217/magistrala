@@ -6,7 +6,7 @@ package api
 import (
 	"github.com/andychao217/magistrala/auth"
 	"github.com/andychao217/magistrala/internal/api"
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	mggroups "github.com/andychao217/magistrala/pkg/groups"
 )
 

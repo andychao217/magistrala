@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/andychao217/magistrala/auth"
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	"github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/go-kit/kit/endpoint"

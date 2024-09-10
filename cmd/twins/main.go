@@ -14,17 +14,17 @@ import (
 
 	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
-	"github.com/andychao217/magistrala/internal"
-	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
 	mongoclient "github.com/andychao217/magistrala/internal/clients/mongo"
 	redisclient "github.com/andychao217/magistrala/internal/clients/redis"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/pkg/auth"
+	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
 	brokerstracing "github.com/andychao217/magistrala/pkg/messaging/brokers/tracing"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	localusers "github.com/andychao217/magistrala/things/standalone"
 	"github.com/andychao217/magistrala/twins"
@@ -161,7 +161,7 @@ func main() {
 		return
 	}
 
-	hs := httpserver.New(ctx, cancel, svcName, httpServerConfig, twapi.MakeHandler(svc, logger, cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, twapi.MakeHandler(svc, logger, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -201,7 +201,7 @@ func newService(ctx context.Context, id string, ps messaging.PubSub, cfg config,
 	}
 
 	svc = api.LoggingMiddleware(svc, logger)
-	counter, latency := internal.MakeMetrics(svcName, "api")
+	counter, latency := prometheus.MakeMetrics(svcName, "api")
 	svc = api.MetricsMiddleware(svc, counter, latency)
 
 	subCfg := messaging.SubscriberConfig{

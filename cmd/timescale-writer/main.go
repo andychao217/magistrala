@@ -18,14 +18,14 @@ import (
 	consumertracing "github.com/andychao217/magistrala/consumers/tracing"
 	"github.com/andychao217/magistrala/consumers/writers/api"
 	"github.com/andychao217/magistrala/consumers/writers/timescale"
-	"github.com/andychao217/magistrala/internal"
-	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
-	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
+	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
 	brokerstracing "github.com/andychao217/magistrala/pkg/messaging/brokers/tracing"
+	pgclient "github.com/andychao217/magistrala/pkg/postgres"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	"github.com/jmoiron/sqlx"
@@ -127,7 +127,7 @@ func main() {
 		return
 	}
 
-	hs := httpserver.New(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svcName, cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svcName, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -150,7 +150,7 @@ func main() {
 func newService(db *sqlx.DB, logger *slog.Logger) consumers.BlockingConsumer {
 	svc := timescale.New(db)
 	svc = api.LoggingMiddleware(svc, logger)
-	counter, latency := internal.MakeMetrics("timescale", "message_writer")
+	counter, latency := prometheus.MakeMetrics("timescale", "message_writer")
 	svc = api.MetricsMiddleware(svc, counter, latency)
 	return svc
 }

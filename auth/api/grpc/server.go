@@ -8,7 +8,7 @@ import (
 
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/auth"
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	"github.com/andychao217/magistrala/pkg/errors"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"

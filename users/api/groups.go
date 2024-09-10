@@ -11,8 +11,8 @@ import (
 
 	"github.com/andychao217/magistrala/auth"
 	"github.com/andychao217/magistrala/internal/api"
-	"github.com/andychao217/magistrala/internal/apiutil"
 	gapi "github.com/andychao217/magistrala/internal/groups/api"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/andychao217/magistrala/pkg/groups"
 	"github.com/go-chi/chi/v5"

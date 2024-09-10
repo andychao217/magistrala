@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/andychao217/magistrala/auth"
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 )
 
 // Invitation is an invitation to join a domain.

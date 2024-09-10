@@ -14,8 +14,8 @@ import (
 	"time"
 
 	apostgres "github.com/andychao217/magistrala/auth/postgres"
-	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
-	"github.com/andychao217/magistrala/internal/postgres"
+	"github.com/andychao217/magistrala/pkg/postgres"
+	pgclient "github.com/andychao217/magistrala/pkg/postgres"
 	"github.com/jmoiron/sqlx"
 	dockertest "github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"

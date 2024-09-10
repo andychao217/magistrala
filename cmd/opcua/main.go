@@ -14,11 +14,7 @@ import (
 
 	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
-	"github.com/andychao217/magistrala/internal"
-	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
 	redisclient "github.com/andychao217/magistrala/internal/clients/redis"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/opcua"
 	"github.com/andychao217/magistrala/opcua/api"
@@ -27,8 +23,12 @@ import (
 	"github.com/andychao217/magistrala/opcua/gopcua"
 	"github.com/andychao217/magistrala/pkg/events"
 	"github.com/andychao217/magistrala/pkg/events/store"
+	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
 	brokerstracing "github.com/andychao217/magistrala/pkg/messaging/brokers/tracing"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	"github.com/go-redis/redis/v8"
@@ -145,7 +145,7 @@ func main() {
 
 	logger.Info("Subscribed to Event Store")
 
-	hs := httpserver.New(ctx, httpCancel, svcName, httpServerConfig, api.MakeHandler(svc, logger, cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, httpCancel, svcName, httpServerConfig, api.MakeHandler(svc, logger, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, httpCancel)
@@ -205,7 +205,7 @@ func newRouteMapRepositoy(client *redis.Client, prefix string, logger *slog.Logg
 func newService(sub opcua.Subscriber, browser opcua.Browser, thingRM, chanRM, connRM opcua.RouteMapRepository, opcuaConfig opcua.Config, logger *slog.Logger) opcua.Service {
 	svc := opcua.New(sub, browser, thingRM, chanRM, connRM, opcuaConfig, logger)
 	svc = api.LoggingMiddleware(svc, logger)
-	counter, latency := internal.MakeMetrics("opc_ua_adapter", "api")
+	counter, latency := prometheus.MakeMetrics("opc_ua_adapter", "api")
 	svc = api.MetricsMiddleware(svc, counter, latency)
 
 	return svc

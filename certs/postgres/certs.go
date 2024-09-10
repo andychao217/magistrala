@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/andychao217/magistrala/certs"
-	"github.com/andychao217/magistrala/internal/postgres"
 	"github.com/andychao217/magistrala/pkg/errors"
 	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	"github.com/andychao217/magistrala/pkg/postgres"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"

@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/andychao217/magistrala/auth"
-	"github.com/andychao217/magistrala/internal/postgres"
 	"github.com/andychao217/magistrala/pkg/errors"
 	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	"github.com/andychao217/magistrala/pkg/postgres"
 )
 
 var (

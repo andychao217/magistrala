@@ -14,19 +14,19 @@ import (
 
 	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
-	"github.com/andychao217/magistrala/internal"
-	"github.com/andychao217/magistrala/internal/clients/jaeger"
-	clientspg "github.com/andychao217/magistrala/internal/clients/postgres"
-	"github.com/andychao217/magistrala/internal/postgres"
-	"github.com/andychao217/magistrala/internal/server"
-	"github.com/andychao217/magistrala/internal/server/http"
 	"github.com/andychao217/magistrala/invitations"
 	"github.com/andychao217/magistrala/invitations/api"
 	"github.com/andychao217/magistrala/invitations/middleware"
 	invitationspg "github.com/andychao217/magistrala/invitations/postgres"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/pkg/auth"
+	"github.com/andychao217/magistrala/pkg/jaeger"
+	"github.com/andychao217/magistrala/pkg/postgres"
+	clientspg "github.com/andychao217/magistrala/pkg/postgres"
+	"github.com/andychao217/magistrala/pkg/prometheus"
 	mgsdk "github.com/andychao217/magistrala/pkg/sdk/go"
+	"github.com/andychao217/magistrala/pkg/server"
+	"github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	"github.com/jmoiron/sqlx"
@@ -134,7 +134,7 @@ func main() {
 		return
 	}
 
-	httpSvr := http.New(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svc, logger, cfg.InstanceID), logger)
+	httpSvr := http.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svc, logger, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -167,7 +167,7 @@ func newService(db *sqlx.DB, dbConfig clientspg.Config, authClient magistrala.Au
 	svc := invitations.NewService(repo, authClient, sdk)
 	svc = middleware.Tracing(svc, tracer)
 	svc = middleware.Logging(logger, svc)
-	counter, latency := internal.MakeMetrics(svcName, "api")
+	counter, latency := prometheus.MakeMetrics(svcName, "api")
 	svc = middleware.Metrics(counter, latency, svc)
 
 	return svc, nil

@@ -10,6 +10,7 @@ import (
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/consumers"
 	"github.com/andychao217/magistrala/pkg/errors"
+	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	"github.com/andychao217/magistrala/pkg/messaging"
 )
 
@@ -72,7 +73,11 @@ func (ns *notifierService) CreateSubscription(ctx context.Context, token string,
 	}
 
 	sub.OwnerID = res.GetId()
-	return ns.subs.Save(ctx, sub)
+	id, err := ns.subs.Save(ctx, sub)
+	if err != nil {
+		return "", errors.Wrap(svcerr.ErrCreateEntity, err)
+	}
+	return id, nil
 }
 
 func (ns *notifierService) ViewSubscription(ctx context.Context, token, id string) (Subscription, error) {

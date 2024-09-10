@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/andychao217/magistrala/consumers/writers/timescale"
-	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
+	pgclient "github.com/andychao217/magistrala/pkg/postgres"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"

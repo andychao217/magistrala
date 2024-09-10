@@ -18,14 +18,14 @@ import (
 	consumertracing "github.com/andychao217/magistrala/consumers/tracing"
 	"github.com/andychao217/magistrala/consumers/writers/api"
 	"github.com/andychao217/magistrala/consumers/writers/cassandra"
-	"github.com/andychao217/magistrala/internal"
 	cassandraclient "github.com/andychao217/magistrala/internal/clients/cassandra"
-	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
+	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
 	brokerstracing "github.com/andychao217/magistrala/pkg/messaging/brokers/tracing"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	"github.com/gocql/gocql"
@@ -125,7 +125,7 @@ func main() {
 		return
 	}
 
-	hs := httpserver.New(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svcName, cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svcName, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -149,7 +149,7 @@ func main() {
 func newService(session *gocql.Session, logger *slog.Logger) consumers.BlockingConsumer {
 	repo := cassandra.New(session)
 	repo = api.LoggingMiddleware(repo, logger)
-	counter, latency := internal.MakeMetrics("cassandra", "message_writer")
+	counter, latency := prometheus.MakeMetrics("cassandra", "message_writer")
 	repo = api.MetricsMiddleware(repo, counter, latency)
 	return repo
 }

@@ -14,8 +14,8 @@ import (
 
 	"github.com/andychao217/magistrala"
 	authmocks "github.com/andychao217/magistrala/auth/mocks"
-	"github.com/andychao217/magistrala/internal/apiutil"
 	"github.com/andychao217/magistrala/internal/testsutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	"github.com/andychao217/magistrala/pkg/transformers/senml"
 	"github.com/andychao217/magistrala/readers"

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/andychao217/magistrala/internal/apiutil"
 	"github.com/andychao217/magistrala/internal/testsutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )

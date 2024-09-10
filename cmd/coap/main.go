@@ -16,15 +16,15 @@ import (
 	"github.com/andychao217/magistrala/coap"
 	"github.com/andychao217/magistrala/coap/api"
 	"github.com/andychao217/magistrala/coap/tracing"
-	"github.com/andychao217/magistrala/internal"
-	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
-	"github.com/andychao217/magistrala/internal/server"
-	coapserver "github.com/andychao217/magistrala/internal/server/coap"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/pkg/auth"
+	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
 	brokerstracing "github.com/andychao217/magistrala/pkg/messaging/brokers/tracing"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	coapserver "github.com/andychao217/magistrala/pkg/server/coap"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	"golang.org/x/sync/errgroup"
@@ -132,12 +132,12 @@ func main() {
 
 	svc = api.LoggingMiddleware(svc, logger)
 
-	counter, latency := internal.MakeMetrics(svcName, "api")
+	counter, latency := prometheus.MakeMetrics(svcName, "api")
 	svc = api.MetricsMiddleware(svc, counter, latency)
 
-	hs := httpserver.New(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(cfg.InstanceID), logger)
 
-	cs := coapserver.New(ctx, cancel, svcName, coapServerConfig, api.MakeCoAPHandler(svc, logger), logger)
+	cs := coapserver.NewServer(ctx, cancel, svcName, coapServerConfig, api.MakeCoAPHandler(svc, logger), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)

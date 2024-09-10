@@ -12,7 +12,7 @@ import (
 
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/auth"
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	"github.com/andychao217/magistrala/pkg/errors"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	grpcapi "github.com/andychao217/magistrala/things/api/grpc"

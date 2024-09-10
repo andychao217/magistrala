@@ -15,11 +15,7 @@ import (
 
 	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
-	"github.com/andychao217/magistrala/internal"
-	"github.com/andychao217/magistrala/internal/clients/jaeger"
 	redisclient "github.com/andychao217/magistrala/internal/clients/redis"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/lora"
 	"github.com/andychao217/magistrala/lora/api"
@@ -27,9 +23,13 @@ import (
 	"github.com/andychao217/magistrala/lora/mqtt"
 	"github.com/andychao217/magistrala/pkg/events"
 	"github.com/andychao217/magistrala/pkg/events/store"
+	"github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
 	brokerstracing "github.com/andychao217/magistrala/pkg/messaging/brokers/tracing"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	mqttpaho "github.com/eclipse/paho.mqtt.golang"
@@ -150,7 +150,7 @@ func main() {
 
 	logger.Info("Subscribed to Event Store")
 
-	hs := httpserver.New(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -226,7 +226,7 @@ func newService(pub messaging.Publisher, rmConn *redis.Client, thingsRMPrefix, c
 
 	svc := lora.New(pub, thingsRM, chansRM, connsRM)
 	svc = api.LoggingMiddleware(svc, logger)
-	counter, latency := internal.MakeMetrics("lora_adapter", "api")
+	counter, latency := prometheus.MakeMetrics("lora_adapter", "api")
 	svc = api.MetricsMiddleware(svc, counter, latency)
 
 	return svc

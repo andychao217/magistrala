@@ -14,9 +14,9 @@ import (
 
 	"github.com/0x6flab/namegenerator"
 	"github.com/andychao217/magistrala/internal/api"
-	"github.com/andychao217/magistrala/internal/apiutil"
 	"github.com/andychao217/magistrala/internal/testsutil"
 	mglog "github.com/andychao217/magistrala/logger"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/errors"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"

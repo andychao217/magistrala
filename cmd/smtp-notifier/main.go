@@ -20,16 +20,16 @@ import (
 	notifierpg "github.com/andychao217/magistrala/consumers/notifiers/postgres"
 	"github.com/andychao217/magistrala/consumers/notifiers/smtp"
 	"github.com/andychao217/magistrala/consumers/notifiers/tracing"
-	"github.com/andychao217/magistrala/internal"
-	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
-	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
 	"github.com/andychao217/magistrala/internal/email"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/pkg/auth"
+	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
 	brokerstracing "github.com/andychao217/magistrala/pkg/messaging/brokers/tracing"
+	pgclient "github.com/andychao217/magistrala/pkg/postgres"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/ulid"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
@@ -163,7 +163,7 @@ func main() {
 		return
 	}
 
-	hs := httpserver.New(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svc, logger, cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svc, logger, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -196,7 +196,7 @@ func newService(db *sqlx.DB, tracer trace.Tracer, authClient magistrala.AuthServ
 	notifier := smtp.New(agent)
 	svc := notifiers.New(authClient, repo, idp, notifier, c.From)
 	svc = api.LoggingMiddleware(svc, logger)
-	counter, latency := internal.MakeMetrics("notifier", "smtp")
+	counter, latency := prometheus.MakeMetrics("notifier", "smtp")
 	svc = api.MetricsMiddleware(svc, counter, latency)
 
 	return svc, nil

@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/andychao217/magistrala/consumers/notifiers/postgres"
-	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
+	pgclient "github.com/andychao217/magistrala/pkg/postgres"
 	"github.com/andychao217/magistrala/pkg/ulid"
 	_ "github.com/jackc/pgx/v5/stdlib" // required for SQL access
 	"github.com/jmoiron/sqlx"

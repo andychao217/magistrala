@@ -14,12 +14,6 @@ import (
 
 	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
-	"github.com/andychao217/magistrala/internal"
-	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
-	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
-	"github.com/andychao217/magistrala/internal/postgres"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	"github.com/andychao217/magistrala/journal"
 	"github.com/andychao217/magistrala/journal/api"
 	"github.com/andychao217/magistrala/journal/events"
@@ -28,6 +22,12 @@ import (
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/pkg/auth"
 	"github.com/andychao217/magistrala/pkg/events/store"
+	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
+	"github.com/andychao217/magistrala/pkg/postgres"
+	pgclient "github.com/andychao217/magistrala/pkg/postgres"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	"github.com/jmoiron/sqlx"
@@ -146,7 +146,7 @@ func main() {
 		return
 	}
 
-	hs := httpserver.New(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svc, logger, svcName, cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svc, logger, svcName, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -173,7 +173,7 @@ func newService(db *sqlx.DB, dbConfig pgclient.Config, authClient magistrala.Aut
 
 	svc := journal.NewService(idp, repo, authClient)
 	svc = middleware.LoggingMiddleware(svc, logger)
-	counter, latency := internal.MakeMetrics("journal", "journal_writer")
+	counter, latency := prometheus.MakeMetrics("journal", "journal_writer")
 	svc = middleware.MetricsMiddleware(svc, counter, latency)
 	svc = middleware.Tracing(svc, tracer)
 

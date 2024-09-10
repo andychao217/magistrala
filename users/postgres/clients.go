@@ -7,11 +7,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/andychao217/magistrala/internal/postgres"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
 	pgclients "github.com/andychao217/magistrala/pkg/clients/postgres"
 	"github.com/andychao217/magistrala/pkg/errors"
 	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	"github.com/andychao217/magistrala/pkg/postgres"
 )
 
 var _ mgclients.Repository = (*clientRepo)(nil)

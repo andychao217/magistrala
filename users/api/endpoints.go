@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/errors"
 	"github.com/andychao217/magistrala/users"

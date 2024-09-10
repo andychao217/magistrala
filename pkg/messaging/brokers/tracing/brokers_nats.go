@@ -9,9 +9,9 @@ package brokers
 import (
 	"log"
 
-	"github.com/andychao217/magistrala/internal/server"
 	"github.com/andychao217/magistrala/pkg/messaging"
 	"github.com/andychao217/magistrala/pkg/messaging/nats/tracing"
+	"github.com/andychao217/magistrala/pkg/server"
 	"go.opentelemetry.io/otel/trace"
 )
 

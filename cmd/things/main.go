@@ -15,22 +15,22 @@ import (
 
 	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
-	"github.com/andychao217/magistrala/internal"
-	jaegerclient "github.com/andychao217/magistrala/internal/clients/jaeger"
-	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
 	redisclient "github.com/andychao217/magistrala/internal/clients/redis"
 	mggroups "github.com/andychao217/magistrala/internal/groups"
 	gapi "github.com/andychao217/magistrala/internal/groups/api"
 	gevents "github.com/andychao217/magistrala/internal/groups/events"
 	gpostgres "github.com/andychao217/magistrala/internal/groups/postgres"
 	gtracing "github.com/andychao217/magistrala/internal/groups/tracing"
-	"github.com/andychao217/magistrala/internal/postgres"
-	"github.com/andychao217/magistrala/internal/server"
-	grpcserver "github.com/andychao217/magistrala/internal/server/grpc"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/pkg/auth"
 	"github.com/andychao217/magistrala/pkg/groups"
+	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
+	"github.com/andychao217/magistrala/pkg/postgres"
+	pgclient "github.com/andychao217/magistrala/pkg/postgres"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	grpcserver "github.com/andychao217/magistrala/pkg/server/grpc"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/andychao217/magistrala/things"
 	"github.com/andychao217/magistrala/things/api"
@@ -183,7 +183,7 @@ func main() {
 		return
 	}
 	mux := chi.NewRouter()
-	httpSvc := httpserver.New(ctx, cancel, svcName, httpServerConfig, httpapi.MakeHandler(csvc, gsvc, mux, logger, cfg.InstanceID), logger)
+	httpSvc := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, httpapi.MakeHandler(csvc, gsvc, mux, logger, cfg.InstanceID), logger)
 
 	grpcServerConfig := server.Config{Port: defSvcAuthGRPCPort}
 	if err := env.ParseWithOptions(&grpcServerConfig, env.Options{Prefix: envPrefixGRPC}); err != nil {
@@ -195,7 +195,7 @@ func main() {
 		reflection.Register(srv)
 		magistrala.RegisterAuthzServiceServer(srv, grpcapi.NewServer(csvc))
 	}
-	gs := grpcserver.New(ctx, cancel, svcName, grpcServerConfig, regiterAuthzServer, logger)
+	gs := grpcserver.NewServer(ctx, cancel, svcName, grpcServerConfig, regiterAuthzServer, logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -244,12 +244,12 @@ func newService(ctx context.Context, db *sqlx.DB, dbConfig pgclient.Config, auth
 
 	csvc = ctracing.New(csvc, tracer)
 	csvc = api.LoggingMiddleware(csvc, logger)
-	counter, latency := internal.MakeMetrics(svcName, "api")
+	counter, latency := prometheus.MakeMetrics(svcName, "api")
 	csvc = api.MetricsMiddleware(csvc, counter, latency)
 
 	gsvc = gtracing.New(gsvc, tracer)
 	gsvc = gapi.LoggingMiddleware(gsvc, logger)
-	counter, latency = internal.MakeMetrics(fmt.Sprintf("%s_groups", svcName), "api")
+	counter, latency = prometheus.MakeMetrics(fmt.Sprintf("%s_groups", svcName), "api")
 	gsvc = gapi.MetricsMiddleware(gsvc, counter, latency)
 
 	return csvc, gsvc, err

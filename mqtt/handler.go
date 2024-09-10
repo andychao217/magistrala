@@ -16,11 +16,11 @@ import (
 	"github.com/absmach/mproxy/pkg/session"
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/auth"
-	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
 	"github.com/andychao217/magistrala/mqtt/events"
 	"github.com/andychao217/magistrala/pkg/errors"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	"github.com/andychao217/magistrala/pkg/messaging"
+	pgclient "github.com/andychao217/magistrala/pkg/postgres"
 	clientspg "github.com/andychao217/magistrala/things/postgres"
 )
 

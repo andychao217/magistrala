@@ -12,11 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andychao217/magistrala/internal/apiutil"
 	"github.com/andychao217/magistrala/journal"
 	"github.com/andychao217/magistrala/journal/api"
 	"github.com/andychao217/magistrala/journal/mocks"
 	mglog "github.com/andychao217/magistrala/logger"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

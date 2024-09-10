@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/andychao217/magistrala/internal/api"
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/errors"
 	mggroups "github.com/andychao217/magistrala/pkg/groups"

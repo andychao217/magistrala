@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andychao217/magistrala/internal/apiutil"
 	"github.com/andychao217/magistrala/journal"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 	"github.com/stretchr/testify/assert"
 )
 

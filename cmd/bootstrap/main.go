@@ -20,17 +20,17 @@ import (
 	"github.com/andychao217/magistrala/bootstrap/events/producer"
 	bootstrappg "github.com/andychao217/magistrala/bootstrap/postgres"
 	"github.com/andychao217/magistrala/bootstrap/tracing"
-	"github.com/andychao217/magistrala/internal"
-	"github.com/andychao217/magistrala/internal/clients/jaeger"
-	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
-	"github.com/andychao217/magistrala/internal/postgres"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/pkg/auth"
 	"github.com/andychao217/magistrala/pkg/events"
 	"github.com/andychao217/magistrala/pkg/events/store"
+	"github.com/andychao217/magistrala/pkg/jaeger"
+	"github.com/andychao217/magistrala/pkg/postgres"
+	pgclient "github.com/andychao217/magistrala/pkg/postgres"
+	"github.com/andychao217/magistrala/pkg/prometheus"
 	mgsdk "github.com/andychao217/magistrala/pkg/sdk/go"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	"github.com/jmoiron/sqlx"
@@ -151,7 +151,7 @@ func main() {
 		exitCode = 1
 		return
 	}
-	hs := httpserver.New(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svc, bootstrap.NewConfigReader([]byte(cfg.EncKey)), logger, cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svc, bootstrap.NewConfigReader([]byte(cfg.EncKey)), logger, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -192,7 +192,7 @@ func newService(ctx context.Context, authClient magistrala.AuthServiceClient, db
 
 	svc = producer.NewEventStoreMiddleware(svc, publisher)
 	svc = api.LoggingMiddleware(svc, logger)
-	counter, latency := internal.MakeMetrics(svcName, "api")
+	counter, latency := prometheus.MakeMetrics(svcName, "api")
 	svc = api.MetricsMiddleware(svc, counter, latency)
 	svc = tracing.New(svc, tracer)
 

@@ -13,11 +13,11 @@ import (
 
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/auth"
-	pgclient "github.com/andychao217/magistrala/internal/clients/postgres"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/errors"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	mggroups "github.com/andychao217/magistrala/pkg/groups"
+	pgclient "github.com/andychao217/magistrala/pkg/postgres"
 	"github.com/andychao217/magistrala/things/postgres"
 	"github.com/mohae/deepcopy"
 	"golang.org/x/sync/errgroup"

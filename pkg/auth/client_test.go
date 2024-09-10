@@ -12,11 +12,11 @@ import (
 	"github.com/andychao217/magistrala"
 	authgrpcapi "github.com/andychao217/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala/auth/mocks"
-	"github.com/andychao217/magistrala/internal/server"
-	grpcserver "github.com/andychao217/magistrala/internal/server/grpc"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/pkg/auth"
 	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/server"
+	grpcserver "github.com/andychao217/magistrala/pkg/server/grpc"
 	thingsgrpcapi "github.com/andychao217/magistrala/things/api/grpc"
 	thmocks "github.com/andychao217/magistrala/things/mocks"
 	"github.com/stretchr/testify/assert"
@@ -29,7 +29,7 @@ func TestSetupAuth(t *testing.T) {
 	registerAuthServiceServer := func(srv *grpc.Server) {
 		magistrala.RegisterAuthServiceServer(srv, authgrpcapi.NewServer(new(mocks.Service)))
 	}
-	gs := grpcserver.New(ctx, cancel, "auth", server.Config{Port: "12345"}, registerAuthServiceServer, mglog.NewMock())
+	gs := grpcserver.NewServer(ctx, cancel, "auth", server.Config{Port: "12345"}, registerAuthServiceServer, mglog.NewMock())
 	go func() {
 		err := gs.Start()
 		assert.Nil(t, err, fmt.Sprintf(`"Unexpected error creating server %s"`, err))
@@ -80,7 +80,7 @@ func TestSetupAuthz(t *testing.T) {
 	registerAuthaServiceServer := func(srv *grpc.Server) {
 		magistrala.RegisterAuthzServiceServer(srv, thingsgrpcapi.NewServer(new(thmocks.Service)))
 	}
-	gs := grpcserver.New(ctx, cancel, "things", server.Config{Port: "12345"}, registerAuthaServiceServer, mglog.NewMock())
+	gs := grpcserver.NewServer(ctx, cancel, "things", server.Config{Port: "12345"}, registerAuthaServiceServer, mglog.NewMock())
 	go func() {
 		err := gs.Start()
 		assert.Nil(t, err, fmt.Sprintf(`"Unexpected error creating server %s"`, err))

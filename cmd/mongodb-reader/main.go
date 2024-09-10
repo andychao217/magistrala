@@ -13,12 +13,12 @@ import (
 
 	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
-	"github.com/andychao217/magistrala/internal"
 	mongoclient "github.com/andychao217/magistrala/internal/clients/mongo"
-	"github.com/andychao217/magistrala/internal/server"
-	httpserver "github.com/andychao217/magistrala/internal/server/http"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/pkg/auth"
+	"github.com/andychao217/magistrala/pkg/prometheus"
+	"github.com/andychao217/magistrala/pkg/server"
+	httpserver "github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/andychao217/magistrala/readers"
 	"github.com/andychao217/magistrala/readers/api"
@@ -117,7 +117,7 @@ func main() {
 		exitCode = 1
 		return
 	}
-	hs := httpserver.New(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(repo, ac, tc, svcName, cfg.InstanceID), logger)
+	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(repo, ac, tc, svcName, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -140,7 +140,7 @@ func main() {
 func newService(db *mongo.Database, logger *slog.Logger) readers.MessageRepository {
 	repo := mongodb.New(db)
 	repo = api.LoggingMiddleware(repo, logger)
-	counter, latency := internal.MakeMetrics("mongodb", "message_reader")
+	counter, latency := prometheus.MakeMetrics("mongodb", "message_reader")
 	repo = api.MetricsMiddleware(repo, counter, latency)
 
 	return repo

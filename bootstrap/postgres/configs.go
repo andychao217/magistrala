@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/andychao217/magistrala/bootstrap"
-	"github.com/andychao217/magistrala/internal/postgres"
 	"github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/errors"
 	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
+	"github.com/andychao217/magistrala/pkg/postgres"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgtype"
 	"github.com/jackc/pgx/v5/pgconn"

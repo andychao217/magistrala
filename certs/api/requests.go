@@ -6,7 +6,7 @@ package api
 import (
 	"time"
 
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 )
 
 const maxLimitSize = 1000

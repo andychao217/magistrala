@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andychao217/magistrala/internal/postgres"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/errors"
 	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
 	mggroups "github.com/andychao217/magistrala/pkg/groups"
+	"github.com/andychao217/magistrala/pkg/postgres"
 	"github.com/jmoiron/sqlx"
 )
 

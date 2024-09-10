@@ -5,7 +5,7 @@ package grpc
 
 import (
 	"github.com/andychao217/magistrala/auth"
-	"github.com/andychao217/magistrala/internal/apiutil"
+	"github.com/andychao217/magistrala/pkg/apiutil"
 )
 
 type identityReq struct {
