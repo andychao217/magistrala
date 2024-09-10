@@ -77,8 +77,8 @@ type config struct {
 	SelfRegister       bool          `env:"MG_USERS_ALLOW_SELF_REGISTER"    envDefault:"false"`
 	OAuthUIRedirectURL string        `env:"MG_OAUTH_UI_REDIRECT_URL"        envDefault:"http://localhost:9095/domains"`
 	OAuthUIErrorURL    string        `env:"MG_OAUTH_UI_ERROR_URL"           envDefault:"http://localhost:9095/error"`
-	DeleteInterval     time.Duration `env:"MG_USERS_DELETE_INTERVAL"     envDefault:"24h"`
-	DeleteAfter        time.Duration `env:"MG_USERS_DELETE_AFTER"        envDefault:"720h"`
+	DeleteInterval     time.Duration `env:"MG_USERS_DELETE_INTERVAL"        envDefault:"24h"`
+	DeleteAfter        time.Duration `env:"MG_USERS_DELETE_AFTER"           envDefault:"720h"`
 	PassRegex          *regexp.Regexp
 }
 

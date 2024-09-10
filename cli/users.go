@@ -468,7 +468,7 @@ var cmdUsers = []cobra.Command{
 // NewUsersCmd returns users command.
 func NewUsersCmd() *cobra.Command {
 	cmd := cobra.Command{
-		Use:   "users [create | get | update | token | password | enable | disable | channels | things | groups]",
+		Use:   "users [create | get | update | token | password | enable | disable | delete | channels | things | groups]",
 		Short: "Users management",
 		Long:  `Users management: create accounts and tokens"`,
 	}

@@ -8,8 +8,8 @@ BUILD_DIR = build
 SERVICES = auth users things http coap ws mqtt invitations \
 	influxdb-writer influxdb-reader mongodb-writer mongodb-reader smtp-notifier smpp-notifier \
 	cassandra-writer cassandra-reader postgres-writer postgres-reader timescale-writer timescale-reader \
-	cli bootstrap opcua twins lora provision certs vault
-TEST_API_SERVICES = auth bootstrap certs http invitations notifiers provision readers things twins users
+	cli bootstrap opcua twins lora provision certs vault journal
+TEST_API_SERVICES = journal auth bootstrap certs http invitations notifiers provision readers things twins users
 TEST_API = $(addprefix test_api_,$(TEST_API_SERVICES))
 DOCKERS = $(addprefix docker_,$(SERVICES))
 DOCKERS_DEV = $(addprefix docker_dev_,$(SERVICES))
@@ -27,7 +27,7 @@ DOCKER_PROJECT ?= $(shell echo $(subst $(space),,$(USER_REPO)) | tr -c -s '[:aln
 DOCKER_COMPOSE_COMMANDS_SUPPORTED := up down config
 DEFAULT_DOCKER_COMPOSE_COMMAND  := up
 GRPC_MTLS_CERT_FILES_EXISTS = 0
-MOCKERY_VERSION=v2.42.3
+MOCKERY_VERSION=v2.43.2
 ifneq ($(MG_MESSAGE_BROKER_TYPE),)
     MG_MESSAGE_BROKER_TYPE := $(MG_MESSAGE_BROKER_TYPE)
 else
@@ -76,7 +76,7 @@ endef
 ADDON_SERVICES = bootstrap cassandra-reader cassandra-writer certs \
 	influxdb-reader influxdb-writer lora-adapter mongodb-reader mongodb-writer \
 	opcua-adapter postgres-reader postgres-writer provision smpp-notifier smtp-notifier \
-	timescale-reader timescale-writer twins vault
+	timescale-reader timescale-writer twins vault journal
 
 EXTERNAL_SERVICES = vault prometheus
 

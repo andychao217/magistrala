@@ -877,7 +877,12 @@ func (svc service) ListMembers(ctx context.Context, token, objectKind, objectID 
 	}
 
 	for i, c := range cp.Clients {
-		cp.Clients[i] = mgclients.Client{ID: c.ID, Name: c.Name}
+		cp.Clients[i] = mgclients.Client{
+			ID:        c.ID,
+			Name:      c.Name,
+			CreatedAt: c.CreatedAt,
+			UpdatedAt: c.UpdatedAt,
+		}
 	}
 
 	if pm.ListPerms && len(cp.Clients) > 0 {
@@ -1080,7 +1085,7 @@ func (svc service) updateClientPolicy(ctx context.Context, userID string, role m
 	case mgclients.UserRole:
 		fallthrough
 	default:
-		resp, err := svc.auth.DeletePolicy(ctx, &magistrala.DeletePolicyReq{
+		resp, err := svc.auth.DeletePolicyFilter(ctx, &magistrala.DeletePolicyFilterReq{
 			SubjectType: auth.UserType,
 			Subject:     userID,
 			Relation:    auth.AdministratorRelation,

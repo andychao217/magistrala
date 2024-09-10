@@ -4,9 +4,6 @@
 package events
 
 import (
-	"encoding/json"
-	"fmt"
-	"strings"
 	"time"
 
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
@@ -66,19 +63,13 @@ func (cce createClientEvent) Encode() (map[string]interface{}, error) {
 		val["name"] = cce.Name
 	}
 	if len(cce.Tags) > 0 {
-		tags := fmt.Sprintf("[%s]", strings.Join(cce.Tags, ","))
-		val["tags"] = tags
+		val["tags"] = cce.Tags
 	}
 	if cce.Domain != "" {
 		val["domain"] = cce.Domain
 	}
 	if cce.Metadata != nil {
-		metadata, err := json.Marshal(cce.Metadata)
-		if err != nil {
-			return map[string]interface{}{}, err
-		}
-
-		val["metadata"] = metadata
+		val["metadata"] = cce.Metadata
 	}
 	if cce.Credentials.Identity != "" {
 		val["identity"] = cce.Credentials.Identity
@@ -109,19 +100,13 @@ func (uce updateClientEvent) Encode() (map[string]interface{}, error) {
 		val["name"] = uce.Name
 	}
 	if len(uce.Tags) > 0 {
-		tags := fmt.Sprintf("[%s]", strings.Join(uce.Tags, ","))
-		val["tags"] = tags
+		val["tags"] = uce.Tags
 	}
 	if uce.Credentials.Identity != "" {
 		val["identity"] = uce.Credentials.Identity
 	}
 	if uce.Metadata != nil {
-		metadata, err := json.Marshal(uce.Metadata)
-		if err != nil {
-			return map[string]interface{}{}, err
-		}
-
-		val["metadata"] = metadata
+		val["metadata"] = uce.Metadata
 	}
 	if !uce.CreatedAt.IsZero() {
 		val["created_at"] = uce.CreatedAt
@@ -164,8 +149,7 @@ func (vce viewClientEvent) Encode() (map[string]interface{}, error) {
 		val["name"] = vce.Name
 	}
 	if len(vce.Tags) > 0 {
-		tags := fmt.Sprintf("[%s]", strings.Join(vce.Tags, ","))
-		val["tags"] = tags
+		val["tags"] = vce.Tags
 	}
 	if vce.Domain != "" {
 		val["domain"] = vce.Domain
@@ -174,12 +158,7 @@ func (vce viewClientEvent) Encode() (map[string]interface{}, error) {
 		val["identity"] = vce.Credentials.Identity
 	}
 	if vce.Metadata != nil {
-		metadata, err := json.Marshal(vce.Metadata)
-		if err != nil {
-			return map[string]interface{}{}, err
-		}
-
-		val["metadata"] = metadata
+		val["metadata"] = vce.Metadata
 	}
 	if !vce.CreatedAt.IsZero() {
 		val["created_at"] = vce.CreatedAt
@@ -211,8 +190,7 @@ func (vpe viewProfileEvent) Encode() (map[string]interface{}, error) {
 		val["name"] = vpe.Name
 	}
 	if len(vpe.Tags) > 0 {
-		tags := fmt.Sprintf("[%s]", strings.Join(vpe.Tags, ","))
-		val["tags"] = tags
+		val["tags"] = vpe.Tags
 	}
 	if vpe.Domain != "" {
 		val["domain"] = vpe.Domain
@@ -221,12 +199,7 @@ func (vpe viewProfileEvent) Encode() (map[string]interface{}, error) {
 		val["identity"] = vpe.Credentials.Identity
 	}
 	if vpe.Metadata != nil {
-		metadata, err := json.Marshal(vpe.Metadata)
-		if err != nil {
-			return map[string]interface{}{}, err
-		}
-
-		val["metadata"] = metadata
+		val["metadata"] = vpe.Metadata
 	}
 	if !vpe.CreatedAt.IsZero() {
 		val["created_at"] = vpe.CreatedAt
@@ -266,12 +239,7 @@ func (lce listClientEvent) Encode() (map[string]interface{}, error) {
 		val["dir"] = lce.Dir
 	}
 	if lce.Metadata != nil {
-		metadata, err := json.Marshal(lce.Metadata)
-		if err != nil {
-			return map[string]interface{}{}, err
-		}
-
-		val["metadata"] = metadata
+		val["metadata"] = lce.Metadata
 	}
 	if lce.Domain != "" {
 		val["domain"] = lce.Domain
@@ -318,12 +286,7 @@ func (lcge listClientByGroupEvent) Encode() (map[string]interface{}, error) {
 		val["dir"] = lcge.Dir
 	}
 	if lcge.Metadata != nil {
-		metadata, err := json.Marshal(lcge.Metadata)
-		if err != nil {
-			return map[string]interface{}{}, err
-		}
-
-		val["metadata"] = metadata
+		val["metadata"] = lcge.Metadata
 	}
 	if lcge.Domain != "" {
 		val["domain"] = lcge.Domain
@@ -351,7 +314,7 @@ type identifyClientEvent struct {
 func (ice identifyClientEvent) Encode() (map[string]interface{}, error) {
 	return map[string]interface{}{
 		"operation": clientIdentify,
-		"user_id":   ice.userID,
+		"id":        ice.userID,
 	}, nil
 }
 

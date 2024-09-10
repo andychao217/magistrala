@@ -62,11 +62,11 @@ func (repo singleUserRepo) AddPolicies(ctx context.Context, in *magistrala.AddPo
 	return nil, nil
 }
 
-func (repo singleUserRepo) DeletePolicy(ctx context.Context, in *magistrala.DeletePolicyReq, opts ...grpc.CallOption) (*magistrala.DeletePolicyRes, error) {
+func (repo singleUserRepo) DeletePolicyFilter(ctx context.Context, in *magistrala.DeletePolicyFilterReq, opts ...grpc.CallOption) (*magistrala.DeletePolicyRes, error) {
 	return nil, nil
 }
 
-func (repo singleUserRepo) DeletePolicies(ctx context.Context, in *magistrala.DeletePoliciesReq, opts ...grpc.CallOption) (*magistrala.DeletePoliciesRes, error) {
+func (repo singleUserRepo) DeletePolicies(ctx context.Context, in *magistrala.DeletePoliciesReq, opts ...grpc.CallOption) (*magistrala.DeletePolicyRes, error) {
 	return nil, nil
 }
 
