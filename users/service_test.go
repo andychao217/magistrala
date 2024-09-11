@@ -23,7 +23,6 @@ import (
 	"github.com/andychao217/magistrala/users/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -535,7 +534,7 @@ func TestListClients(t *testing.T) {
 			authorizeResponse: &magistrala.AuthorizeRes{Authorized: false},
 			token:             validToken,
 			authorizeErr:      svcerr.ErrAuthorization,
-			err:               nil,
+			err:               svcerr.ErrAuthorization,
 		},
 		{
 			desc: "list clients as admin with failed to retrieve clients",
@@ -558,29 +557,7 @@ func TestListClients(t *testing.T) {
 			authorizeResponse: &magistrala.AuthorizeRes{Authorized: false},
 			token:             validToken,
 			superAdminErr:     svcerr.ErrAuthorization,
-			err:               nil,
-		},
-		{
-			desc: "list clients as normal user successfully",
-			page: mgclients.Page{
-				Total: 1,
-			},
-			identifyResponse:  &magistrala.IdentityRes{UserId: client.ID},
-			authorizeResponse: &magistrala.AuthorizeRes{Authorized: false},
-			retrieveAllResponse: mgclients.ClientsPage{
-				Page: mgclients.Page{
-					Total: 1,
-				},
-				Clients: []mgclients.Client{basicClient},
-			},
-			response: mgclients.ClientsPage{
-				Page: mgclients.Page{
-					Total: 1,
-				},
-				Clients: []mgclients.Client{basicClient},
-			},
-			token: validToken,
-			err:   nil,
+			err:               svcerr.ErrAuthorization,
 		},
 		{
 			desc: "list clients as normal user with failed to retrieve clients",
@@ -592,7 +569,7 @@ func TestListClients(t *testing.T) {
 			retrieveAllResponse: mgclients.ClientsPage{},
 			token:               validToken,
 			retrieveAllErr:      repoerr.ErrNotFound,
-			err:                 svcerr.ErrViewEntity,
+			err:                 svcerr.ErrAuthorization,
 		},
 	}
 
@@ -601,7 +578,6 @@ func TestListClients(t *testing.T) {
 		authCall1 := auth.On("Authorize", context.Background(), mock.Anything).Return(tc.authorizeResponse, tc.authorizeErr)
 		repoCall := cRepo.On("CheckSuperAdmin", context.Background(), mock.Anything).Return(tc.superAdminErr)
 		repoCall1 := cRepo.On("RetrieveAll", context.Background(), mock.Anything).Return(tc.retrieveAllResponse, tc.retrieveAllErr)
-		repoCall2 := cRepo.On("SearchClients", context.Background(), mock.Anything).Return(tc.response, tc.err)
 		page, err := svc.ListClients(context.Background(), tc.token, tc.page)
 		assert.True(t, errors.Contains(err, tc.err), fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
 		assert.Equal(t, tc.response, page, fmt.Sprintf("%s: expected %v got %v\n", tc.desc, tc.response, page))
@@ -613,7 +589,88 @@ func TestListClients(t *testing.T) {
 		authCall1.Unset()
 		repoCall.Unset()
 		repoCall1.Unset()
-		repoCall2.Unset()
+	}
+}
+
+func TestSearchUsers(t *testing.T) {
+	svc, cRepo, auth, _ := newService(true)
+	cases := []struct {
+		desc               string
+		token              string
+		page               mgclients.Page
+		identifyResp       *magistrala.IdentityRes
+		authorizeResponse  *magistrala.AuthorizeRes
+		response           mgclients.ClientsPage
+		responseErr        error
+		identifyErr        error
+		authorizeErr       error
+		checkSuperAdminErr error
+		err                error
+	}{
+		{
+			desc:  "search clients with valid token",
+			token: validToken,
+			page:  mgclients.Page{Offset: 0, Name: "clientname", Limit: 100},
+			response: mgclients.ClientsPage{
+				Page:    mgclients.Page{Total: 1, Offset: 0, Limit: 100},
+				Clients: []mgclients.Client{client},
+			},
+			identifyResp:      &magistrala.IdentityRes{UserId: client.ID},
+			authorizeResponse: &magistrala.AuthorizeRes{Authorized: true},
+		},
+		{
+			desc:        "search clients with invalid token",
+			token:       inValidToken,
+			page:        mgclients.Page{Offset: 0, Name: "clientname", Limit: 100},
+			response:    mgclients.ClientsPage{},
+			responseErr: svcerr.ErrAuthentication,
+			err:         svcerr.ErrAuthentication,
+		},
+		{
+			desc:  "search clients with id",
+			token: validToken,
+			page:  mgclients.Page{Offset: 0, Id: "d8dd12ef-aa2a-43fe-8ef2-2e4fe514360f", Limit: 100},
+			response: mgclients.ClientsPage{
+				Page:    mgclients.Page{Total: 1, Offset: 0, Limit: 100},
+				Clients: []mgclients.Client{client},
+			},
+			identifyResp:      &magistrala.IdentityRes{UserId: client.ID},
+			authorizeResponse: &magistrala.AuthorizeRes{Authorized: true},
+		},
+		{
+			desc:  "search clients with random name",
+			token: validToken,
+			page:  mgclients.Page{Offset: 0, Name: "randomname", Limit: 100},
+			response: mgclients.ClientsPage{
+				Page:    mgclients.Page{Total: 0, Offset: 0, Limit: 100},
+				Clients: []mgclients.Client{},
+			},
+			identifyResp:      &magistrala.IdentityRes{UserId: client.ID},
+			authorizeResponse: &magistrala.AuthorizeRes{Authorized: true},
+		},
+		{
+			desc:               "search clients as a normal user",
+			token:              validToken,
+			page:               mgclients.Page{Offset: 0, Identity: "clientidentity", Limit: 100},
+			response:           mgclients.ClientsPage{},
+			authorizeResponse:  &magistrala.AuthorizeRes{Authorized: false},
+			checkSuperAdminErr: svcerr.ErrAuthorization,
+			responseErr:        nil,
+		},
+	}
+
+	for _, tc := range cases {
+		authCall := auth.On("Identify", context.Background(), &magistrala.IdentityReq{Token: tc.token}).Return(tc.identifyResp, tc.identifyErr)
+		authCall1 := auth.On("Authorize", context.Background(), mock.Anything).Return(tc.authorizeResponse, tc.authorizeErr)
+		repoCall := cRepo.On("CheckSuperAdmin", context.Background(), mock.Anything).Return(tc.checkSuperAdminErr)
+		repoCall1 := cRepo.On("SearchClients", context.Background(), mock.Anything).Return(tc.response, tc.responseErr)
+		page, err := svc.SearchUsers(context.Background(), tc.token, tc.page)
+		assert.True(t, errors.Contains(err, tc.err), fmt.Sprintf("%s: expected %s got %s\n", tc.desc, tc.err, err))
+		assert.Equal(t, tc.response, page, fmt.Sprintf("%s: expected %v got %v\n", tc.desc, tc.response, page))
+		authCall.Unset()
+		authCall1.Unset()
+		repoCall.Unset()
+		repoCall1.Unset()
 	}
 }
 
@@ -1518,7 +1575,7 @@ func TestDisableClient(t *testing.T) {
 			id:                 enabledClient1.ID,
 			token:              validToken,
 			client:             enabledClient1,
-			identifyResponse:   &magistrala.IdentityRes{UserId: enabledClient1.ID},
+			identifyResponse:   &magistrala.IdentityRes{UserId: validID},
 			authorizeResponse:  &magistrala.AuthorizeRes{Authorized: false},
 			checkSuperAdminErr: svcerr.ErrAuthorization,
 			err:                svcerr.ErrAuthorization,
@@ -1578,72 +1635,6 @@ func TestDisableClient(t *testing.T) {
 		repoCall.Unset()
 		repoCall1.Unset()
 		repoCall2.Unset()
-	}
-
-	cases2 := []struct {
-		desc     string
-		status   mgclients.Status
-		size     uint64
-		response mgclients.ClientsPage
-	}{
-		{
-			desc:   "list enabled clients",
-			status: mgclients.EnabledStatus,
-			size:   1,
-			response: mgclients.ClientsPage{
-				Page: mgclients.Page{
-					Total:  1,
-					Offset: 0,
-					Limit:  100,
-				},
-				Clients: []mgclients.Client{enabledClient1},
-			},
-		},
-		{
-			desc:   "list disabled clients",
-			status: mgclients.DisabledStatus,
-			size:   2,
-			response: mgclients.ClientsPage{
-				Page: mgclients.Page{
-					Total:  2,
-					Offset: 0,
-					Limit:  100,
-				},
-				Clients: []mgclients.Client{disenabledClient1, disabledClient1},
-			},
-		},
-		{
-			desc:   "list enabled and disabled clients",
-			status: mgclients.AllStatus,
-			size:   3,
-			response: mgclients.ClientsPage{
-				Page: mgclients.Page{
-					Total:  3,
-					Offset: 0,
-					Limit:  100,
-				},
-				Clients: []mgclients.Client{enabledClient1, disabledClient1, disenabledClient1},
-			},
-		},
-	}
-
-	for _, tc := range cases2 {
-		pm := mgclients.Page{
-			Offset: 0,
-			Limit:  100,
-			Status: tc.status,
-		}
-		authCall := auth.On("Identify", context.Background(), &magistrala.IdentityReq{Token: validToken}).Return(&magistrala.IdentityRes{UserId: client.ID}, nil)
-		authCall1 := auth.On("Authorize", context.Background(), mock.Anything).Return(&magistrala.AuthorizeRes{Authorized: true}, nil)
-		repoCall := cRepo.On("RetrieveAll", context.Background(), mock.Anything).Return(tc.response, nil)
-
-		page, err := svc.ListClients(context.Background(), validToken, pm)
-		require.Nil(t, err, fmt.Sprintf("unexpected error: %s", err))
-		size := uint64(len(page.Clients))
-		assert.Equal(t, tc.size, size, fmt.Sprintf("%s: expected size %d got %d\n", tc.desc, tc.size, size))
-		authCall.Unset()
-		authCall1.Unset()
-		repoCall.Unset()
 	}
 }
 
