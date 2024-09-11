@@ -23,8 +23,9 @@ RUN echo http://mirrors.aliyun.com/alpine/v3.19/main/ > /etc/apk/repositories &&
 
 RUN apk update \
     && apk upgrade \
-    && apk add make\
+    && apk add make upx\
     && make GOOS=$TARGETOS GOARCH=$TARGETARCH $SVC \
+    && upx build/$SVC \
     && mv build/$SVC /exe
 
 FROM scratch
