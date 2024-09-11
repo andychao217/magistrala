@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/0x6flab/namegenerator v1.3.1
-	github.com/absmach/mproxy v0.4.3-0.20240430090627-27dad4c91c6c
+	github.com/absmach/mproxy v0.4.3-0.20240712131952-28f88581126a
 	github.com/absmach/senml v1.0.5
 	github.com/andychao217/callhome v1.0.0
 	github.com/authzed/authzed-go v0.11.1
