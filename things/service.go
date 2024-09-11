@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"time"
 
-	grpcclient "github.com/absmach/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/auth"
+	grpcclient "github.com/andychao217/magistrala/auth/api/grpc"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/errors"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"

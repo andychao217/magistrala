@@ -10,9 +10,9 @@ import (
 	"encoding/hex"
 	"time"
 
-	grpcclient "github.com/absmach/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/auth"
+	grpcclient "github.com/andychao217/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala/pkg/errors"
 	repoerr "github.com/andychao217/magistrala/pkg/errors/repository"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
