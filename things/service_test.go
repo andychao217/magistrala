@@ -668,6 +668,7 @@ func TestListClients(t *testing.T) {
 				Offset:    0,
 				Limit:     100,
 				ListPerms: true,
+				Domain:    domainID,
 			},
 			identifyResponse:     &magistrala.IdentityRes{Id: nonAdminID, UserId: nonAdminID, DomainId: domainID},
 			authorizeResponse:    &magistrala.AuthorizeRes{Authorized: true},
@@ -703,6 +704,7 @@ func TestListClients(t *testing.T) {
 				Offset:    0,
 				Limit:     100,
 				ListPerms: true,
+				Domain:    domainID,
 			},
 			identifyResponse:  &magistrala.IdentityRes{Id: nonAdminID, UserId: nonAdminID, DomainId: domainID},
 			authorizeResponse: &magistrala.AuthorizeRes{Authorized: false},
@@ -717,6 +719,7 @@ func TestListClients(t *testing.T) {
 				Offset:    0,
 				Limit:     100,
 				ListPerms: true,
+				Domain:    domainID,
 			},
 			identifyResponse:     &magistrala.IdentityRes{Id: nonAdminID, UserId: nonAdminID, DomainId: domainID},
 			authorizeResponse:    &magistrala.AuthorizeRes{Authorized: true},
@@ -735,6 +738,7 @@ func TestListClients(t *testing.T) {
 				Offset:    0,
 				Limit:     100,
 				ListPerms: true,
+				Domain:    domainID,
 			},
 			identifyResponse:     &magistrala.IdentityRes{Id: nonAdminID, UserId: nonAdminID, DomainId: domainID},
 			authorizeResponse:    &magistrala.AuthorizeRes{Authorized: true},
@@ -761,6 +765,7 @@ func TestListClients(t *testing.T) {
 				Offset:    0,
 				Limit:     100,
 				ListPerms: true,
+				Domain:    domainID,
 			},
 			identifyResponse:     &magistrala.IdentityRes{Id: nonAdminID, UserId: nonAdminID, DomainId: domainID},
 			authorizeResponse:    &magistrala.AuthorizeRes{Authorized: true},
@@ -778,6 +783,7 @@ func TestListClients(t *testing.T) {
 				Offset:    0,
 				Limit:     100,
 				ListPerms: true,
+				Domain:    domainID,
 			},
 			identifyResponse:     &magistrala.IdentityRes{Id: nonAdminID, UserId: nonAdminID, DomainId: domainID},
 			authorizeResponse:    &magistrala.AuthorizeRes{Authorized: true},
@@ -1596,6 +1602,7 @@ func TestListMembers(t *testing.T) {
 		repoCall4.Unset()
 	}
 }
+
 func TestDeleteClient(t *testing.T) {
 	svc, cRepo, auth, cache := newService()
 
