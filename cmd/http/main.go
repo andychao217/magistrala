@@ -22,7 +22,7 @@ import (
 	adapter "github.com/andychao217/magistrala/http"
 	"github.com/andychao217/magistrala/http/api"
 	mglog "github.com/andychao217/magistrala/logger"
-	"github.com/andychao217/magistrala/pkg/auth"
+	"github.com/andychao217/magistrala/pkg/grpcclient"
 	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
@@ -38,12 +38,12 @@ import (
 )
 
 const (
-	svcName        = "http_adapter"
-	envPrefix      = "MG_HTTP_ADAPTER_"
-	envPrefixAuthz = "MG_THINGS_AUTH_GRPC_"
-	defSvcHTTPPort = "80"
-	targetHTTPPort = "81"
-	targetHTTPHost = "http://localhost"
+	svcName         = "http_adapter"
+	envPrefix       = "MG_HTTP_ADAPTER_"
+	envPrefixThings = "MG_THINGS_AUTH_GRPC_"
+	defSvcHTTPPort  = "80"
+	targetHTTPPort  = "81"
+	targetHTTPHost  = "http://localhost"
 )
 
 type config struct {
@@ -87,22 +87,22 @@ func main() {
 		return
 	}
 
-	authConfig := auth.Config{}
-	if err := env.ParseWithOptions(&authConfig, env.Options{Prefix: envPrefixAuthz}); err != nil {
+	thingsClientCfg := grpcclient.Config{}
+	if err := env.ParseWithOptions(&thingsClientCfg, env.Options{Prefix: envPrefixThings}); err != nil {
 		logger.Error(fmt.Sprintf("failed to load %s auth configuration : %s", svcName, err))
 		exitCode = 1
 		return
 	}
 
-	authClient, authHandler, err := auth.SetupAuthz(ctx, authConfig)
+	thingsClient, thingsHandler, err := grpcclient.SetupThingsClient(ctx, thingsClientCfg)
 	if err != nil {
 		logger.Error(err.Error())
 		exitCode = 1
 		return
 	}
-	defer authHandler.Close()
+	defer thingsHandler.Close()
 
-	logger.Info("Successfully connected to things grpc server " + authHandler.Secure())
+	logger.Info("Things service gRPC client successfully connected to things gRPC server " + thingsHandler.Secure())
 
 	tp, err := jaegerclient.NewProvider(ctx, svcName, cfg.JaegerURL, cfg.InstanceID, cfg.TraceRatio)
 	if err != nil {
@@ -126,7 +126,7 @@ func main() {
 	defer pub.Close()
 	pub = brokerstracing.NewPublisher(httpServerConfig, tracer, pub)
 
-	svc := newService(pub, authClient, logger, tracer)
+	svc := newService(pub, thingsClient, logger, tracer)
 	targetServerCfg := server.Config{Port: targetHTTPPort}
 
 	hs := httpserver.NewServer(ctx, cancel, svcName, targetServerCfg, api.MakeHandler(logger, cfg.InstanceID), logger)

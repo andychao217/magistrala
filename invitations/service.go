@@ -9,6 +9,7 @@ import (
 
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/auth"
+	grpcclient "github.com/andychao217/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala/pkg/errors"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	mgsdk "github.com/andychao217/magistrala/pkg/sdk/go"
@@ -16,14 +17,14 @@ import (
 
 type service struct {
 	repo Repository
-	auth magistrala.AuthServiceClient
+	auth grpcclient.AuthServiceClient
 	sdk  mgsdk.SDK
 }
 
 // ErrMemberExist indicates that the user is already a member of the domain.
 var ErrMemberExist = errors.New("user is already a member of the domain")
 
-func NewService(repo Repository, authClient magistrala.AuthServiceClient, sdk mgsdk.SDK) Service {
+func NewService(repo Repository, authClient grpcclient.AuthServiceClient, sdk mgsdk.SDK) Service {
 	return &service{
 		repo: repo,
 		auth: authClient,

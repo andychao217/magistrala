@@ -20,7 +20,7 @@ import (
 	certspg "github.com/andychao217/magistrala/certs/postgres"
 	"github.com/andychao217/magistrala/certs/tracing"
 	mglog "github.com/andychao217/magistrala/logger"
-	"github.com/andychao217/magistrala/pkg/auth"
+	"github.com/andychao217/magistrala/pkg/grpcclient"
 	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/postgres"
 	pgclient "github.com/andychao217/magistrala/pkg/postgres"
@@ -119,14 +119,14 @@ func main() {
 	}
 	defer db.Close()
 
-	authConfig := auth.Config{}
-	if err := env.ParseWithOptions(&authConfig, env.Options{Prefix: envPrefixAuth}); err != nil {
+	authClientCfg := grpcclient.Config{}
+	if err := env.ParseWithOptions(&authClientCfg, env.Options{Prefix: envPrefixAuth}); err != nil {
 		logger.Error(fmt.Sprintf("failed to load %s auth configuration : %s", svcName, err))
 		exitCode = 1
 		return
 	}
 
-	authClient, authHandler, err := auth.Setup(ctx, authConfig)
+	authClient, authHandler, err := grpcclient.SetupAuthClient(ctx, authClientCfg)
 	if err != nil {
 		logger.Error(err.Error())
 		exitCode = 1
@@ -134,7 +134,7 @@ func main() {
 	}
 	defer authHandler.Close()
 
-	logger.Info("Successfully connected to auth grpc server " + authHandler.Secure())
+	logger.Info("AuthService gRPC client successfully connected to auth gRPC server " + authHandler.Secure())
 
 	tp, err := jaegerclient.NewProvider(ctx, svcName, cfg.JaegerURL, cfg.InstanceID, cfg.TraceRatio)
 	if err != nil {
@@ -177,7 +177,7 @@ func main() {
 	}
 }
 
-func newService(authClient magistrala.AuthServiceClient, db *sqlx.DB, tracer trace.Tracer, logger *slog.Logger, cfg config, dbConfig pgclient.Config, pkiAgent vault.Agent) certs.Service {
+func newService(authClient magistrala.AuthnServiceClient, db *sqlx.DB, tracer trace.Tracer, logger *slog.Logger, cfg config, dbConfig pgclient.Config, pkiAgent vault.Agent) certs.Service {
 	database := postgres.NewDatabase(db, dbConfig, tracer)
 	certsRepo := certspg.NewRepository(database, logger)
 	config := mgsdk.Config{

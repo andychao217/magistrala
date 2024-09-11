@@ -11,6 +11,7 @@ import (
 
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/auth"
+	grpcclient "github.com/andychao217/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala/pkg/apiutil"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
 	"github.com/andychao217/magistrala/pkg/errors"
@@ -27,7 +28,8 @@ var (
 
 type service struct {
 	groups     groups.Repository
-	auth       magistrala.AuthServiceClient
+	auth       grpcclient.AuthServiceClient
+	policy     magistrala.PolicyServiceClient
 	idProvider magistrala.IDProvider
 }
 
@@ -38,11 +40,12 @@ type ThingsListResponse struct {
 }
 
 // NewService returns a new Clients service implementation.
-func NewService(g groups.Repository, idp magistrala.IDProvider, authClient magistrala.AuthServiceClient) groups.Service {
+func NewService(g groups.Repository, idp magistrala.IDProvider, authClient grpcclient.AuthServiceClient, policyClient magistrala.PolicyServiceClient) groups.Service {
 	return service{
 		groups:     g,
 		idProvider: idp,
 		auth:       authClient,
+		policy:     policyClient,
 	}
 }
 
@@ -132,7 +135,7 @@ func (svc service) ListGroups(ctx context.Context, token, memberKind, memberID s
 		if _, err := svc.authorizeKind(ctx, res.GetDomainId(), auth.UserType, auth.UsersKind, res.GetId(), auth.ViewPermission, auth.ThingType, memberID); err != nil {
 			return groups.Page{}, err
 		}
-		cids, err := svc.auth.ListAllSubjects(ctx, &magistrala.ListSubjectsReq{
+		cids, err := svc.policy.ListAllSubjects(ctx, &magistrala.ListSubjectsReq{
 			SubjectType: auth.GroupType,
 			Permission:  auth.GroupRelation,
 			ObjectType:  auth.ThingType,
@@ -150,7 +153,7 @@ func (svc service) ListGroups(ctx context.Context, token, memberKind, memberID s
 			return groups.Page{}, err
 		}
 
-		gids, err := svc.auth.ListAllObjects(ctx, &magistrala.ListObjectsReq{
+		gids, err := svc.policy.ListAllObjects(ctx, &magistrala.ListObjectsReq{
 			SubjectType: auth.GroupType,
 			Subject:     memberID,
 			Permission:  auth.ParentGroupRelation,
@@ -167,7 +170,7 @@ func (svc service) ListGroups(ctx context.Context, token, memberKind, memberID s
 		if _, err := svc.authorizeKind(ctx, res.GetDomainId(), auth.UserType, auth.UsersKind, res.GetId(), auth.ViewPermission, auth.GroupType, memberID); err != nil {
 			return groups.Page{}, err
 		}
-		gids, err := svc.auth.ListAllSubjects(ctx, &magistrala.ListSubjectsReq{
+		gids, err := svc.policy.ListAllSubjects(ctx, &magistrala.ListSubjectsReq{
 			SubjectType: auth.GroupType,
 			Permission:  auth.ParentGroupRelation,
 			ObjectType:  auth.GroupType,
@@ -187,7 +190,7 @@ func (svc service) ListGroups(ctx context.Context, token, memberKind, memberID s
 			if _, err := svc.authorizeKind(ctx, res.GetDomainId(), auth.UserType, auth.UsersKind, res.GetId(), auth.AdminPermission, auth.DomainType, res.GetDomainId()); err != nil {
 				return groups.Page{}, err
 			}
-			gids, err := svc.auth.ListAllObjects(ctx, &magistrala.ListObjectsReq{
+			gids, err := svc.policy.ListAllObjects(ctx, &magistrala.ListObjectsReq{
 				SubjectType: auth.UserType,
 				Subject:     auth.EncodeDomainUserID(res.GetDomainId(), memberID),
 				Permission:  gm.Permission,
@@ -252,7 +255,7 @@ func (svc service) retrievePermissions(ctx context.Context, userID string, group
 }
 
 func (svc service) listUserGroupPermission(ctx context.Context, userID, groupID string) ([]string, error) {
-	lp, err := svc.auth.ListPermissions(ctx, &magistrala.ListPermissionsReq{
+	lp, err := svc.policy.ListPermissions(ctx, &magistrala.ListPermissionsReq{
 		SubjectType: auth.UserType,
 		Subject:     userID,
 		Object:      groupID,
@@ -292,7 +295,7 @@ func (svc service) ListMembers(ctx context.Context, token, groupID, permission, 
 	}
 	switch memberKind {
 	case auth.ThingsKind:
-		tids, err := svc.auth.ListAllObjects(ctx, &magistrala.ListObjectsReq{
+		tids, err := svc.policy.ListAllObjects(ctx, &magistrala.ListObjectsReq{
 			SubjectType: auth.GroupType,
 			Subject:     groupID,
 			Relation:    auth.GroupRelation,
@@ -317,7 +320,7 @@ func (svc service) ListMembers(ctx context.Context, token, groupID, permission, 
 			Members: members,
 		}, nil
 	case auth.UsersKind:
-		uids, err := svc.auth.ListAllSubjects(ctx, &magistrala.ListSubjectsReq{
+		uids, err := svc.policy.ListAllSubjects(ctx, &magistrala.ListSubjectsReq{
 			SubjectType: auth.UserType,
 			Permission:  permission,
 			Object:      groupID,
@@ -473,7 +476,7 @@ func (svc service) Assign(ctx context.Context, token, groupID, relation, memberK
 		return errMemberKind
 	}
 
-	if _, err := svc.auth.AddPolicies(ctx, &policies); err != nil {
+	if _, err := svc.policy.AddPolicies(ctx, &policies); err != nil {
 		return errors.Wrap(svcerr.ErrAddPolicies, err)
 	}
 
@@ -512,12 +515,12 @@ func (svc service) assignParentGroup(ctx context.Context, domain, parentGroupID 
 		})
 	}
 
-	if _, err := svc.auth.AddPolicies(ctx, &addPolicies); err != nil {
+	if _, err := svc.policy.AddPolicies(ctx, &addPolicies); err != nil {
 		return errors.Wrap(svcerr.ErrAddPolicies, err)
 	}
 	defer func() {
 		if err != nil {
-			if _, errRollback := svc.auth.DeletePolicies(ctx, &deletePolicies); errRollback != nil {
+			if _, errRollback := svc.policy.DeletePolicies(ctx, &deletePolicies); errRollback != nil {
 				err = errors.Wrap(err, errors.Wrap(apiutil.ErrRollbackTx, errRollback))
 			}
 		}
@@ -558,12 +561,12 @@ func (svc service) unassignParentGroup(ctx context.Context, domain, parentGroupI
 		})
 	}
 
-	if _, err := svc.auth.DeletePolicies(ctx, &deletePolicies); err != nil {
+	if _, err := svc.policy.DeletePolicies(ctx, &deletePolicies); err != nil {
 		return errors.Wrap(svcerr.ErrDeletePolicies, err)
 	}
 	defer func() {
 		if err != nil {
-			if _, errRollback := svc.auth.AddPolicies(ctx, &addPolicies); errRollback != nil {
+			if _, errRollback := svc.policy.AddPolicies(ctx, &addPolicies); errRollback != nil {
 				err = errors.Wrap(err, errors.Wrap(apiutil.ErrRollbackTx, errRollback))
 			}
 		}
@@ -655,7 +658,7 @@ func (svc service) Unassign(ctx context.Context, token, groupID, relation, membe
 		return errMemberKind
 	}
 
-	if _, err := svc.auth.DeletePolicies(ctx, &policies); err != nil {
+	if _, err := svc.policy.DeletePolicies(ctx, &policies); err != nil {
 		return errors.Wrap(svcerr.ErrDeletePolicies, err)
 	}
 	return nil
@@ -670,7 +673,7 @@ func (svc service) DeleteGroup(ctx context.Context, token, id string) error {
 		return err
 	}
 
-	deleteRes, err := svc.auth.DeleteEntityPolicies(ctx, &magistrala.DeleteEntityPoliciesReq{
+	deleteRes, err := svc.policy.DeleteEntityPolicies(ctx, &magistrala.DeleteEntityPoliciesReq{
 		EntityType: auth.GroupType,
 		Id:         id,
 	})
@@ -706,7 +709,7 @@ func (svc service) filterAllowedGroupIDsOfUserID(ctx context.Context, userID, pe
 }
 
 func (svc service) listAllGroupsOfUserID(ctx context.Context, userID, permission string) ([]string, error) {
-	allowedIDs, err := svc.auth.ListAllObjects(ctx, &magistrala.ListObjectsReq{
+	allowedIDs, err := svc.policy.ListAllObjects(ctx, &magistrala.ListObjectsReq{
 		SubjectType: auth.UserType,
 		Subject:     userID,
 		Permission:  permission,
@@ -815,7 +818,7 @@ func (svc service) addGroupPolicy(ctx context.Context, userID, domainID, id, par
 			Object:      id,
 		})
 	}
-	if _, err := svc.auth.AddPolicies(ctx, &policies); err != nil {
+	if _, err := svc.policy.AddPolicies(ctx, &policies); err != nil {
 		return errors.Wrap(svcerr.ErrAddPolicies, err)
 	}
 
@@ -852,7 +855,7 @@ func (svc service) addGroupPolicyRollback(ctx context.Context, userID, domainID,
 			Object:      id,
 		})
 	}
-	if _, err := svc.auth.DeletePolicies(ctx, &policies); err != nil {
+	if _, err := svc.policy.DeletePolicies(ctx, &policies); err != nil {
 		return errors.Wrap(svcerr.ErrDeletePolicies, err)
 	}
 

@@ -14,12 +14,13 @@ import (
 
 	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
+	authclient "github.com/andychao217/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala/invitations"
 	"github.com/andychao217/magistrala/invitations/api"
 	"github.com/andychao217/magistrala/invitations/middleware"
 	invitationspg "github.com/andychao217/magistrala/invitations/postgres"
 	mglog "github.com/andychao217/magistrala/logger"
-	"github.com/andychao217/magistrala/pkg/auth"
+	"github.com/andychao217/magistrala/pkg/grpcclient"
 	"github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/postgres"
 	clientspg "github.com/andychao217/magistrala/pkg/postgres"
@@ -92,20 +93,20 @@ func main() {
 	}
 	defer db.Close()
 
-	authConfig := auth.Config{}
-	if err := env.ParseWithOptions(&authConfig, env.Options{Prefix: envPrefixAuth}); err != nil {
+	authClientCfg := grpcclient.Config{}
+	if err := env.ParseWithOptions(&authClientCfg, env.Options{Prefix: envPrefixAuth}); err != nil {
 		logger.Error(fmt.Sprintf("failed to load auth configuration : %s", err.Error()))
 		exitCode = 1
 		return
 	}
-	authClient, authHandler, err := auth.Setup(ctx, authConfig)
+	authClient, authHandler, err := grpcclient.SetupAuthClient(ctx, authClientCfg)
 	if err != nil {
 		logger.Error(err.Error())
 		exitCode = 1
 		return
 	}
 	defer authHandler.Close()
-	logger.Info("Successfully connected to auth grpc server " + authHandler.Secure())
+	logger.Info("AuthService gRPC client successfully connected to auth gRPC server " + authHandler.Secure())
 
 	tp, err := jaeger.NewProvider(ctx, svcName, cfg.JaegerURL, cfg.InstanceID, cfg.TraceRatio)
 	if err != nil {
@@ -154,7 +155,7 @@ func main() {
 	}
 }
 
-func newService(db *sqlx.DB, dbConfig clientspg.Config, authClient magistrala.AuthServiceClient, tracer trace.Tracer, conf config, logger *slog.Logger) (invitations.Service, error) {
+func newService(db *sqlx.DB, dbConfig clientspg.Config, authClient authclient.AuthServiceClient, tracer trace.Tracer, conf config, logger *slog.Logger) (invitations.Service, error) {
 	database := postgres.NewDatabase(db, dbConfig, tracer)
 	repo := invitationspg.NewRepository(database)
 

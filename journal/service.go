@@ -8,17 +8,18 @@ import (
 
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/auth"
+	grpcclient "github.com/andychao217/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala/pkg/errors"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 )
 
 type service struct {
 	idProvider magistrala.IDProvider
-	auth       magistrala.AuthServiceClient
+	auth       grpcclient.AuthServiceClient
 	repository Repository
 }
 
-func NewService(idp magistrala.IDProvider, repository Repository, authClient magistrala.AuthServiceClient) Service {
+func NewService(idp magistrala.IDProvider, repository Repository, authClient grpcclient.AuthServiceClient) Service {
 	return &service{
 		idProvider: idp,
 		auth:       authClient,

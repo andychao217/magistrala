@@ -10,6 +10,7 @@ import (
 	"encoding/hex"
 	"time"
 
+	grpcclient "github.com/absmach/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala"
 	"github.com/andychao217/magistrala/auth"
 	"github.com/andychao217/magistrala/pkg/errors"
@@ -119,7 +120,8 @@ type ConfigReader interface {
 }
 
 type bootstrapService struct {
-	auth       magistrala.AuthServiceClient
+	auth       grpcclient.AuthServiceClient
+	policy     magistrala.PolicyServiceClient
 	configs    ConfigRepository
 	sdk        mgsdk.SDK
 	encKey     []byte
@@ -127,11 +129,12 @@ type bootstrapService struct {
 }
 
 // New returns new Bootstrap service.
-func New(uauth magistrala.AuthServiceClient, configs ConfigRepository, sdk mgsdk.SDK, encKey []byte, idp magistrala.IDProvider) Service {
+func New(auth grpcclient.AuthServiceClient, policy magistrala.PolicyServiceClient, configs ConfigRepository, sdk mgsdk.SDK, encKey []byte, idp magistrala.IDProvider) Service {
 	return &bootstrapService{
 		configs:    configs,
 		sdk:        sdk,
-		auth:       uauth,
+		auth:       auth,
+		policy:     policy,
 		encKey:     encKey,
 		idProvider: idp,
 	}
@@ -302,7 +305,7 @@ func (bs bootstrapService) UpdateConnections(ctx context.Context, token, id stri
 }
 
 func (bs bootstrapService) listClientIDs(ctx context.Context, userID string) ([]string, error) {
-	tids, err := bs.auth.ListAllObjects(ctx, &magistrala.ListObjectsReq{
+	tids, err := bs.policy.ListAllObjects(ctx, &magistrala.ListObjectsReq{
 		SubjectType: auth.UserType,
 		Subject:     userID,
 		Permission:  auth.ViewPermission,

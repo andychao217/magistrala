@@ -14,6 +14,7 @@ import (
 
 	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
+	authclient "github.com/andychao217/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala/bootstrap"
 	"github.com/andychao217/magistrala/bootstrap/api"
 	"github.com/andychao217/magistrala/bootstrap/events/consumer"
@@ -21,9 +22,9 @@ import (
 	bootstrappg "github.com/andychao217/magistrala/bootstrap/postgres"
 	"github.com/andychao217/magistrala/bootstrap/tracing"
 	mglog "github.com/andychao217/magistrala/logger"
-	"github.com/andychao217/magistrala/pkg/auth"
 	"github.com/andychao217/magistrala/pkg/events"
 	"github.com/andychao217/magistrala/pkg/events/store"
+	"github.com/andychao217/magistrala/pkg/grpcclient"
 	"github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/postgres"
 	pgclient "github.com/andychao217/magistrala/pkg/postgres"
@@ -100,21 +101,30 @@ func main() {
 	}
 	defer db.Close()
 
-	authConfig := auth.Config{}
-	if err := env.ParseWithOptions(&authConfig, env.Options{Prefix: envPrefixAuth}); err != nil {
+	clientConfig := grpcclient.Config{}
+	if err := env.ParseWithOptions(&clientConfig, env.Options{Prefix: envPrefixAuth}); err != nil {
 		logger.Error(fmt.Sprintf("failed to load %s auth configuration : %s", svcName, err))
 		exitCode = 1
 		return
 	}
 
-	authClient, authHandler, err := auth.Setup(ctx, authConfig)
+	authClient, authHandler, err := grpcclient.SetupAuthClient(ctx, clientConfig)
 	if err != nil {
 		logger.Error(err.Error())
 		exitCode = 1
 		return
 	}
 	defer authHandler.Close()
-	logger.Info("Successfully connected to auth grpc server " + authHandler.Secure())
+	logger.Info("AuthService gRPC client successfully connected to auth gRPC server " + authHandler.Secure())
+
+	policyClient, policyHandler, err := grpcclient.SetupPolicyClient(ctx, clientConfig)
+	if err != nil {
+		logger.Error(err.Error())
+		exitCode = 1
+		return
+	}
+	defer policyHandler.Close()
+	logger.Info("PolicyService gRPC client successfully connected to auth gRPC server " + policyHandler.Secure())
 
 	tp, err := jaeger.NewProvider(ctx, svcName, cfg.JaegerURL, cfg.InstanceID, cfg.TraceRatio)
 	if err != nil {
@@ -130,7 +140,7 @@ func main() {
 	tracer := tp.Tracer(svcName)
 
 	// Create new service
-	svc, err := newService(ctx, authClient, db, tracer, logger, cfg, dbConfig)
+	svc, err := newService(ctx, authClient, policyClient, db, tracer, logger, cfg, dbConfig)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to create %s service: %s", svcName, err))
 		exitCode = 1
@@ -171,7 +181,7 @@ func main() {
 	}
 }
 
-func newService(ctx context.Context, authClient magistrala.AuthServiceClient, db *sqlx.DB, tracer trace.Tracer, logger *slog.Logger, cfg config, dbConfig pgclient.Config) (bootstrap.Service, error) {
+func newService(ctx context.Context, authClient authclient.AuthServiceClient, policyClient magistrala.PolicyServiceClient, db *sqlx.DB, tracer trace.Tracer, logger *slog.Logger, cfg config, dbConfig pgclient.Config) (bootstrap.Service, error) {
 	database := postgres.NewDatabase(db, dbConfig, tracer)
 
 	repoConfig := bootstrappg.NewConfigRepository(database, logger)
@@ -183,7 +193,7 @@ func newService(ctx context.Context, authClient magistrala.AuthServiceClient, db
 	sdk := mgsdk.NewSDK(config)
 	idp := uuid.New()
 
-	svc := bootstrap.New(authClient, repoConfig, sdk, []byte(cfg.EncKey), idp)
+	svc := bootstrap.New(authClient, policyClient, repoConfig, sdk, []byte(cfg.EncKey), idp)
 
 	publisher, err := store.NewPublisher(ctx, cfg.ESURL, streamID)
 	if err != nil {

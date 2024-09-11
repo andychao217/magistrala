@@ -12,13 +12,13 @@ import (
 
 	"github.com/absmach/mproxy/pkg/session"
 	"github.com/andychao217/magistrala"
-	authmocks "github.com/andychao217/magistrala/auth/mocks"
 	"github.com/andychao217/magistrala/internal/testsutil"
 	mglog "github.com/andychao217/magistrala/logger"
 	"github.com/andychao217/magistrala/mqtt"
 	"github.com/andychao217/magistrala/mqtt/mocks"
 	"github.com/andychao217/magistrala/pkg/errors"
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
+	thmocks "github.com/andychao217/magistrala/things/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -121,7 +121,7 @@ func TestAuthConnect(t *testing.T) {
 }
 
 func TestAuthPublish(t *testing.T) {
-	handler, auth, _ := newHandler()
+	handler, things, _ := newHandler()
 
 	cases := []struct {
 		desc    string
@@ -161,7 +161,7 @@ func TestAuthPublish(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		repocall := auth.On("Authorize", mock.Anything, mock.Anything).Return(&magistrala.AuthorizeRes{Authorized: true, Id: testsutil.GenerateUUID(t)}, tc.err)
+		repocall := things.On("Authorize", mock.Anything, mock.Anything).Return(&magistrala.AuthorizeRes{Authorized: true, Id: testsutil.GenerateUUID(t)}, tc.err)
 		ctx := context.TODO()
 		if tc.session != nil {
 			ctx = session.NewContext(ctx, tc.session)
@@ -173,7 +173,7 @@ func TestAuthPublish(t *testing.T) {
 }
 
 func TestAuthSubscribe(t *testing.T) {
-	handler, auth, _ := newHandler()
+	handler, things, _ := newHandler()
 
 	cases := []struct {
 		desc    string
@@ -214,7 +214,7 @@ func TestAuthSubscribe(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		repocall := auth.On("Authorize", mock.Anything, mock.Anything).Return(&magistrala.AuthorizeRes{Authorized: true, Id: testsutil.GenerateUUID(t)}, tc.err)
+		repocall := things.On("Authorize", mock.Anything, mock.Anything).Return(&magistrala.AuthorizeRes{Authorized: true, Id: testsutil.GenerateUUID(t)}, tc.err)
 		ctx := context.TODO()
 		if tc.session != nil {
 			ctx = session.NewContext(ctx, tc.session)
@@ -450,12 +450,12 @@ func TestDisconnect(t *testing.T) {
 	}
 }
 
-func newHandler() (session.Handler, *authmocks.AuthClient, *mocks.EventStore) {
+func newHandler() (session.Handler, *thmocks.AuthzServiceClient, *mocks.EventStore) {
 	logger, err := mglog.New(&logBuffer, "debug")
 	if err != nil {
 		log.Fatalf("failed to create logger: %s", err)
 	}
-	auth := new(authmocks.AuthClient)
+	things := new(thmocks.AuthzServiceClient)
 	eventStore := new(mocks.EventStore)
-	return mqtt.NewHandler(mocks.NewPublisher(), eventStore, logger, auth), auth, eventStore
+	return mqtt.NewHandler(mocks.NewPublisher(), eventStore, logger, things), things, eventStore
 }

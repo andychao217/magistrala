@@ -27,8 +27,8 @@ import (
 	"github.com/andychao217/magistrala/mqtt"
 	"github.com/andychao217/magistrala/mqtt/events"
 	mqtttracing "github.com/andychao217/magistrala/mqtt/tracing"
-	"github.com/andychao217/magistrala/pkg/auth"
 	"github.com/andychao217/magistrala/pkg/errors"
+	"github.com/andychao217/magistrala/pkg/grpcclient"
 	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/messaging/brokers"
 	brokerstracing "github.com/andychao217/magistrala/pkg/messaging/brokers/tracing"
@@ -42,9 +42,9 @@ import (
 )
 
 const (
-	svcName        = "mqtt"
-	envPrefixAuthz = "MG_THINGS_AUTH_GRPC_"
-	wsPathPrefix   = "/mqtt"
+	svcName         = "mqtt"
+	envPrefixThings = "MG_THINGS_AUTH_GRPC_"
+	wsPathPrefix    = "/mqtt"
 )
 
 type config struct {
@@ -165,24 +165,24 @@ func main() {
 		return
 	}
 
-	authConfig := auth.Config{}
-	if err := env.ParseWithOptions(&authConfig, env.Options{Prefix: envPrefixAuthz}); err != nil {
+	thingsClientCfg := grpcclient.Config{}
+	if err := env.ParseWithOptions(&thingsClientCfg, env.Options{Prefix: envPrefixThings}); err != nil {
 		logger.Error(fmt.Sprintf("failed to load %s auth configuration : %s", svcName, err))
 		exitCode = 1
 		return
 	}
 
-	authClient, authHandler, err := auth.SetupAuthz(ctx, authConfig)
+	thingsClient, thingsHandler, err := grpcclient.SetupThingsClient(ctx, thingsClientCfg)
 	if err != nil {
 		logger.Error(err.Error())
 		exitCode = 1
 		return
 	}
-	defer authHandler.Close()
+	defer thingsHandler.Close()
 
-	logger.Info("Successfully connected to things grpc server " + authHandler.Secure())
+	logger.Info("Things service gRPC client successfully connected to things gRPC server " + thingsHandler.Secure())
 
-	h := mqtt.NewHandler(np, es, logger, authClient)
+	h := mqtt.NewHandler(np, es, logger, thingsClient)
 	h = handler.NewTracing(tracer, h)
 
 	if cfg.SendTelemetry {

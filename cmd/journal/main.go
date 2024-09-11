@@ -14,20 +14,21 @@ import (
 
 	chclient "github.com/andychao217/callhome/pkg/client"
 	"github.com/andychao217/magistrala"
+	authclient "github.com/andychao217/magistrala/auth/api/grpc"
 	"github.com/andychao217/magistrala/journal"
 	"github.com/andychao217/magistrala/journal/api"
 	"github.com/andychao217/magistrala/journal/events"
 	"github.com/andychao217/magistrala/journal/middleware"
 	journalpg "github.com/andychao217/magistrala/journal/postgres"
 	mglog "github.com/andychao217/magistrala/logger"
-	"github.com/andychao217/magistrala/pkg/auth"
 	"github.com/andychao217/magistrala/pkg/events/store"
+	"github.com/andychao217/magistrala/pkg/grpcclient"
 	jaegerclient "github.com/andychao217/magistrala/pkg/jaeger"
 	"github.com/andychao217/magistrala/pkg/postgres"
 	pgclient "github.com/andychao217/magistrala/pkg/postgres"
 	"github.com/andychao217/magistrala/pkg/prometheus"
 	"github.com/andychao217/magistrala/pkg/server"
-	httpserver "github.com/andychao217/magistrala/pkg/server/http"
+	"github.com/andychao217/magistrala/pkg/server/http"
 	"github.com/andychao217/magistrala/pkg/uuid"
 	"github.com/caarlos0/env/v10"
 	"github.com/jmoiron/sqlx"
@@ -92,22 +93,22 @@ func main() {
 	}
 	defer db.Close()
 
-	authConfig := auth.Config{}
-	if err := env.ParseWithOptions(&authConfig, env.Options{Prefix: envPrefixAuth}); err != nil {
+	authClientCfg := grpcclient.Config{}
+	if err := env.ParseWithOptions(&authClientCfg, env.Options{Prefix: envPrefixAuth}); err != nil {
 		logger.Error(fmt.Sprintf("failed to load %s auth configuration : %s", svcName, err))
 		exitCode = 1
 		return
 	}
 
-	ac, acHandler, err := auth.Setup(ctx, authConfig)
+	authClient, authHandler, err := grpcclient.SetupAuthClient(ctx, authClientCfg)
 	if err != nil {
 		logger.Error(err.Error())
 		exitCode = 1
 		return
 	}
-	defer acHandler.Close()
+	defer authHandler.Close()
 
-	logger.Info("Successfully connected to auth grpc server " + acHandler.Secure())
+	logger.Info("AuthService gRPC client successfully connected to auth gRPC server " + authHandler.Secure())
 
 	tp, err := jaegerclient.NewProvider(ctx, svcName, cfg.JaegerURL, cfg.InstanceID, cfg.TraceRatio)
 	if err != nil {
@@ -122,7 +123,7 @@ func main() {
 	}()
 	tracer := tp.Tracer(svcName)
 
-	svc := newService(db, dbConfig, ac, logger, tracer)
+	svc := newService(db, dbConfig, authClient, logger, tracer)
 
 	subscriber, err := store.NewSubscriber(ctx, cfg.ESURL, logger)
 	if err != nil {
@@ -146,7 +147,7 @@ func main() {
 		return
 	}
 
-	hs := httpserver.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svc, logger, svcName, cfg.InstanceID), logger)
+	hs := http.NewServer(ctx, cancel, svcName, httpServerConfig, api.MakeHandler(svc, logger, svcName, cfg.InstanceID), logger)
 
 	if cfg.SendTelemetry {
 		chc := chclient.New(svcName, magistrala.Version, logger, cancel)
@@ -166,7 +167,7 @@ func main() {
 	}
 }
 
-func newService(db *sqlx.DB, dbConfig pgclient.Config, authClient magistrala.AuthServiceClient, logger *slog.Logger, tracer trace.Tracer) journal.Service {
+func newService(db *sqlx.DB, dbConfig pgclient.Config, authClient authclient.AuthServiceClient, logger *slog.Logger, tracer trace.Tracer) journal.Service {
 	database := postgres.NewDatabase(db, dbConfig, tracer)
 	repo := journalpg.NewRepository(database)
 	idp := uuid.New()
