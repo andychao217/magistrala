@@ -7,8 +7,6 @@ import (
 	"github.com/andychao217/magistrala/internal/api"
 	"github.com/andychao217/magistrala/pkg/apiutil"
 	mgclients "github.com/andychao217/magistrala/pkg/clients"
-	"github.com/andychao217/magistrala/pkg/errors"
-	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 )
 
 type createClientReq struct {
@@ -335,10 +333,10 @@ type thingShareRequest struct {
 
 func (req *thingShareRequest) validate() error {
 	if req.thingID == "" {
-		return errors.ErrMalformedEntity
+		return apiutil.ErrMissingID
 	}
 	if req.Relation == "" || len(req.UserIDs) == 0 {
-		return svcerr.ErrCreateEntity
+		return apiutil.ErrMalformedPolicy
 	}
 	return nil
 }
@@ -352,10 +350,10 @@ type thingUnshareRequest struct {
 
 func (req *thingUnshareRequest) validate() error {
 	if req.thingID == "" {
-		return errors.ErrMalformedEntity
+		return apiutil.ErrMissingID
 	}
 	if req.Relation == "" || len(req.UserIDs) == 0 {
-		return svcerr.ErrCreateEntity
+		return apiutil.ErrMalformedPolicy
 	}
 	return nil
 }
