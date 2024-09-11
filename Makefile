@@ -102,7 +102,7 @@ FILTERED_SERVICES = $(filter-out $(RUN_ADDON_ARGS), $(SERVICES))
 
 all: $(SERVICES)
 
-.PHONY: all $(SERVICES) dockers dockers_dev latest release run run_addons grpc_mtls_certs check_mtls check_certs test_api
+.PHONY: all $(SERVICES) dockers dockers_dev latest release run run_addons grpc_mtls_certs check_mtls check_certs test_api mocks
 
 clean:
 	rm -rf ${BUILD_DIR}
@@ -124,6 +124,7 @@ install:
 mocks:
 	@which mockery > /dev/null || go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
 	@unset MOCKERY_VERSION && go generate ./...
+	mockery --config ./tools/config/mockery.yaml
 
 
 DIRS = consumers readers postgres internal opcua
