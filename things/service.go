@@ -486,7 +486,6 @@ func (svc service) UpdateClient(ctx context.Context, token string, cli mgclients
 	cRepo := postgres.NewRepository(database)
 	oldThing, _ := cRepo.RetrieveByIdentity(ctx, cli.Credentials.Identity)
 	onlineStatus, statusOk := oldThing.Metadata["online_status"].(string)
-	fmt.Println("thing onlineStatus 2345:", onlineStatus)
 
 	client := mgclients.Client{
 		ID:        cli.ID,
