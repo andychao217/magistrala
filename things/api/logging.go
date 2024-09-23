@@ -75,7 +75,7 @@ func (lm *loggingMiddleware) ViewClientPerms(ctx context.Context, token, id stri
 	return lm.svc.ViewClientPerms(ctx, token, id)
 }
 
-func (lm *loggingMiddleware) ListClients(ctx context.Context, token, reqUserID string, pm mgclients.Page, showFullData bool) (cp mgclients.ClientsPage, err error) {
+func (lm *loggingMiddleware) ListClients(ctx context.Context, token, reqUserID string, pm mgclients.Page, showFullData string) (cp mgclients.ClientsPage, err error) {
 	defer func(begin time.Time) {
 		args := []any{
 			slog.String("duration", time.Since(begin).String()),

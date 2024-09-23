@@ -98,7 +98,7 @@ type listClientsReq struct {
 	userID       string
 	listPerms    bool
 	metadata     mgclients.Metadata
-	showFullData bool
+	showFullData string
 }
 
 func (req listClientsReq) validate() error {

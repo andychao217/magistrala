@@ -100,8 +100,8 @@ func listClientsEndpoint(svc things.Service) endpoint.Endpoint {
 		}
 
 		// 提供 showFullData 的默认值
-		if !req.showFullData { // 如果没有传入，则使用默认值
-			req.showFullData = false // 默认值
+		if req.showFullData != "true" { // 如果没有传入，则使用默认值
+			req.showFullData = "" // 默认值
 		}
 
 		pm := mgclients.Page{

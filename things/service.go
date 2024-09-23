@@ -322,7 +322,7 @@ func (svc service) ViewClientPerms(ctx context.Context, token, id string) ([]str
 	return permissions, nil
 }
 
-func (svc service) ListClients(ctx context.Context, token, reqUserID string, pm mgclients.Page, showFullData bool) (mgclients.ClientsPage, error) {
+func (svc service) ListClients(ctx context.Context, token, reqUserID string, pm mgclients.Page, showFullData string) (mgclients.ClientsPage, error) {
 	var ids []string
 
 	res, err := svc.identify(ctx, token)
@@ -368,7 +368,7 @@ func (svc service) ListClients(ctx context.Context, token, reqUserID string, pm 
 		return mgclients.ClientsPage{}, errors.Wrap(svcerr.ErrViewEntity, err)
 	}
 
-	if !showFullData {
+	if showFullData != "true" {
 		// 过滤 Client 字段
 		for i := range tp.Clients {
 			tp.Clients[i] = filterClientFields(tp.Clients[i])

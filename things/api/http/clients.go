@@ -194,8 +194,8 @@ func decodeListClients(_ context.Context, r *http.Request) (interface{}, error) 
 	if err != nil {
 		return nil, errors.Wrap(apiutil.ErrValidation, err)
 	}
-	// 读取 showFullData 参数，默认为 false
-	sf, err := apiutil.ReadBoolQuery(r, api.ShowFullDataKey, false) // 假设有一个常量 api.ShowFullDataKey
+	// 读取 showFullData 参数，默认为 ""
+	sf, err := apiutil.ReadStringQuery(r, api.ShowFullDataKey, "") // 假设有一个常量 api.ShowFullDataKey
 	if err != nil {
 		return nil, errors.Wrap(apiutil.ErrValidation, err)
 	}
