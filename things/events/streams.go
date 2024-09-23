@@ -125,8 +125,8 @@ func (es *eventStore) ViewClientPerms(ctx context.Context, token, id string) ([]
 	return permissions, nil
 }
 
-func (es *eventStore) ListClients(ctx context.Context, token, reqUserID string, pm mgclients.Page) (mgclients.ClientsPage, error) {
-	cp, err := es.svc.ListClients(ctx, token, reqUserID, pm)
+func (es *eventStore) ListClients(ctx context.Context, token, reqUserID string, pm mgclients.Page, showFullData bool) (mgclients.ClientsPage, error) {
+	cp, err := es.svc.ListClients(ctx, token, reqUserID, pm, showFullData)
 	if err != nil {
 		return cp, err
 	}

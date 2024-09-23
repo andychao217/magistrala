@@ -114,6 +114,7 @@ type PageMetadata struct {
 	UserID          string   `json:"user_id,omitempty"`
 	DomainID        string   `json:"domain_id,omitempty"`
 	Relation        string   `json:"relation,omitempty"`
+	ShowFullData    string   `json:"showFullData,omitempty"`
 }
 
 // Credentials represent client credentials: it contains
@@ -1375,6 +1376,9 @@ func (pm PageMetadata) query() (string, error) {
 	}
 	if pm.Relation != "" {
 		q.Add("relation", pm.Relation)
+	}
+	if pm.ShowFullData != "" {
+		q.Add("showFullData", pm.ShowFullData)
 	}
 
 	return q.Encode(), nil

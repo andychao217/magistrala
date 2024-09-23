@@ -187,7 +187,7 @@ func (_m *Service) Identify(ctx context.Context, key string) (string, error) {
 }
 
 // ListClients provides a mock function with given fields: ctx, token, reqUserID, pm
-func (_m *Service) ListClients(ctx context.Context, token string, reqUserID string, pm clients.Page) (clients.ClientsPage, error) {
+func (_m *Service) ListClients(ctx context.Context, token string, reqUserID string, pm clients.Page, showFullData bool) (clients.ClientsPage, error) {
 	ret := _m.Called(ctx, token, reqUserID, pm)
 
 	if len(ret) == 0 {

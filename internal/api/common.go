@@ -58,16 +58,14 @@ const (
 	SharedVisibility = "shared"
 	MyVisibility     = "mine"
 	AllVisibility    = "all"
-	// ContentType represents JSON content type.
-	ContentType = "application/json"
-
-	// MaxNameSize limits name size to prevent making them too complex.
-	MaxLimitSize = 1000
-	MaxNameSize  = 1024
-	NameOrder    = "name"
-	IDOrder      = "id"
-	AscDir       = "asc"
-	DescDir      = "desc"
+	ContentType      = "application/json" // ContentType represents JSON content type.
+	ShowFullDataKey  = "showFullData"
+	MaxLimitSize     = 1000 // MaxNameSize limits name size to prevent making them too complex.
+	MaxNameSize      = 1024
+	NameOrder        = "name"
+	IDOrder          = "id"
+	AscDir           = "asc"
+	DescDir          = "desc"
 )
 
 // ValidateUUID validates UUID format.

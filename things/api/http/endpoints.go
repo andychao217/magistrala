@@ -99,6 +99,11 @@ func listClientsEndpoint(svc things.Service) endpoint.Endpoint {
 			return nil, errors.Wrap(apiutil.ErrValidation, err)
 		}
 
+		// 提供 showFullData 的默认值
+		if !req.showFullData { // 如果没有传入，则使用默认值
+			req.showFullData = false // 默认值
+		}
+
 		pm := mgclients.Page{
 			Status:     req.status,
 			Offset:     req.offset,
@@ -110,7 +115,7 @@ func listClientsEndpoint(svc things.Service) endpoint.Endpoint {
 			ListPerms:  req.listPerms,
 			Role:       mgclients.AllRole, // retrieve all things since things don't have roles
 		}
-		page, err := svc.ListClients(ctx, req.token, req.userID, pm)
+		page, err := svc.ListClients(ctx, req.token, req.userID, pm, req.showFullData)
 		if err != nil {
 			return nil, err
 		}

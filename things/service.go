@@ -322,7 +322,7 @@ func (svc service) ViewClientPerms(ctx context.Context, token, id string) ([]str
 	return permissions, nil
 }
 
-func (svc service) ListClients(ctx context.Context, token, reqUserID string, pm mgclients.Page) (mgclients.ClientsPage, error) {
+func (svc service) ListClients(ctx context.Context, token, reqUserID string, pm mgclients.Page, showFullData bool) (mgclients.ClientsPage, error) {
 	var ids []string
 
 	res, err := svc.identify(ctx, token)
@@ -368,6 +368,13 @@ func (svc service) ListClients(ctx context.Context, token, reqUserID string, pm 
 		return mgclients.ClientsPage{}, errors.Wrap(svcerr.ErrViewEntity, err)
 	}
 
+	if !showFullData {
+		// 过滤 Client 字段
+		for i := range tp.Clients {
+			tp.Clients[i] = filterClientFields(tp.Clients[i])
+		}
+	}
+
 	if pm.ListPerms && len(tp.Clients) > 0 {
 		g, ctx := errgroup.WithContext(ctx)
 
@@ -384,6 +391,49 @@ func (svc service) ListClients(ctx context.Context, token, reqUserID string, pm 
 		}
 	}
 	return tp, nil
+}
+
+func filterClientFields(client mgclients.Client) mgclients.Client {
+	// 创建一个新的 Client 对象以存储过滤后的字段
+	filteredClient := mgclients.Client{
+		ID:          client.ID,
+		Name:        client.Name,
+		Credentials: client.Credentials,
+		CreatedAt:   client.CreatedAt,
+		UpdatedAt:   client.UpdatedAt,
+		UpdatedBy:   client.UpdatedBy,
+		Status:      client.Status,
+		Role:        client.Role,
+		Permissions: client.Permissions,
+		Domain:      client.Domain,
+		Metadata:    make(map[string]interface{}), // 初始化 Metadata
+	}
+
+	// 只有在字段存在时，才将其复制
+	if val, exists := client.Metadata["aliase"]; exists {
+		filteredClient.Metadata["aliase"] = val
+	}
+	if val, exists := client.Metadata["info"]; exists {
+		filteredClient.Metadata["info"] = val
+	}
+	if val, exists := client.Metadata["is_channel"]; exists {
+		filteredClient.Metadata["is_channel"] = val
+	}
+	if val, exists := client.Metadata["is_online"]; exists {
+		filteredClient.Metadata["is_online"] = val
+	}
+	if val, exists := client.Metadata["out_channel"]; exists {
+		filteredClient.Metadata["out_channel"] = val
+	}
+	if val, exists := client.Metadata["out_channel_array"]; exists {
+		filteredClient.Metadata["out_channel_array"] = val
+	}
+	if val, exists := client.Metadata["product_name"]; exists {
+		filteredClient.Metadata["product_name"] = val
+	}
+
+	filteredClient.Metadata["test"] = "test_attribute"
+	return filteredClient
 }
 
 // Experimental functions used for async calling of svc.listUserThingPermission. This might be helpful during listing of large number of entities.
