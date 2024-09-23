@@ -25,7 +25,6 @@ import (
 	"github.com/andychao217/magistrala/pkg/messaging"
 	clientspg "github.com/andychao217/magistrala/things/postgres"
 	proto "github.com/andychao217/websocket_bridge/proto"
-	"github.com/mohae/deepcopy"
 	gProto "google.golang.org/protobuf/proto"
 )
 
@@ -374,20 +373,33 @@ func updateClientInfo(ctx context.Context, s *session.Session, newDeviceInfo *pr
 	database, err := pgclient.Connect(dbConfig)
 	if err != nil {
 		fmt.Printf("Failed to connect to database: %v\n", err)
+		return
 	}
 	defer database.Close() // 确保在函数结束时关闭数据库连接
 
 	cRepo := clientspg.NewRepository(database)
-	thing, _ := cRepo.RetrieveByIdentity(ctx, s.Username)
+	thing, err := cRepo.RetrieveByIdentity(ctx, s.Username)
+	if err != nil {
+		fmt.Printf("Failed to retrieve thing: %v\n", err)
+		return
+	}
 
 	if thing.ID != "" && !strings.Contains(thing.Name, "Platform") {
 		if info, exists := thing.Metadata["info"]; !exists {
 			// 如果不存在，调用 updateInfo()
 			updateInfo(ctx, cRepo, thing, newDeviceInfo)
 		} else {
-			oldDeviceInfo, ok := deepcopy.Copy(info).(*proto.DeviceInfo)
-			if !ok {
-				fmt.Println("Type assertion to *proto.DeviceInfo failed")
+			// 将 info 转换为 JSON 字符串
+			infoJson, err := json.Marshal(info)
+			if err != nil {
+				fmt.Printf("Failed to marshal info: %v\n", err)
+				return
+			}
+
+			// 将 JSON 字符串解码为 *proto.DeviceInfo
+			var oldDeviceInfo proto.DeviceInfo
+			if err := json.Unmarshal(infoJson, &oldDeviceInfo); err != nil {
+				fmt.Println("Failed to unmarshal info to *proto.DeviceInfo:", err)
 				return
 			}
 
@@ -403,6 +415,9 @@ func updateClientInfo(ctx context.Context, s *session.Session, newDeviceInfo *pr
 				return
 			}
 
+			fmt.Printf("oldJson: %v\n", string(oldJson))
+			fmt.Printf("newJson: %v\n", string(newJson))
+
 			if string(oldJson) != string(newJson) {
 				updateInfo(ctx, cRepo, thing, newDeviceInfo)
 			}
@@ -413,6 +428,10 @@ func updateClientInfo(ctx context.Context, s *session.Session, newDeviceInfo *pr
 func updateInfo(ctx context.Context, cRepo clientspg.Repository, thing clients.Client, newDeviceInfo *proto.DeviceInfo) {
 	thing.Metadata["info"] = newDeviceInfo
 	thing.UpdatedAt = time.Now()
+
+	thingJSON, _ := json.Marshal(thing)
+	fmt.Printf("thingJSON: %v\n", string(thingJSON))
+
 	if _, err := cRepo.Update(ctx, thing); err != nil {
 		fmt.Printf("Failed to update thing: %v\n", err)
 		return
@@ -443,9 +462,11 @@ func updateInfo(ctx context.Context, cRepo clientspg.Repository, thing clients.C
 								if len(channels) > 0 {
 									if i-1 < len(channels) {
 										channelInfo := channels[i-1]
-										aliase := channelInfo.Aliase
-										newThing.Metadata["aliase"] = newThing.Name + "_" + aliase
-										newThing.Name = newThing.Name + "_" + aliase
+										channel_aliase := channelInfo.Aliase
+										device_aliase := newDeviceInfo.DeviceAliase
+										name := device_aliase + "_" + channel_aliase
+										newThing.Metadata["aliase"] = name
+										newThing.Name = name
 									}
 									thing.Metadata["out_channel_array"] = channels
 								}
