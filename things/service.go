@@ -20,6 +20,7 @@ import (
 	svcerr "github.com/andychao217/magistrala/pkg/errors/service"
 	mggroups "github.com/andychao217/magistrala/pkg/groups"
 	"github.com/andychao217/magistrala/things/postgres"
+	"github.com/andychao217/websocket_bridge/proto"
 	"github.com/mohae/deepcopy"
 	"golang.org/x/sync/errgroup"
 )
@@ -410,29 +411,64 @@ func filterClientFields(client mgclients.Client) mgclients.Client {
 	}
 
 	// 只有在字段存在时，才将其复制
-	if val, exists := client.Metadata["aliase"]; exists {
-		filteredClient.Metadata["aliase"] = val
-	}
 	if val, exists := client.Metadata["info"]; exists {
-		filteredClient.Metadata["info"] = val
-	}
-	if val, exists := client.Metadata["is_channel"]; exists {
-		filteredClient.Metadata["is_channel"] = val
+		// 将 info 转换为 JSON 字符串
+		infoJson, err := json.Marshal(val)
+		if err != nil {
+			fmt.Printf("Failed to marshal info: %v\n", err)
+		}
+		var deviceInfo proto.DeviceInfo
+		if err := json.Unmarshal(infoJson, &deviceInfo); err != nil {
+			fmt.Println("Failed to unmarshal info to *proto.DeviceInfo:", err)
+		}
+		filteredClient.Metadata["info"] = make(map[string]interface{})
+		// 创建 netcfg 的 map
+		netcfg := map[string]interface{}{
+			"service_ip":   deviceInfo.Netcfg.ServiceIp,
+			"service_port": deviceInfo.Netcfg.ServicePort,
+		}
+		// 将 netcfg 赋值给 filteredClient.Metadata["info"]
+		filteredClient.Metadata["info"].(map[string]interface{})["netcfg"] = netcfg
+
+		inChannelMap := deviceInfo.InChannel
+		inChannels := inChannelMap.Channel
+		filteredInChannels := []map[string]interface{}{}
+		for _, ch := range inChannels {
+			// 只保留需要的字段
+			filteredInChannel := map[string]interface{}{
+				"aliase": ch.Aliase,
+				"id":     ch.Id,
+				"ignore": ch.Ignore,
+			}
+			filteredInChannels = append(filteredInChannels, filteredInChannel)
+		}
+		var inChannel = map[string]interface{}{
+			"channel": filteredInChannels,
+		}
+		filteredClient.Metadata["info"].(map[string]interface{})["in_channel"] = inChannel
+
+		outChannelMap := deviceInfo.OutChannel
+		outChannels := outChannelMap.Channel
+		filteredOutChannels := []map[string]interface{}{}
+		for _, ch := range outChannels {
+			// 只保留需要的字段
+			filteredOutChannel := map[string]interface{}{
+				"aliase": ch.Aliase,
+				"id":     ch.Id,
+			}
+			filteredOutChannels = append(filteredOutChannels, filteredOutChannel)
+		}
+		var outChannel = map[string]interface{}{
+			"channel": filteredOutChannels,
+		}
+		filteredClient.Metadata["info"].(map[string]interface{})["out_channel"] = outChannel
 	}
 	if val, exists := client.Metadata["is_online"]; exists {
 		filteredClient.Metadata["is_online"] = val
 	}
-	if val, exists := client.Metadata["out_channel"]; exists {
-		filteredClient.Metadata["out_channel"] = val
-	}
-	if val, exists := client.Metadata["out_channel_array"]; exists {
-		filteredClient.Metadata["out_channel_array"] = val
-	}
 	if val, exists := client.Metadata["product_name"]; exists {
 		filteredClient.Metadata["product_name"] = val
 	}
-
-	filteredClient.Metadata["test"] = "test_attribute"
 	return filteredClient
 }
 
