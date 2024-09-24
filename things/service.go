@@ -462,6 +462,8 @@ func filterClientFields(client mgclients.Client) mgclients.Client {
 			"channel": filteredOutChannels,
 		}
 		filteredClient.Metadata["info"].(map[string]interface{})["out_channel"] = outChannel
+
+		filteredClient.Metadata["info"].(map[string]interface{})["sw_version"] = deviceInfo.SwVersion
 	}
 	if val, exists := client.Metadata["is_online"]; exists {
 		filteredClient.Metadata["is_online"] = val
