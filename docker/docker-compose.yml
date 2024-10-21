@@ -899,26 +899,26 @@ services:
       - magistrala-ui-db-volume:/var/lib/postgresql/data
 
   socket_bridge:
-      image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-socket_bridge:${MG_RELEASE_TAG}
-      container_name: magistrala-socket_bridge
-      logging:  
-        driver: "json-file"  
-        options:  
-          max-size: "10m"  
-          max-file: "3"
-      restart: on-failure
-      ports:
-        - ${MG_SOCKET_BRIDGE_PORT}:${MG_SOCKET_BRIDGE_PORT}
-      environment:
-        MG_SOCKET_BRIDGE_PORT: ${MG_SOCKET_BRIDGE_PORT}
-        MG_SOCKET_BRIDGE_UDP_PORT: ${MG_SOCKET_BRIDGE_UDP_PORT}
-        MG_SOCKET_BRIDGE_UDP_IP: ${MG_SOCKET_BRIDGE_UDP_IP}
-        MINIO_ENDPOINT: "minio:${MINIO_PORT}"
-        MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
-        MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
-        MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
-        MINIO_BRIDGE_PORT: ${MINIO_BRIDGE_PORT}
-      network_mode: "host"
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-socket_bridge:${MG_RELEASE_TAG}
+    container_name: magistrala-socket_bridge
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
+    restart: on-failure
+    ports:
+      - ${MG_SOCKET_BRIDGE_PORT}:${MG_SOCKET_BRIDGE_PORT}
+    environment:
+      MG_SOCKET_BRIDGE_PORT: ${MG_SOCKET_BRIDGE_PORT}
+      MG_SOCKET_BRIDGE_UDP_PORT: ${MG_SOCKET_BRIDGE_UDP_PORT}
+      MG_SOCKET_BRIDGE_UDP_IP: ${MG_SOCKET_BRIDGE_UDP_IP}
+      MINIO_ENDPOINT: "minio:${MINIO_PORT}"
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BRIDGE_PORT: ${MINIO_BRIDGE_PORT}
+    network_mode: "host"
   
   minio:
     image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/minio:latest
@@ -937,40 +937,46 @@ services:
     command: server /data --address ":${MINIO_PORT}" --console-address ":${MINIO_CONSOLE_PORT}"
 
   minio_bridge:
-      image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-minio_bridge:${MG_RELEASE_TAG}
-      container_name: magistrala-minio_bridge
-      depends_on:
-        - minio
-      logging:  
-        driver: "json-file"  
-        options:  
-          max-size: "10m"  
-          max-file: "3"
-      restart: on-failure
-      environment:
-        MINIO_ENDPOINT: "minio:${MINIO_PORT}"
-        MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
-        MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
-        MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
-        MINIO_BRIDGE_PORT: ${MINIO_BRIDGE_PORT} # 添加环境变量来配置端口
-      ports:
-        - "${MINIO_BRIDGE_PORT}:${MINIO_BRIDGE_PORT}" # 这里你也可以更改宿主机的端口，比如 "9090:8080"
-      networks:
-        - magistrala-base-net
+    image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/magistrala-minio_bridge:${MG_RELEASE_TAG}
+    container_name: magistrala-minio_bridge
+    depends_on:
+      - minio
+    logging:  
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
+    restart: on-failure
+    environment:
+      MINIO_ENDPOINT: "minio:${MINIO_PORT}"
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BRIDGE_PORT: ${MINIO_BRIDGE_PORT} # 添加环境变量来配置端口
+    ports:
+      - "${MINIO_BRIDGE_PORT}:${MINIO_BRIDGE_PORT}" # 这里你也可以更改宿主机的端口，比如 "9090:8080"
+    volumes:
+      - /dev:/dev
+      - /proc:/proc
+      - /run/udev:/run/udev
+      - magistrala-minio-data-volume:/data
+    privileged: true
+    networks:
+      - magistrala-base-net
 
   portainer:
     image: ${MG_DOCKER_IMAGE_ALIYUN_PREFIX}/${MG_DOCKER_IMAGE_USERNAME_PREFIX}/portainer-ce:latest
     container_name: magistrala-portainer
     logging:  
-        driver: "json-file"  
-        options:  
-          max-size: "10m"  
-          max-file: "3"
+      driver: "json-file"  
+      options:  
+        max-size: "10m"  
+        max-file: "3"
     restart: on-failure
     ports:
       - ${PORTAINER_PORT}:9000
     networks:
-        - magistrala-base-net
+      - magistrala-base-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - magistrala-portainer-data-volume:/data
