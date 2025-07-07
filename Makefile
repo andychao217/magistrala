@@ -4,6 +4,8 @@
 MG_DOCKER_IMAGE_ALIYUN_PREFIX ?= registry.cn-hangzhou.aliyuncs.com
 MG_DOCKER_IMAGE_USERNAME_PREFIX ?= andychao217
 MG_DOCKER_IMAGE_NAME_PREFIX ?= magistrala
+ALIYUN_DOCKER_PASSWORD ?= Andy986372
+ALIYUN_DOCKER_USERNAME ?= andychao217
 BUILD_DIR = build
 SERVICES = auth users things http coap ws mqtt invitations \
 	influxdb-writer influxdb-reader mongodb-writer mongodb-reader smtp-notifier smpp-notifier \
@@ -236,7 +238,7 @@ endif
 endif
 endif
 
-run: check_certs
+run: check_certs login
 	docker compose -f docker/docker-compose.yml --env-file docker/.env -p $(DOCKER_PROJECT) $(DOCKER_COMPOSE_COMMAND) $(args)
 
 run_addons: check_certs
@@ -244,3 +246,12 @@ run_addons: check_certs
 	@for SVC in $(RUN_ADDON_ARGS); do \
 		MG_ADDONS_CERTS_PATH_PREFIX="../."  docker compose -f docker/addons/$$SVC/docker-compose.yml -p $(DOCKER_PROJECT) --env-file ./docker/.env $(DOCKER_COMPOSE_COMMAND) $(args) & \
 	done
+
+login:
+	@if [ -n "$(ALIYUN_DOCKER_PASSWORD)" ]; then \
+		echo "Logging in to registry.cn-hangzhou.aliyuncs.com..."; \
+		echo "$(ALIYUN_DOCKER_PASSWORD)" | docker login -u "$(ALIYUN_DOCKER_USERNAME)" --password-stdin registry.cn-hangzhou.aliyuncs.com; \
+	else \
+		echo "Error: ALIYUN_DOCKER_PASSWORD environment variable not set"; \
+		exit 1; \
+	fi
