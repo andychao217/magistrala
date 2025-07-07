@@ -1,6 +1,6 @@
 #!/bin/bash
-cd /root/magistrala || exit 1
-make run
+cd /magistrala || exit 1
+make run DOCKER_PROJECT=magistrala
 
 # 赋予该脚本可执行权限
 # chmod +x ~/start_magistrala.sh
@@ -16,8 +16,8 @@ make run
 #
 # [Service]
 # Type=simple
-# ExecStart=/bin/bash /root/start_magistrala.sh
-# WorkingDirectory=/root/magistrala  # 替换为实际路径
+# ExecStart=/bin/bash /magistrala/docker/start_magistrala.sh
+# WorkingDirectory=/magistrala
 # Restart=on-failure
 #
 # [Install]
